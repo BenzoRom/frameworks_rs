@@ -90,7 +90,7 @@ public class ScriptGroup extends BaseObj {
     }
 
 
-    ScriptGroup(long id, RenderScript rs) {
+    ScriptGroup(int id, RenderScript rs) {
         super(id, rs);
     }
 
@@ -173,6 +173,8 @@ public class ScriptGroup extends BaseObj {
         private ArrayList<ConnectLine> mLines = new ArrayList<ConnectLine>();
         private int mKernelCount;
 
+        private ScriptGroupThunker.Builder mT;
+
         /**
          * Create a Builder for generating a ScriptGroup.
          *
@@ -180,6 +182,9 @@ public class ScriptGroup extends BaseObj {
          * @param rs The RenderScript context.
          */
         public Builder(RenderScript rs) {
+            if (rs.isNative) {
+                mT = new ScriptGroupThunker.Builder(rs);
+            }
             mRS = rs;
         }
 
@@ -281,6 +286,11 @@ public class ScriptGroup extends BaseObj {
          * @return Builder Returns this.
          */
         public Builder addKernel(Script.KernelID k) {
+            if (mT != null) {
+                mT.addKernel(k);
+                return this;
+            }
+
             if (mLines.size() != 0) {
                 throw new RSInvalidStateException(
                     "Kernels may not be added once connections exist.");
@@ -316,6 +326,12 @@ public class ScriptGroup extends BaseObj {
          */
         public Builder addConnection(Type t, Script.KernelID from, Script.FieldID to) {
             //android.util.Log.v("RSR", "addConnection " + t +", " + from + ", " + to);
+
+            if (mT != null) {
+                mT.addConnection(t, from, to);
+                return this;
+            }
+
             Node nf = findNode(from);
             if (nf == null) {
                 throw new RSInvalidStateException("From script not found.");
@@ -350,6 +366,12 @@ public class ScriptGroup extends BaseObj {
          */
         public Builder addConnection(Type t, Script.KernelID from, Script.KernelID to) {
             //android.util.Log.v("RSR", "addConnection " + t +", " + from + ", " + to);
+
+            if (mT != null) {
+                mT.addConnection(t, from, to);
+                return this;
+            }
+
             Node nf = findNode(from);
             if (nf == null) {
                 throw new RSInvalidStateException("From script not found.");
@@ -380,6 +402,10 @@ public class ScriptGroup extends BaseObj {
          */
         public ScriptGroup create() {
 
+            if (mT != null) {
+                return mT.create();
+            }
+
             if (mNodes.size() == 0) {
                 throw new RSInvalidStateException("Empty script groups are not allowed");
             }
@@ -393,7 +419,7 @@ public class ScriptGroup extends BaseObj {
             ArrayList<IO> inputs = new ArrayList<IO>();
             ArrayList<IO> outputs = new ArrayList<IO>();
 
-            long[] kernels = new long[mKernelCount];
+            int[] kernels = new int[mKernelCount];
             int idx = 0;
             for (int ct=0; ct < mNodes.size(); ct++) {
                 Node n = mNodes.get(ct);
@@ -426,10 +452,10 @@ public class ScriptGroup extends BaseObj {
                 throw new RSRuntimeException("Count mismatch, should not happen.");
             }
 
-            long[] src = new long[mLines.size()];
-            long[] dstk = new long[mLines.size()];
-            long[] dstf = new long[mLines.size()];
-            long[] types = new long[mLines.size()];
+            int[] src = new int[mLines.size()];
+            int[] dstk = new int[mLines.size()];
+            int[] dstf = new int[mLines.size()];
+            int[] types = new int[mLines.size()];
 
             for (int ct=0; ct < mLines.size(); ct++) {
                 ConnectLine cl = mLines.get(ct);
@@ -443,7 +469,7 @@ public class ScriptGroup extends BaseObj {
                 types[ct] = cl.mAllocationType.getID(mRS);
             }
 
-            long id = mRS.nScriptGroupCreate(kernels, src, dstk, dstf, types);
+            int id = mRS.nScriptGroupCreate(kernels, src, dstk, dstf, types);
             if (id == 0) {
                 throw new RSRuntimeException("Object creation error, should not happen.");
             }

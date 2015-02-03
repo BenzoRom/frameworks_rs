@@ -159,7 +159,7 @@ public class Allocation extends BaseObj {
     }
 
 
-    private long getIDSafe() {
+    private int getIDSafe() {
         if (mAdaptedAllocation != null) {
             return mAdaptedAllocation.getID(mRS);
         }
@@ -218,7 +218,7 @@ public class Allocation extends BaseObj {
         mBitmap = b;
     }
 
-    Allocation(long id, RenderScript rs, Type t, int usage) {
+    Allocation(int id, RenderScript rs, Type t, int usage) {
         super(id, rs);
         if ((usage & ~(USAGE_SCRIPT |
                        USAGE_GRAPHICS_TEXTURE |
@@ -262,14 +262,6 @@ public class Allocation extends BaseObj {
         super.finalize();
     }
 
-    private void validateIsInt64() {
-        if ((mType.mElement.mType == Element.DataType.SIGNED_64) ||
-            (mType.mElement.mType == Element.DataType.UNSIGNED_64)) {
-            return;
-        }
-        throw new RSIllegalArgumentException(
-            "64 bit integer source does not match allocation type " + mType.mElement.mType);
-    }
 
     private void validateIsInt32() {
         if ((mType.mElement.mType == Element.DataType.SIGNED_32) ||
@@ -395,20 +387,11 @@ public class Allocation extends BaseObj {
             throw new RSIllegalArgumentException("Array size mismatch, allocation sizeX = " +
                                                  mCurrentCount + ", array length = " + d.length);
         }
-
-        if (RenderScript.sPointerSize == 8) {
-            long i[] = new long[d.length * 4];
-            for (int ct=0; ct < d.length; ct++) {
-                i[ct * 4] = d[ct].getID(mRS);
-            }
-            copy1DRangeFromUnchecked(0, mCurrentCount, i);
-        } else {
-            int i[] = new int[d.length];
-            for (int ct=0; ct < d.length; ct++) {
-                i[ct] = (int)d[ct].getID(mRS);
-            }
-            copy1DRangeFromUnchecked(0, mCurrentCount, i);
+        int i[] = new int[d.length];
+        for (int ct=0; ct < d.length; ct++) {
+            i[ct] = d[ct].getID(mRS);
         }
+        copy1DRangeFromUnchecked(0, mCurrentCount, i);
     }
 
     private void validateBitmapFormat(Bitmap b) {
@@ -740,19 +723,6 @@ public class Allocation extends BaseObj {
      * @param count The number of elements to be copied.
      * @param d the source data array
      */
-    public void copy1DRangeFromUnchecked(int off, int count, long[] d) {
-        int dataSize = mType.mElement.getBytesSize() * count;
-        data1DChecks(off, count, d.length * 8, dataSize);
-        mRS.nAllocationData1D(getIDSafe(), off, mSelectedLOD, count, d, dataSize);
-    }
-    /**
-     * Copy an array into part of this Allocation.  This method does not
-     * guarantee that the Allocation is compatible with the input buffer.
-     *
-     * @param off The offset of the first element to be copied.
-     * @param count The number of elements to be copied.
-     * @param d the source data array
-     */
     public void copy1DRangeFromUnchecked(int off, int count, int[] d) {
         int dataSize = mType.mElement.getBytesSize() * count;
         data1DChecks(off, count, d.length * 4, dataSize);
@@ -796,20 +766,6 @@ public class Allocation extends BaseObj {
         int dataSize = mType.mElement.getBytesSize() * count;
         data1DChecks(off, count, d.length * 4, dataSize);
         mRS.nAllocationData1D(getIDSafe(), off, mSelectedLOD, count, d, dataSize);
-    }
-
-    /**
-     * Copy an array into part of this Allocation.  This variant is type checked
-     * and will generate exceptions if the Allocation type is not a 32 bit
-     * integer type.
-     *
-     * @param off The offset of the first element to be copied.
-     * @param count The number of elements to be copied.
-     * @param d the source data array
-     */
-    public void copy1DRangeFrom(int off, int count, long[] d) {
-        validateIsInt64();
-        copy1DRangeFromUnchecked(off, count, d);
     }
 
     /**
@@ -915,13 +871,6 @@ public class Allocation extends BaseObj {
                               w, h, data, data.length * 2);
     }
 
-    void copy2DRangeFromUnchecked(int xoff, int yoff, int w, int h, long[] data) {
-        mRS.validate();
-        validate2DRange(xoff, yoff, w, h);
-        mRS.nAllocationData2D(getIDSafe(), xoff, yoff, mSelectedLOD, mSelectedFace.mID,
-                              w, h, data, data.length * 8);
-    }
-
     void copy2DRangeFromUnchecked(int xoff, int yoff, int w, int h, int[] data) {
         mRS.validate();
         validate2DRange(xoff, yoff, w, h);
@@ -964,21 +913,6 @@ public class Allocation extends BaseObj {
      */
     public void copy2DRangeFrom(int xoff, int yoff, int w, int h, short[] data) {
         validateIsInt16();
-        copy2DRangeFromUnchecked(xoff, yoff, w, h, data);
-    }
-
-    /**
-     * Copy from an array into a rectangular region in this Allocation.  The
-     * array is assumed to be tightly packed.
-     *
-     * @param xoff X offset of the region to update in this Allocation
-     * @param yoff Y offset of the region to update in this Allocation
-     * @param w Width of the region to update
-     * @param h Height of the region to update
-     * @param data to be placed into the Allocation
-     */
-    public void copy2DRangeFrom(int xoff, int yoff, int w, int h, long[] data) {
-        validateIsInt64();
         copy2DRangeFromUnchecked(xoff, yoff, w, h, data);
     }
 
@@ -1100,17 +1034,6 @@ public class Allocation extends BaseObj {
      * @hide
      *
      */
-    void copy3DRangeFromUnchecked(int xoff, int yoff, int zoff, int w, int h, int d, long[] data) {
-        mRS.validate();
-        validate3DRange(xoff, yoff, zoff, w, h, d);
-        mRS.nAllocationData3D(getIDSafe(), xoff, yoff, zoff, mSelectedLOD,
-                              w, h, d, data, data.length * 8);
-    }
-
-    /**
-     * @hide
-     *
-     */
     void copy3DRangeFromUnchecked(int xoff, int yoff, int zoff, int w, int h, int d, int[] data) {
         mRS.validate();
         validate3DRange(xoff, yoff, zoff, w, h, d);
@@ -1154,15 +1077,6 @@ public class Allocation extends BaseObj {
      */
     public void copy3DRangeFrom(int xoff, int yoff, int zoff, int w, int h, int d, short[] data) {
         validateIsInt16();
-        copy3DRangeFromUnchecked(xoff, yoff, zoff, w, h, d, data);
-    }
-
-    /**
-     * @hide
-     *
-     */
-    public void copy3DRangeFrom(int xoff, int yoff, int zoff, int w, int h, int d, long[] data) {
-        validateIsInt64();
         copy3DRangeFromUnchecked(xoff, yoff, zoff, w, h, d, data);
     }
 
@@ -1256,19 +1170,6 @@ public class Allocation extends BaseObj {
      *
      * @param d The array to be set from the Allocation.
      */
-    public void copyTo(long[] d) {
-        validateIsInt64();
-        mRS.validate();
-        mRS.nAllocationRead(getID(mRS), d);
-    }
-
-    /**
-     * Copy from the Allocation into a int array.  The array must be at least as
-     * large as the Allocation.  The allocation must be of an 32 bit integer
-     * {@link android.support.v8.renderscript.Element} type.
-     *
-     * @param d The array to be set from the Allocation.
-     */
     public void copyTo(int[] d) {
         validateIsInt32();
         mRS.validate();
@@ -1306,16 +1207,15 @@ public class Allocation extends BaseObj {
      *              utilized
      */
     static public Allocation createTyped(RenderScript rs, Type type, MipmapControl mips, int usage) {
+        if (rs.isNative) {
+            RenderScriptThunker rst = (RenderScriptThunker)rs;
+            return AllocationThunker.createTyped(rst, type, mips, usage);
+        }
         rs.validate();
         if (type.getID(rs) == 0) {
             throw new RSInvalidStateException("Bad Type");
         }
-
-        if(!rs.usingIO() && (usage & (USAGE_IO_INPUT | USAGE_IO_INPUT)) != 0) {
-            throw new RSRuntimeException("USAGE_IO not supported, Allocation creation failed.");
-        }
-
-        long id = rs.nAllocationCreateTyped(type.getID(rs), mips.mID, usage, 0);
+        int id = rs.nAllocationCreateTyped(type.getID(rs), mips.mID, usage, 0);
         if (id == 0) {
             throw new RSRuntimeException("Allocation creation failed.");
         }
@@ -1363,12 +1263,16 @@ public class Allocation extends BaseObj {
      */
     static public Allocation createSized(RenderScript rs, Element e,
                                          int count, int usage) {
+        if (rs.isNative) {
+            RenderScriptThunker rst = (RenderScriptThunker)rs;
+            return AllocationThunker.createSized(rs, e, count, usage);
+        }
         rs.validate();
         Type.Builder b = new Type.Builder(rs, e);
         b.setX(count);
         Type t = b.create();
 
-        long id = rs.nAllocationCreateTyped(t.getID(rs), MipmapControl.MIPMAP_NONE.mID, usage, 0);
+        int id = rs.nAllocationCreateTyped(t.getID(rs), MipmapControl.MIPMAP_NONE.mID, usage, 0);
         if (id == 0) {
             throw new RSRuntimeException("Allocation creation failed.");
         }
@@ -1431,6 +1335,10 @@ public class Allocation extends BaseObj {
     static public Allocation createFromBitmap(RenderScript rs, Bitmap b,
                                               MipmapControl mips,
                                               int usage) {
+        if (rs.isNative) {
+            RenderScriptThunker rst = (RenderScriptThunker)rs;
+            return AllocationThunker.createFromBitmap(rst, b, mips, usage);
+        }
         rs.validate();
 
         // WAR undocumented color formats
@@ -1450,7 +1358,7 @@ public class Allocation extends BaseObj {
         if (mips == MipmapControl.MIPMAP_NONE &&
             t.getElement().isCompatible(Element.RGBA_8888(rs)) &&
             usage == (USAGE_SHARED | USAGE_SCRIPT | USAGE_GRAPHICS_TEXTURE)) {
-            long id = rs.nAllocationCreateBitmapBackedAllocation(t.getID(rs), mips.mID, b, usage);
+            int id = rs.nAllocationCreateBitmapBackedAllocation(t.getID(rs), mips.mID, b, usage);
             if (id == 0) {
                 throw new RSRuntimeException("Load failed.");
             }
@@ -1462,25 +1370,11 @@ public class Allocation extends BaseObj {
         }
 
 
-        long id = rs.nAllocationCreateFromBitmap(t.getID(rs), mips.mID, b, usage);
+        int id = rs.nAllocationCreateFromBitmap(t.getID(rs), mips.mID, b, usage);
         if (id == 0) {
             throw new RSRuntimeException("Load failed.");
         }
         return new Allocation(id, rs, t, usage);
-    }
-
-    /**
-     * Associate a {@link android.view.Surface} with this Allocation. This
-     * operation is only valid for Allocations with {@link #USAGE_IO_OUTPUT}.
-     *
-     * @param sur Surface to associate with allocation
-     */
-    public void setSurface(Surface sur) {
-        mRS.validate();
-        if ((mUsage & USAGE_IO_OUTPUT) == 0) {
-            throw new RSInvalidStateException("Allocation is not USAGE_IO_OUTPUT.");
-        }
-        mRS.nAllocationSetSurface(getID(mRS), sur);
     }
 
     /**
@@ -1542,7 +1436,7 @@ public class Allocation extends BaseObj {
         tb.setMipmaps(mips == MipmapControl.MIPMAP_FULL);
         Type t = tb.create();
 
-        long id = rs.nAllocationCubeCreateFromBitmap(t.getID(rs), mips.mID, b, usage);
+        int id = rs.nAllocationCubeCreateFromBitmap(t.getID(rs), mips.mID, b, usage);
         if(id == 0) {
             throw new RSRuntimeException("Load failed for bitmap " + b + " element " + e);
         }

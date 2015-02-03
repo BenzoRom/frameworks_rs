@@ -27,7 +27,7 @@ package android.support.v8.renderscript;
 public class ScriptIntrinsicYuvToRGB extends ScriptIntrinsic {
     private Allocation mInput;
 
-    ScriptIntrinsicYuvToRGB(long id, RenderScript rs) {
+    ScriptIntrinsicYuvToRGB(int id, RenderScript rs) {
         super(id, rs);
     }
 
@@ -42,8 +42,13 @@ public class ScriptIntrinsicYuvToRGB extends ScriptIntrinsic {
      * @return ScriptIntrinsicYuvToRGB
      */
     public static ScriptIntrinsicYuvToRGB create(RenderScript rs, Element e) {
+        if (rs.isNative) {
+            RenderScriptThunker rst = (RenderScriptThunker) rs;
+            return ScriptIntrinsicYuvToRGBThunker.create(rs, e);
+        }
+
         // 6 comes from RS_SCRIPT_INTRINSIC_YUV_TO_RGB in rsDefines.h
-        long id = rs.nScriptIntrinsicCreate(6, e.getID(rs));
+        int id = rs.nScriptIntrinsicCreate(6, e.getID(rs));
         ScriptIntrinsicYuvToRGB si = new ScriptIntrinsicYuvToRGB(id, rs);
         return si;
     }

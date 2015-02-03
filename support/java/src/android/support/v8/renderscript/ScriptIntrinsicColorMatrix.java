@@ -31,7 +31,7 @@ public class ScriptIntrinsicColorMatrix extends ScriptIntrinsic {
     private final Matrix4f mMatrix = new Matrix4f();
     private Allocation mInput;
 
-    protected ScriptIntrinsicColorMatrix(long id, RenderScript rs) {
+    protected ScriptIntrinsicColorMatrix(int id, RenderScript rs) {
         super(id, rs);
     }
 
@@ -47,10 +47,15 @@ public class ScriptIntrinsicColorMatrix extends ScriptIntrinsic {
      * @return ScriptIntrinsicColorMatrix
      */
     public static ScriptIntrinsicColorMatrix create(RenderScript rs, Element e) {
+        if (rs.isNative) {
+            RenderScriptThunker rst = (RenderScriptThunker) rs;
+            return ScriptIntrinsicColorMatrixThunker.create(rs, e);
+        }
+
         if (!e.isCompatible(Element.U8_4(rs))) {
             throw new RSIllegalArgumentException("Unsuported element type.");
         }
-        long id = rs.nScriptIntrinsicCreate(2, e.getID(rs));
+        int id = rs.nScriptIntrinsicCreate(2, e.getID(rs));
         return new ScriptIntrinsicColorMatrix(id, rs);
 
     }
