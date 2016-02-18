@@ -173,7 +173,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
         const int yWidth = mAlloc[idx]->mHal.drvState.lod[0].dimX;
         const int yHeight = mAlloc[idx]->mHal.drvState.lod[0].dimY;
 
-        if (mSlots[buf].mGraphicBuffer->getPixelFormat() ==
+        if (mSlots[slot].mGraphicBuffer->getPixelFormat() ==
                 HAL_PIXEL_FORMAT_YCbCr_420_888) {
             const int cWidth = yWidth / 2;
             const int cHeight = yHeight / 2;
@@ -194,7 +194,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
             mAlloc[idx]->mHal.drvState.yuv.shift = 1;
             mAlloc[idx]->mHal.drvState.yuv.step = ycbcr.chroma_step;
             mAlloc[idx]->mHal.drvState.lodCount = 3;
-        } else if (mSlots[buf].mGraphicBuffer->getPixelFormat() ==
+        } else if (mSlots[slot].mGraphicBuffer->getPixelFormat() ==
                        HAL_PIXEL_FORMAT_YV12) {
             // For YV12, the data layout is Y, followed by Cr, followed by Cb;
             // for YCbCr_420_888, it's Y, followed by Cb, followed by Cr.
@@ -227,7 +227,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
             mAlloc[idx]->mHal.drvState.lodCount = 3;
         } else {
             ALOGD("Unrecognized format: %d",
-               mSlots[buf].mGraphicBuffer->getPixelFormat());
+               mSlots[slot].mGraphicBuffer->getPixelFormat());
         }
     }
 
