@@ -97,7 +97,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
         }
     }
 
-    int buf = b.mBuf;
+    int slot = b.mSlot;
 
     if (b.mFence.get()) {
         err = b.mFence->waitForever("GrallocConsumer::lockNextBuffer");
@@ -111,9 +111,9 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
     void *bufferPointer = nullptr;
     android_ycbcr ycbcr = android_ycbcr();
 
-    if (mSlots[buf].mGraphicBuffer->getPixelFormat() ==
+    if (mSlots[slot].mGraphicBuffer->getPixelFormat() ==
             HAL_PIXEL_FORMAT_YCbCr_420_888) {
-        err = mSlots[buf].mGraphicBuffer->lockYCbCr(
+        err = mSlots[slot].mGraphicBuffer->lockYCbCr(
             GraphicBuffer::USAGE_SW_READ_OFTEN,
             b.mCrop,
             &ycbcr);
@@ -125,7 +125,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
         }
         bufferPointer = ycbcr.y;
     } else {
-        err = mSlots[buf].mGraphicBuffer->lock(
+        err = mSlots[slot].mGraphicBuffer->lock(
             GraphicBuffer::USAGE_SW_READ_OFTEN,
             b.mCrop,
             &bufferPointer);
@@ -140,20 +140,20 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
     size_t lockedIdx = 0;
     rsAssert(mAcquiredBuffer[idx].mSlot == BufferQueue::INVALID_BUFFER_SLOT);
 
-    mAcquiredBuffer[idx].mSlot = buf;
+    mAcquiredBuffer[idx].mSlot = slot;
     mAcquiredBuffer[idx].mBufferPointer = bufferPointer;
-    mAcquiredBuffer[idx].mGraphicBuffer = mSlots[buf].mGraphicBuffer;
+    mAcquiredBuffer[idx].mGraphicBuffer = mSlots[slot].mGraphicBuffer;
 
     mAlloc[idx]->mHal.drvState.lod[0].mallocPtr = reinterpret_cast<uint8_t*>(bufferPointer);
-    mAlloc[idx]->mHal.drvState.lod[0].stride = mSlots[buf].mGraphicBuffer->getStride() *
+    mAlloc[idx]->mHal.drvState.lod[0].stride = mSlots[slot].mGraphicBuffer->getStride() *
             mAlloc[idx]->mHal.state.type->getElementSizeBytes();
     mAlloc[idx]->mHal.state.nativeBuffer = mAcquiredBuffer[idx].mGraphicBuffer->getNativeBuffer();
     mAlloc[idx]->mHal.state.timestamp = b.mTimestamp;
 
     rsAssert(mAlloc[idx]->mHal.drvState.lod[0].dimX ==
-             mSlots[buf].mGraphicBuffer->getWidth());
+             mSlots[slot].mGraphicBuffer->getWidth());
     rsAssert(mAlloc[idx]->mHal.drvState.lod[0].dimY ==
-             mSlots[buf].mGraphicBuffer->getHeight());
+             mSlots[slot].mGraphicBuffer->getHeight());
 
     //mAlloc->format = mSlots[buf].mGraphicBuffer->getPixelFormat();
 
@@ -173,7 +173,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
         const int yWidth = mAlloc[idx]->mHal.drvState.lod[0].dimX;
         const int yHeight = mAlloc[idx]->mHal.drvState.lod[0].dimY;
 
-        if (mSlots[buf].mGraphicBuffer->getPixelFormat() ==
+        if (mSlots[slot].mGraphicBuffer->getPixelFormat() ==
                 HAL_PIXEL_FORMAT_YCbCr_420_888) {
             const int cWidth = yWidth / 2;
             const int cHeight = yHeight / 2;
@@ -194,7 +194,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
             mAlloc[idx]->mHal.drvState.yuv.shift = 1;
             mAlloc[idx]->mHal.drvState.yuv.step = ycbcr.chroma_step;
             mAlloc[idx]->mHal.drvState.lodCount = 3;
-        } else if (mSlots[buf].mGraphicBuffer->getPixelFormat() ==
+        } else if (mSlots[slot].mGraphicBuffer->getPixelFormat() ==
                        HAL_PIXEL_FORMAT_YV12) {
             // For YV12, the data layout is Y, followed by Cr, followed by Cb;
             // for YCbCr_420_888, it's Y, followed by Cb, followed by Cr.
@@ -227,7 +227,7 @@ status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
             mAlloc[idx]->mHal.drvState.lodCount = 3;
         } else {
             ALOGD("Unrecognized format: %d",
-               mSlots[buf].mGraphicBuffer->getPixelFormat());
+               mSlots[slot].mGraphicBuffer->getPixelFormat());
         }
     }
 
