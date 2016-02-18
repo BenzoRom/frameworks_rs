@@ -169,9 +169,10 @@ arg: void* ptr
 test: none
 end:
 
+# Bug: 24862914: Add f16 to all functions below once the bug is fixed
 function: rsCreateAllocation_#1
 version: UNRELEASED
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 arg: uint32_t dimY
@@ -186,7 +187,7 @@ end:
 function: rsCreateAllocation_#2#1
 version: UNRELEASED
 w: 2, 3, 4
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 arg: uint32_t dimY
@@ -200,7 +201,7 @@ end:
 
 function: rsCreateAllocation_#1
 version: UNRELEASED
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 arg: uint32_t dimY
@@ -214,7 +215,7 @@ end:
 function: rsCreateAllocation_#2#1
 version: UNRELEASED
 w: 2, 3, 4
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 arg: uint32_t dimY
@@ -227,7 +228,7 @@ end:
 
 function: rsCreateAllocation_#1
 version: UNRELEASED
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 inline:
@@ -240,7 +241,7 @@ end:
 function: rsCreateAllocation_#2#1
 version: UNRELEASED
 w: 2, 3, 4
-t: u8, u16, u32, u64, i8, i16, i32, i64, f16, f32, f64
+t: u8, u16, u32, u64, i8, i16, i32, i64, f32, f64
 ret: rs_allocation
 arg: uint32_t dimX
 inline:
