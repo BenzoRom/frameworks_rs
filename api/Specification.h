@@ -262,11 +262,13 @@ private:
     Constant* mConstant;  // Not owned
 
     std::string mValue;  // E.g. "3.1415"
+    std::string mType;
 public:
     ConstantSpecification(Constant* constant) : mConstant(constant) {}
 
     Constant* getConstant() const { return mConstant; }
     std::string getValue() const { return mValue; }
+    std::string getType() const { return mType; }
 
     // Parse a constant specification and add it to specFile.
     static void scanConstantSpecification(Scanner* scanner, SpecFile* specFile, unsigned int maxApiLevel);
