@@ -195,8 +195,9 @@ void Allocation::data(Context *rsc, uint32_t xoff, uint32_t lod,
 
     if ((count * eSize) != sizeBytes) {
         char buf[1024];
-        sprintf(buf, "Allocation::subData called with mismatched size expected %zu, got %zu",
-                (count * eSize), sizeBytes);
+        snprintf(buf, sizeof(buf),
+                 "Allocation::subData called with mismatched size expected %zu, got %zu",
+                 (count * eSize), sizeBytes);
         rsc->setError(RS_ERROR_BAD_VALUE, buf);
         mHal.state.type->dumpLOGV("type info");
         return;
@@ -225,8 +226,9 @@ void Allocation::read(Context *rsc, uint32_t xoff, uint32_t lod,
 
     if ((count * eSize) != sizeBytes) {
         char buf[1024];
-        sprintf(buf, "Allocation::read called with mismatched size expected %zu, got %zu",
-                (count * eSize), sizeBytes);
+        snprintf(buf, sizeof(buf),
+                 "Allocation::read called with mismatched size expected %zu, got %zu",
+                 (count * eSize), sizeBytes);
         rsc->setError(RS_ERROR_BAD_VALUE, buf);
         mHal.state.type->dumpLOGV("type info");
         return;
@@ -244,7 +246,8 @@ void Allocation::read(Context *rsc, uint32_t xoff, uint32_t yoff, uint32_t lod, 
     } else {
         if ((lineSize * h) != sizeBytes) {
             char buf[1024];
-            sprintf(buf, "Allocation size mismatch, expected %zu, got %zu", (lineSize * h), sizeBytes);
+            snprintf(buf, sizeof(buf), "Allocation size mismatch, expected %zu, got %zu",
+                     (lineSize * h), sizeBytes);
             rsc->setError(RS_ERROR_BAD_VALUE, buf);
             return;
         }
@@ -353,7 +356,7 @@ void Allocation::dumpLOGV(const char *prefix) const {
     char buf[1024];
 
     if ((strlen(prefix) + 10) < sizeof(buf)) {
-        sprintf(buf, "%s type ", prefix);
+        snprintf(buf, sizeof(buf), "%s type ", prefix);
         if (mHal.state.type) {
             mHal.state.type->dumpLOGV(buf);
         }
