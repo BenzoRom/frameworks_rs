@@ -227,7 +227,8 @@ static uint32_t getProp(const char *str) {
 void Context::displayDebugStats() {
 #ifndef RS_COMPATIBILITY_LIB
     char buffer[128];
-    sprintf(buffer, "Avg fps %u, Frame %i ms, Script %i ms", mAverageFPS, mTimeMSLastFrame, mTimeMSLastScript);
+    snprintf(buffer, sizeof(buffer), "Avg fps %u, Frame %i ms, Script %i ms",
+             mAverageFPS, mTimeMSLastFrame, mTimeMSLastScript);
     float oldR, oldG, oldB, oldA;
     mStateFont.getFontColor(&oldR, &oldG, &oldB, &oldA);
     uint32_t bufferLen = strlen(buffer);
