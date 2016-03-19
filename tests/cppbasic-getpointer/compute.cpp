@@ -45,9 +45,9 @@ int test_compute()
     uint32_t *output = (uint32_t*)aout->getPointer(&outputStride);
 
     printf("Input pointer: %p\n", input);
-    printf("Input stride: %u\n", inputStride);
+    printf("Input stride: %zu\n", inputStride);
     printf("Output pointer: %p\n", output);
-    printf("Output stride: %u\n", outputStride);
+    printf("Output stride: %zu\n", outputStride);
 
     inputStride /= sizeof(uint32_t);
     outputStride /= sizeof(uint32_t);
@@ -76,7 +76,7 @@ int test_compute()
     for (size_t i = 0; i < DIMY; i++) {
         for (size_t j = 0; j < DIMX; j++) {
             if (input[i * inputStride + j] != ~(output[i * inputStride + j])) {
-                printf("Mismatch at location %u, %u\n", j, i);
+                printf("Mismatch at location %zu, %zu\n", j, i);
                 failed = true;
                 return failed;
             }

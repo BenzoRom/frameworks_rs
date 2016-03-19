@@ -11,7 +11,7 @@ LOCAL_SRC_FILES:= \
 LOCAL_STATIC_LIBRARIES := \
 	libRScpp_static
 
-LOCAL_CFLAGS := -std=c++11
+LOCAL_CFLAGS := -std=c++11 -Werror
 LOCAL_LDFLAGS += -llog -ldl
 
 LOCAL_MODULE:= rstest-cppallocation
