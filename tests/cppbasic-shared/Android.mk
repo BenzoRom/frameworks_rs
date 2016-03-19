@@ -15,7 +15,7 @@ LOCAL_MODULE_TAGS := tests
 
 intermediates := $(call intermediates-dir-for,STATIC_LIBRARIES,libRS,TARGET,)
 
-LOCAL_CFLAGS := -std=c++11
+LOCAL_CFLAGS := -std=c++11 -Werror
 
 LOCAL_C_INCLUDES += frameworks/rs/cpp
 LOCAL_C_INCLUDES += frameworks/rs
