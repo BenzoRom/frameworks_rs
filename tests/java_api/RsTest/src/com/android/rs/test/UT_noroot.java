@@ -52,6 +52,9 @@ public class UT_noroot extends UnitTest {
         s.invoke_noroot_test();
         pRS.finish();
         waitForMessage();
+        A.getType().destroy();
+        A.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

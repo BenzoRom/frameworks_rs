@@ -86,6 +86,7 @@ public class UT_array_init extends UnitTest {
         s.invoke_array_init_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
         passTest();
     }

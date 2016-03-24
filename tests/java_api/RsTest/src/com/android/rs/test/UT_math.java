@@ -32,6 +32,7 @@ public class UT_math extends UnitTest {
         s.invoke_math_test(0, 0);
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -848,6 +848,7 @@ public class UT_reduce extends UnitTest {
         inputAllocation.destroy();
         outputAllocation.destroy();
 
+        scriptHsg.destroy();
         return outputArray;
     }
 
@@ -1487,6 +1488,7 @@ public class UT_reduce extends UnitTest {
         // pass &= runPerformanceQuick(pRS, s);
 
         pRS.finish();
+        s.destroy();
         pRS.destroy();
 
         Log.i(TAG, pass ? "PASSED" : "FAILED");

@@ -23,6 +23,7 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
 public class UT_ctxt_default extends UnitTest {
+    private Type T;
     private Allocation A;
     private Allocation B;
 
@@ -36,9 +37,10 @@ public class UT_ctxt_default extends UnitTest {
         s.set_gDimX(X);
         typeBuilder.setX(X);
 
-        A = Allocation.createTyped(RS, typeBuilder.create());
+        T = typeBuilder.create();
+        A = Allocation.createTyped(RS, T);
         s.set_A(A);
-        B = Allocation.createTyped(RS, typeBuilder.create());
+        B = Allocation.createTyped(RS, T);
         s.set_B(B);
         return;
     }
@@ -54,6 +56,10 @@ public class UT_ctxt_default extends UnitTest {
         s.invoke_kernel_test();
         pRS.finish();
         waitForMessage();
+        T.destroy();
+        A.destroy();
+        B.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

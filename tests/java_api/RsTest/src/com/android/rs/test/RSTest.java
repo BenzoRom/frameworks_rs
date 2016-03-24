@@ -19,6 +19,11 @@ package com.android.rs.test;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.renderscript.RenderScript;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.os.StrictMode;
+import android.provider.Settings.System;
 import android.util.Log;
 
 public class RSTest extends ListActivity {
@@ -33,6 +38,12 @@ public class RSTest extends ListActivity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
+
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                               .detectLeakedClosableObjects()
+                               .penaltyLog()
+                               .build());
+
         mRS = RenderScript.create(this);
 
         RSTC = new RSTestCore(this);

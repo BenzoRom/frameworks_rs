@@ -23,6 +23,8 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
 public class UT_refcount extends UnitTest {
+    private Type mT;
+    private Allocation mA;
 
     protected UT_refcount(RSTestCore rstc, Context ctx) {
         super(rstc, "Refcount", ctx);
@@ -33,8 +35,9 @@ public class UT_refcount extends UnitTest {
         int X = 500;
         int Y = 700;
         typeBuilder.setX(X).setY(Y);
-        Allocation A = Allocation.createTyped(RS, typeBuilder.create());
-        s.set_globalA(A);
+        mT = typeBuilder.create();
+        mA = Allocation.createTyped(RS, mT);
+        s.set_globalA(mA);
     }
 
     public void run() {
@@ -45,6 +48,9 @@ public class UT_refcount extends UnitTest {
         s.invoke_refcount_test();
         pRS.finish();
         waitForMessage();
+        mA.destroy();
+        mT.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -54,6 +54,9 @@ public class UT_foreach extends UnitTest {
         s.invoke_foreach_test();
         pRS.finish();
         waitForMessage();
+        A.getType().destroy();
+        A.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }
