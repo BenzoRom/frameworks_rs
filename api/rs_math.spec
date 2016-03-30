@@ -51,6 +51,7 @@ end:
 # TODO Add f16 versions of these constants.
 constant: M_1_PI
 value: 0.318309886183790671537767526745028724f
+type: float
 summary: 1 / pi, as a 32 bit float
 description:
  The inverse of pi, as a 32 bit float.
@@ -58,6 +59,7 @@ end:
 
 constant: M_2_PI
 value: 0.636619772367581343075535053490057448f
+type: float
 summary: 2 / pi, as a 32 bit float
 description:
  2 divided by pi, as a 32 bit float.
@@ -65,6 +67,7 @@ end:
 
 constant: M_2_PIl
 value: 0.636619772367581343075535053490057448f
+type: float
 hidden:
 deprecated: 22, Use M_2_PI instead.
 summary: 2 / pi, as a 32 bit float
@@ -74,6 +77,7 @@ end:
 
 constant: M_2_SQRTPI
 value: 1.128379167095512573896158903121545172f
+type: float
 summary:  2 / sqrt(pi), as a 32 bit float
 description:
  2 divided by the square root of pi, as a 32 bit float.
@@ -81,6 +85,7 @@ end:
 
 constant: M_E
 value: 2.718281828459045235360287471352662498f
+type: float
 summary: e, as a 32 bit float
 description:
  The number e, the base of the natural logarithm, as a 32 bit float.
@@ -88,6 +93,7 @@ end:
 
 constant: M_LN10
 value: 2.302585092994045684017991454684364208f
+type: float
 summary: log_e(10), as a 32 bit float
 description:
  The natural logarithm of 10, as a 32 bit float.
@@ -95,6 +101,7 @@ end:
 
 constant: M_LN2
 value: 0.693147180559945309417232121458176568f
+type: float
 summary: log_e(2), as a 32 bit float
 description:
  The natural logarithm of 2, as a 32 bit float.
@@ -102,6 +109,7 @@ end:
 
 constant: M_LOG10E
 value: 0.434294481903251827651128918916605082f
+type: float
 summary: log_10(e), as a 32 bit float
 description:
  The logarithm base 10 of e, as a 32 bit float.
@@ -109,6 +117,7 @@ end:
 
 constant: M_LOG2E
 value: 1.442695040888963407359924681001892137f
+type: float
 summary: log_2(e), as a 32 bit float
 description:
  The logarithm base 2 of e, as a 32 bit float.
@@ -116,6 +125,7 @@ end:
 
 constant: M_PI
 value: 3.141592653589793238462643383279502884f
+type: float
 summary: pi, as a 32 bit float
 description:
  The constant pi, as a 32 bit float.
@@ -123,6 +133,7 @@ end:
 
 constant: M_PI_2
 value: 1.570796326794896619231321691639751442f
+type: float
 summary: pi / 2, as a 32 bit float
 description:
  Pi divided by 2, as a 32 bit float.
@@ -130,6 +141,7 @@ end:
 
 constant: M_PI_4
 value: 0.785398163397448309615660845819875721f
+type: float
 summary: pi / 4, as a 32 bit float
 description:
  Pi divided by 4, as a 32 bit float.
@@ -137,6 +149,7 @@ end:
 
 constant: M_SQRT1_2
 value: 0.707106781186547524400844362104849039f
+type: float
 summary: 1 / sqrt(2), as a 32 bit float
 description:
  The inverse of the square root of 2, as a 32 bit float.
@@ -144,6 +157,7 @@ end:
 
 constant: M_SQRT2
 value: 1.414213562373095048801688724209698079f
+type: float
 summary: sqrt(2), as a 32 bit float
 description:
  The square root of 2, as a 32 bit float.

@@ -381,6 +381,9 @@ void ConstantSpecification::scanConstantSpecification(Scanner* scanner, SpecFile
     if (scanner->findTag("value:")) {
         spec->mValue = scanner->getValue();
     }
+    if (scanner->findTag("type:")) {
+        spec->mType = scanner->getValue();
+    }
     constant->scanDocumentationTags(scanner, created, specFile);
 
     scanner->findTag("end:");
