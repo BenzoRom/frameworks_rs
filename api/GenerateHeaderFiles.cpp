@@ -120,7 +120,13 @@ static void writeConstantSpecification(GeneratedFile* file, const ConstantSpecif
     const Constant* constant = spec.getConstant();
     VersionInfo info = spec.getVersionInfo();
     writeVersionGuardStart(file, info, constant->getFinalVersion());
-    *file << "#define " << constant->getName() << " " << spec.getValue() << "\n\n";
+
+    *file << "#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))\n";
+    *file << "extern const " << spec.getType() << " " << constant->getName() << ";\n";
+    *file << "#else\n";
+    *file << "#define " << constant->getName() << " " << spec.getValue() << "\n";
+    *file << "#endif\n\n";
+
     writeVersionGuardEnd(file, info);
 }
 
