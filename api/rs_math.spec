@@ -1822,9 +1822,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-# TODO Need range(-1,1) here similar to the float version?
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-1,1)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_acosh
@@ -1878,9 +1878,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-# TODO Need range(-1,1) here similar to the float version?
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-1,1)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_asin
@@ -1907,9 +1907,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-# TODO Need range(-1,1) here similar to the float version?
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-1,1)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_asinh
@@ -1963,9 +1963,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-# TODO Need range(-1,1) here similar to the float version?
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-1,1)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_atan
@@ -2145,8 +2145,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-314,314)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_cosh
@@ -2194,8 +2195,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-100,100)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_divide
@@ -2570,8 +2572,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-314,314)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_sincos
@@ -2596,8 +2599,9 @@ w: 1, 2, 3, 4
 t: f16
 ret: #2#1
 arg: #2#1 v
-arg: #2#1* cos
-test: none
+arg: #2#1* cos, range(-314,314)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_sinh
@@ -2645,8 +2649,9 @@ attrib: const
 w: 1, 2, 3, 4
 t: f16
 ret: #2#1
-arg: #2#1 v
-test: none
+arg: #2#1 v, range(-100,100)
+# Absolute error of 2^-11, i.e. 0.00048828125
+test: limited(0.00048828125)
 end:
 
 function: native_sqrt
