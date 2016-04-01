@@ -63,7 +63,7 @@ RS::~RS() {
             RS::dispatch->ContextDeinitToClient(mContext);
 
             void *res = nullptr;
-            int status = pthread_join(mMessageThreadId, &res);
+            pthread_join(mMessageThreadId, &res);
 
             RS::dispatch->ContextDestroy(mContext);
             mContext = nullptr;
