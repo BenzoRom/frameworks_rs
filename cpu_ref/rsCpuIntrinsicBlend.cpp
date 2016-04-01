@@ -112,8 +112,6 @@ extern void rsdIntrinsicBlendSub_K(void *dst, const void *src, uint32_t count8);
 void RsdCpuScriptIntrinsicBlend::kernel(const RsExpandKernelDriverInfo *info,
                                         uint32_t xstart, uint32_t xend,
                                         uint32_t outstep) {
-    RsdCpuScriptIntrinsicBlend *cp = (RsdCpuScriptIntrinsicBlend *)info->usr;
-
     // instep/outstep can be ignored--sizeof(uchar4) known at compile time
     uchar4 *out = (uchar4 *)info->outPtr[0];
     uchar4 *in = (uchar4 *)info->inPtr[0];
