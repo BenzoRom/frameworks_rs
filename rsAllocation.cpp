@@ -270,8 +270,6 @@ void Allocation::read(Context *rsc, uint32_t xoff, uint32_t yoff, uint32_t zoff,
 
 void Allocation::elementData(Context *rsc, uint32_t x, uint32_t y, uint32_t z,
                              const void *data, uint32_t cIdx, size_t sizeBytes) {
-    size_t eSize = mHal.state.elementSizeBytes;
-
     if (x >= mHal.drvState.lod[0].dimX) {
         rsc->setError(RS_ERROR_BAD_VALUE, "subElementData X offset out of range.");
         return;
@@ -305,8 +303,6 @@ void Allocation::elementData(Context *rsc, uint32_t x, uint32_t y, uint32_t z,
 
 void Allocation::elementRead(Context *rsc, uint32_t x, uint32_t y, uint32_t z,
                              void *data, uint32_t cIdx, size_t sizeBytes) {
-    size_t eSize = mHal.state.elementSizeBytes;
-
     if (x >= mHal.drvState.lod[0].dimX) {
         rsc->setError(RS_ERROR_BAD_VALUE, "subElementData X offset out of range.");
         return;
@@ -428,7 +424,6 @@ void Allocation::unpackVec3Allocation(Context *rsc, const void *data, size_t dat
 }
 
 void Allocation::packVec3Allocation(Context *rsc, OStream *stream) const {
-    uint32_t paddedBytes = getType()->getElement()->getSizeBytes();
     uint32_t unpaddedBytes = getType()->getElement()->getSizeBytesUnpadded();
     uint32_t numItems = mHal.state.type->getCellCount();
 

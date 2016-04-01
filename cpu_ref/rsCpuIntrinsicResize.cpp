@@ -652,7 +652,6 @@ void RsdCpuScriptIntrinsicResize::preLaunch(uint32_t slot,
     }
     const uint32_t srcHeight = mAlloc->mHal.drvState.lod[0].dimY;
     const uint32_t srcWidth = mAlloc->mHal.drvState.lod[0].dimX;
-    const size_t stride = mAlloc->mHal.drvState.lod[0].stride;
 
     //check the data type to determine F or U.
     if (mAlloc->getType()->getElement()->getType() == RS_TYPE_UNSIGNED_8) {

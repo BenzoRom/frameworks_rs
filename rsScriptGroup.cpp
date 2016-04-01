@@ -249,8 +249,6 @@ ScriptGroup * ScriptGroup::create(Context *rsc,
             if (l->mAlloc.get()) {
                 continue;
             }
-            const ScriptKernelID *k = l->mSource.get();
-
             Allocation * alloc = Allocation::createAllocation(rsc,
                     l->mType.get(), RS_ALLOCATION_USAGE_SCRIPT);
             l->mAlloc = alloc;
