@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2015 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.android.rs.refocus;
 
 import android.content.ContentResolver;
@@ -7,7 +23,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
-
+import com.android.rs.refocus.image.RangeInverseDepthTransform;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -18,8 +34,6 @@ import java.io.IOException;
  * while the color channel and depth channels are encoded as XMP data.
  * The class supports lazy initialization where the XMP meta data is loaded only when first
  * accessed.
- *
- * @author chernand@google.com (Carlos Hernandez)
  */
 public class RGBZ {
   public static final String TAG = "RGBZ";
@@ -41,11 +55,64 @@ public class RGBZ {
     if (preview == null) {
       throw new FileNotFoundException(uri.toString());
     }
-    this.depthImage = new DepthImage(context, uri);
-    this.depthBitmap = depthImage.getDepthBitmap();
-    this.bitmap = setAlphaChannel(preview, this.depthBitmap);
-    this.depthTransform = depthImage.getDepthTransform();
+    depthImage = DepthImage.createFromXMPMetadata(context, uri);
+    depthBitmap = depthImage.getDepthBitmap();
+    //MediaStoreSaver.savePNG(depthBitmap, "depthmap", "depthmap", context);
+    bitmap = setAlphaChannel(preview, depthBitmap);
+    depthTransform = depthImage.getDepthTransform();
   }
+
+  /**
+   * Creates an RGBZ from uris to an image and a depthmap.
+   *
+   * @param uriImage The uri name of the image
+   * @param uriDepthmap The uri name of the depthmap
+   * @throws FileNotFoundException if the RGBZ could not be read
+   */
+  public RGBZ(Uri uriImage, Uri uriDepthmap, ContentResolver contentResolver,
+              Context context) throws IOException {
+    preview = BitmapFactory.decodeStream(contentResolver.openInputStream(uriImage));
+    if (preview == null) {
+      throw new FileNotFoundException(uriImage.toString());
+    }
+    depthImage = DepthImage.createFromDepthmap(context, uriDepthmap);
+    depthBitmap = depthImage.getDepthBitmap();
+    bitmap = setAlphaChannel(preview, depthBitmap);
+    depthTransform = depthImage.getDepthTransform();
+  }
+
+
+    public RGBZ(Bitmap image, DepthImage depthImage) {
+        preview = image;
+        this.depthImage = depthImage;
+        depthBitmap = depthImage.getDepthBitmap();
+        bitmap = setAlphaChannel(preview, depthBitmap);
+        depthTransform = depthImage.getDepthTransform();
+    }
+
+    public static RGBZ createFromBitmapDepthmap(Uri uriImage, Uri uriDepthmap,
+                                                ContentResolver contentResolver, Context context)
+            throws IOException {
+        Bitmap image = BitmapFactory.decodeStream(contentResolver.openInputStream(uriImage));
+        if (image == null) {
+            throw new FileNotFoundException(uriImage.toString());
+        }
+        DepthImage depthImage = DepthImage.createFromDepthmap(context, uriDepthmap);
+        return new RGBZ(image, depthImage);
+    }
+
+    public static RGBZ createFromPFMDepthmap(Uri uriImage, Uri uriDepthmap,
+                                             ContentResolver contentResolver, Context context)
+            throws IOException {
+        Bitmap image = BitmapFactory.decodeStream(contentResolver.openInputStream(uriImage));
+        if (image == null) {
+            throw new FileNotFoundException(uriImage.toString());
+        }
+        DepthImage depthImage = DepthImage.createFromPFM(context, uriDepthmap);
+        MediaStoreSaver.savePNG(depthImage.getDepthBitmap(), "depthmap",
+                                "depthmap", context);
+        return new RGBZ(image, depthImage);
+    }
 
   /**
    * @return Whether the RGBZ has a depth channel

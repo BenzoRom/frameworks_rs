@@ -45,8 +45,9 @@ public class MediaStoreSaver {
             System.out.println("make directory: " + dir.getAbsolutePath());
             dir.mkdirs();
         }
-        int n = dir.listFiles().length;
-        File file = new File(dir, imageName + n + ".png");
+        //int n = dir.listFiles().length;
+        //File file = new File(dir, imageName + n + ".png");
+        File file = new File(dir, imageName + ".png");
         try {
             FileOutputStream fOut = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.PNG, 0, fOut);
@@ -59,7 +60,7 @@ public class MediaStoreSaver {
             e.printStackTrace();
         }
 
-        MediaStorageScan(mContext, file);
+        // MediaStorageScan(mContext, file);
         return file.getAbsolutePath();
     }
     /*
