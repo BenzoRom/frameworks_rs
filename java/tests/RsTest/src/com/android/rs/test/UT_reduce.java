@@ -121,11 +121,24 @@ public class UT_reduce extends UnitTest {
         return array;
     }
 
-    private float[] createInputArrayFloat(int len, int seed) {
-        Random rand = new Random(seed);
+    private float[] createInputArrayFloat(int len, Random rand) {
         float[] array = new float[len];
-        for (int i = 0; i < len; ++i)
-            array[i] = rand.nextFloat();
+        for (int i = 0; i < len; ++i) {
+            final float val = rand.nextFloat();
+            array[i] = rand.nextBoolean() ? val : -val;
+        }
+        return array;
+    }
+
+    private float[] createInputArrayFloat(int len, int seed) {
+        return createInputArrayFloat(len, new Random(seed));
+    }
+
+    private float[] createInputArrayFloatWithInfs(int len, int infs, int seed) {
+        Random rand = new Random(seed);
+        float[] array = createInputArrayFloat(len, rand);
+        for (int i = 0; i < infs; ++i)
+            array[rand.nextInt(len)] = (rand.nextBoolean() ? Float.POSITIVE_INFINITY : Float.NEGATIVE_INFINITY);
         return array;
     }
 
@@ -155,26 +168,26 @@ public class UT_reduce extends UnitTest {
     }
 
     private <T extends Number> boolean result(String testName, final timing t,
-                                              T javaRslt, T rsRslt) {
-        final boolean success = javaRslt.equals(rsRslt);
+                                              T javaResult, T rsResult) {
+        final boolean success = javaResult.equals(rsResult);
         String status = (success ? "PASSED" : "FAILED");
         if (success && (t != null))
             status += " " + t.string();
-        Log.i(TAG, testName + ": java " + javaRslt + ", rs " + rsRslt + ": " + status);
+        Log.i(TAG, testName + ": java " + javaResult + ", rs " + rsResult + ": " + status);
         return success;
     }
 
     private boolean result(String testName, final timing t,
-                           final float[] javaRslt, final float[] rsRslt) {
-        if (javaRslt.length != rsRslt.length) {
-            Log.i(TAG, testName + ": java length " + javaRslt.length +
-                       ", rs length " + rsRslt.length + ": FAILED");
+                           final float[] javaResult, final float[] rsResult) {
+        if (javaResult.length != rsResult.length) {
+            Log.i(TAG, testName + ": java length " + javaResult.length +
+                       ", rs length " + rsResult.length + ": FAILED");
             return false;
         }
-        for (int i = 0; i < javaRslt.length; ++i) {
-            if (javaRslt[i] != rsRslt[i]) {
-                Log.i(TAG, testName + "[" + i + "]: java " + javaRslt[i] +
-                           ", rs " + rsRslt[i] + ": FAILED");
+        for (int i = 0; i < javaResult.length; ++i) {
+            if (javaResult[i] != rsResult[i]) {
+                Log.i(TAG, testName + "[" + i + "]: java " + javaResult[i] +
+                           ", rs " + rsResult[i] + ": FAILED");
                 return false;
             }
         }
@@ -186,16 +199,16 @@ public class UT_reduce extends UnitTest {
     }
 
     private boolean result(String testName, final timing t,
-                           final long[] javaRslt, final long[] rsRslt) {
-        if (javaRslt.length != rsRslt.length) {
-            Log.i(TAG, testName + ": java length " + javaRslt.length +
-                       ", rs length " + rsRslt.length + ": FAILED");
+                           final long[] javaResult, final long[] rsResult) {
+        if (javaResult.length != rsResult.length) {
+            Log.i(TAG, testName + ": java length " + javaResult.length +
+                       ", rs length " + rsResult.length + ": FAILED");
             return false;
         }
-        for (int i = 0; i < javaRslt.length; ++i) {
-            if (javaRslt[i] != rsRslt[i]) {
-                Log.i(TAG, testName + "[" + i + "]: java " + javaRslt[i] +
-                           ", rs " + rsRslt[i] + ": FAILED");
+        for (int i = 0; i < javaResult.length; ++i) {
+            if (javaResult[i] != rsResult[i]) {
+                Log.i(TAG, testName + "[" + i + "]: java " + javaResult[i] +
+                           ", rs " + rsResult[i] + ": FAILED");
                 return false;
             }
         }
@@ -207,32 +220,32 @@ public class UT_reduce extends UnitTest {
     }
 
     private boolean result(String testName, final timing t,
-                           final int[] javaRslt, final int[] rsRslt) {
-        return result(testName, t, intArrayToLong(javaRslt), intArrayToLong(rsRslt));
+                           final int[] javaResult, final int[] rsResult) {
+        return result(testName, t, intArrayToLong(javaResult), intArrayToLong(rsResult));
     }
 
-    private boolean result(String testName, final timing t, Int2 javaRslt, Int2 rsRslt) {
-        final boolean success = (javaRslt.x == rsRslt.x) && (javaRslt.y == rsRslt.y);
+    private boolean result(String testName, final timing t, Int2 javaResult, Int2 rsResult) {
+        final boolean success = (javaResult.x == rsResult.x) && (javaResult.y == rsResult.y);
         String status = (success ? "PASSED" : "FAILED");
         if (success && (t != null))
             status += " " + t.string();
         Log.i(TAG,
                 testName +
-                ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
-                ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
+                ": java (" + javaResult.x + ", " + javaResult.y + ")" +
+                ", rs (" + rsResult.x + ", " + rsResult.y + ")" +
                 ": " + status);
         return success;
     }
 
-    private boolean result(String testName, final timing t, Float2 javaRslt, Float2 rsRslt) {
-        final boolean success = (javaRslt.x == rsRslt.x) && (javaRslt.y == rsRslt.y);
+    private boolean result(String testName, final timing t, Float2 javaResult, Float2 rsResult) {
+        final boolean success = (javaResult.x == rsResult.x) && (javaResult.y == rsResult.y);
         String status = (success ? "PASSED" : "FAILED");
         if (success && (t != null))
             status += " " + t.string();
         Log.i(TAG,
                 testName +
-                ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
-                ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
+                ": java (" + javaResult.x + ", " + javaResult.y + ")" +
+                ", rs (" + rsResult.x + ", " + rsResult.y + ")" +
                 ": " + status);
         return success;
     }
@@ -240,26 +253,26 @@ public class UT_reduce extends UnitTest {
     ///////////////////////////////////////////////////////////////////
 
     private int addint(int[] input) {
-        int rslt = 0;
+        int result = 0;
         for (int idx = 0; idx < input.length; ++idx)
-            rslt += input[idx];
-        return rslt;
+            result += input[idx];
+        return result;
     }
 
     private boolean addint1D_array(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
         final int[] input = createInputArrayInt(size[0], seed, Integer.MAX_VALUE / size[0]);
 
-        final int javaRslt = addint(input);
-        final int rsRslt = s.reduce_addint(input).get();
+        final int javaResult = addint(input);
+        final int rsResult = s.reduce_addint(input).get();
 
-        return result("addint1D_array", new timing(size[0]), javaRslt, rsRslt);
+        return result("addint1D_array", new timing(size[0]), javaResult, rsResult);
     }
 
     private boolean addint1D(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
         final int[] inputArray = createInputArrayInt(size[0], seed, Integer.MAX_VALUE / size[0]);
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRslt = addint(inputArray);
+        final int javaResult = addint(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -271,14 +284,14 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copyFrom(inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final int rsRslt = s.reduce_addint(inputAllocation).get();
+        final int rsResult = s.reduce_addint(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         final boolean success =
                 result("addint1D",
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
                                    copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocation.destroy();
         return success;
     }
@@ -290,7 +303,7 @@ public class UT_reduce extends UnitTest {
         final int[] inputArray = createInputArrayInt(dimX * dimY, seed, Integer.MAX_VALUE / (dimX * dimY));
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRslt = addint(inputArray);
+        final int javaResult = addint(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -304,14 +317,14 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copy2DRangeFrom(0, 0, dimX, dimY, inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final int rsRslt = s.reduce_addint(inputAllocation).get();
+        final int rsResult = s.reduce_addint(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         final boolean success =
                 result("addint2D",
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
                                    copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocation.destroy();
         return success;
     }
@@ -324,7 +337,7 @@ public class UT_reduce extends UnitTest {
         final int[] inputArray = createInputArrayInt(dimX * dimY * dimZ, seed, Integer.MAX_VALUE / (dimX * dimY * dimZ));
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRslt = addint(inputArray);
+        final int javaResult = addint(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -338,14 +351,14 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copy3DRangeFrom(0, 0, 0, dimX, dimY, dimZ, inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final int rsRslt = s.reduce_addint(inputAllocation).get();
+        final int rsResult = s.reduce_addint(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         final boolean success =
                 result("addint3D",
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
                                    copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocation.destroy();
         return success;
     }
@@ -365,16 +378,16 @@ public class UT_reduce extends UnitTest {
         final int[] input1 = createInputArrayInt(123, Integer.MAX_VALUE / inputSize);
         final int[] input2 = createInputArrayInt(456, Integer.MAX_VALUE / inputSize);
 
-        final int javaRslt1 = addint(input1);
-        final int javaRslt2 = addint(input2);
+        final int javaResult1 = addint(input1);
+        final int javaResult2 = addint(input2);
 
-        final ScriptC_reduce.result_int rsRsltFuture1 = s.reduce_addint(input1);
-        final ScriptC_reduce.result_int rsRsltFuture2 = s.reduce_addint(input2);
+        final ScriptC_reduce.result_int rsResultFuture1 = s.reduce_addint(input1);
+        final ScriptC_reduce.result_int rsResultFuture2 = s.reduce_addint(input2);
 
         pass &= result("patternInterleavedReduce (1)", new timing(inputSize),
-                javaRslt1, rsRsltFuture1.get());
+                javaResult1, rsResultFuture1.get());
         pass &= result("patternInterleavedReduce (2)", new timing(inputSize),
-                javaRslt2, rsRsltFuture2.get());
+                javaResult2, rsResultFuture2.get());
 
         return pass;
     }
@@ -405,17 +418,83 @@ public class UT_reduce extends UnitTest {
         final int inputSize = 1000;
         final int[] input = createInputArrayInt(149, Integer.MAX_VALUE / inputSize);
 
-        final int[] javaRsltDec = sillySumIntoDecArray(input);
-        final int[] rsRsltDec = s.reduce_sillySumIntoDecArray(input).get();
+        final int[] javaResultDec = sillySumIntoDecArray(input);
+        final int[] rsResultDec = s.reduce_sillySumIntoDecArray(input).get();
         pass &= result("patternDuplicateAnonymousResult (Dec)", new timing(inputSize),
-                javaRsltDec, rsRsltDec);
+                javaResultDec, rsResultDec);
 
-        final int[] javaRsltInc = sillySumIntoIncArray(input);
-        final int[] rsRsltInc = s.reduce_sillySumIntoIncArray(input).get();
+        final int[] javaResultInc = sillySumIntoIncArray(input);
+        final int[] rsResultInc = s.reduce_sillySumIntoIncArray(input).get();
         pass &= result("patternDuplicateAnonymousResult (Inc)", new timing(inputSize),
-                javaRsltInc, rsRsltInc);
+                javaResultInc, rsResultInc);
 
         return pass;
+    }
+
+    ///////////////////////////////////////////////////////////////////
+
+    private float findMinAbs(float[] input) {
+        float accum = input[0];
+        for (int idx = 1; idx < input.length; ++idx) {
+            final float val = input[idx];
+            if (Math.abs(val) < Math.abs(accum))
+                accum = val;
+        }
+        return accum;
+    }
+
+    static interface ReduceFindMinAbs {
+        float run(Allocation input);
+    };
+
+    private boolean findMinAbs(RenderScript RS, float[] inputArray, String testName, ReduceFindMinAbs reduction) {
+        final long javaTimeStart = java.lang.System.currentTimeMillis();
+        final float javaResult = findMinAbs(inputArray);
+        final long javaTimeEnd = java.lang.System.currentTimeMillis();
+
+        final long rsTimeStart = java.lang.System.currentTimeMillis();
+
+        Allocation inputAllocation = Allocation.createSized(RS, Element.F32(RS), inputArray.length);
+
+        final long copyTimeStart = java.lang.System.currentTimeMillis();
+
+        inputAllocation.copyFrom(inputArray);
+
+        final long kernelTimeStart = java.lang.System.currentTimeMillis();
+        final float rsResult = reduction.run(inputAllocation);
+        final long rsTimeEnd = java.lang.System.currentTimeMillis();
+
+        // Note that the Java and RenderScript algorithms are not
+        // guaranteed to find the same results -- but the results
+        // should have the same absolute value.
+
+        final boolean success =
+                result(testName,
+                        new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
+                                   copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
+                        Math.abs(javaResult), Math.abs(rsResult));
+        inputAllocation.destroy();
+        return success;
+    }
+
+    private boolean findMinAbsBool(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
+        return findMinAbs(RS, createInputArrayFloat(size[0], seed), "findMinAbsBool",
+                (Allocation input) -> s.reduce_findMinAbsBool(input).get());
+    }
+
+    private boolean findMinAbsBoolInf(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
+        return findMinAbs(RS, createInputArrayFloatWithInfs(size[0], 1 + size[0]/1000, seed), "findMinAbsBoolInf",
+                (Allocation input) -> s.reduce_findMinAbsBool(input).get());
+    }
+
+    private boolean findMinAbsNaN(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
+        return findMinAbs(RS, createInputArrayFloat(size[0], seed), "findMinAbsNaN",
+                (Allocation input) -> s.reduce_findMinAbsNaN(input).get());
+    }
+
+    private boolean findMinAbsNaNInf(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
+        return findMinAbs(RS, createInputArrayFloatWithInfs(size[0], 1 + size[0]/1000, seed), "findMinAbsNaNInf",
+                (Allocation input) -> s.reduce_findMinAbsNaN(input).get());
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -443,14 +522,14 @@ public class UT_reduce extends UnitTest {
     private boolean findMinAndMax_array(RenderScript RS, ScriptC_reduce s, int seed, int[] size) {
         final float[] input = createInputArrayFloat(size[0], seed);
 
-        final Int2 javaRslt = findMinAndMax(input);
-        final Int2 rsRslt = s.reduce_findMinAndMax(input).get();
+        final Int2 javaResult = findMinAndMax(input);
+        final Int2 rsResult = s.reduce_findMinAndMax(input).get();
 
         // Note that the Java and RenderScript algorithms are not
         // guaranteed to find the same cells -- but they should
         // find cells of the same value.
-        final Float2 javaVal = new Float2(input[javaRslt.x], input[javaRslt.y]);
-        final Float2 rsVal = new Float2(input[rsRslt.x], input[rsRslt.y]);
+        final Float2 javaVal = new Float2(input[javaResult.x], input[javaResult.y]);
+        final Float2 rsVal = new Float2(input[rsResult.x], input[rsResult.y]);
 
         return result("findMinAndMax_array", new timing(size[0]), javaVal, rsVal);
     }
@@ -459,7 +538,7 @@ public class UT_reduce extends UnitTest {
         final float[] inputArray = createInputArrayFloat(size[0], seed);
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final Int2 javaRslt = findMinAndMax(inputArray);
+        final Int2 javaResult = findMinAndMax(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -471,14 +550,14 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copyFrom(inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final Int2 rsRslt = s.reduce_findMinAndMax(inputAllocation).get();
+        final Int2 rsResult = s.reduce_findMinAndMax(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         // Note that the Java and RenderScript algorithms are not
         // guaranteed to find the same cells -- but they should
         // find cells of the same value.
-        final Float2 javaVal = new Float2(inputArray[javaRslt.x], inputArray[javaRslt.y]);
-        final Float2 rsVal = new Float2(inputArray[rsRslt.x], inputArray[rsRslt.y]);
+        final Float2 javaVal = new Float2(inputArray[javaResult.x], inputArray[javaResult.y]);
+        final Float2 rsVal = new Float2(inputArray[rsResult.x], inputArray[rsResult.y]);
 
         final boolean success =
                 result("findMinAndMax",
@@ -517,7 +596,7 @@ public class UT_reduce extends UnitTest {
         final float[] inputArray = createInputArrayFloat(matSizeSquared * length, seed);
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final float[] javaRslt = findMinMat(inputArray, matSize);
+        final float[] javaResult = findMinMat(inputArray, matSize);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -529,14 +608,14 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copyFromUnchecked(inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final float[] rsRslt = reduction.run(inputAllocation);
+        final float[] rsResult = reduction.run(inputAllocation);
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         final boolean success =
                 result("findMinMat" + matSize,
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
                                    copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocation.destroy();
         return success;
     }
@@ -566,11 +645,11 @@ public class UT_reduce extends UnitTest {
         // just in case we got unlucky
         input[(new Random(seed+1)).nextInt(inputLen)] = 0;
 
-        final int rsRslt = s.reduce_fz(input).get();
+        final int rsResult = s.reduce_fz(input).get();
 
-        final boolean success = (input[rsRslt] == 0);
+        final boolean success = (input[rsResult] == 0);
         Log.i(TAG,
-                "fz_array: input[" + rsRslt + "] == " + input[rsRslt] + ": " +
+                "fz_array: input[" + rsResult + "] == " + input[rsResult] + ": " +
                 (success ? "PASSED " + timing.string(size[0]) : "FAILED"));
         return success;
     }
@@ -582,7 +661,7 @@ public class UT_reduce extends UnitTest {
         inputArray[(new Random(seed+1)).nextInt(inputLen)] = 0;
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRslt = fz(inputArray);
+        final int javaResult = fz(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -594,17 +673,17 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copyFrom(inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final int rsRslt = s.reduce_fz(inputAllocation).get();
+        final int rsResult = s.reduce_fz(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
-        final boolean success = (inputArray[rsRslt] == 0);
+        final boolean success = (inputArray[rsResult] == 0);
         String status = (success ? "PASSED" : "FAILED");
         if (success)
             status += " " + timing.string(javaTimeStart, javaTimeEnd, rsTimeStart,
                                           copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation);
         Log.i(TAG,
-                "fz: java input[" + javaRslt + "] == " + inputArray[javaRslt] +
-                ", rs input[" + rsRslt + "] == " + inputArray[javaRslt] + ": " + status);
+                "fz: java input[" + javaResult + "] == " + inputArray[javaResult] +
+                ", rs input[" + rsResult + "] == " + inputArray[javaResult] + ": " + status);
         inputAllocation.destroy();
         return success;
     }
@@ -620,11 +699,11 @@ public class UT_reduce extends UnitTest {
         inputArray[(new Random(seed+1)).nextInt(inputLen)] = 0;
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRsltLinear = fz(inputArray);
+        final int javaResultLinear = fz(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
-        final Int2 javaRslt = new Int2(javaRsltLinear % dimX, javaRsltLinear / dimX);
-        final int javaCellVal = inputArray[javaRslt.x + dimX * javaRslt.y];
+        final Int2 javaResult = new Int2(javaResultLinear % dimX, javaResultLinear / dimX);
+        final int javaCellVal = inputArray[javaResult.x + dimX * javaResult.y];
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
 
@@ -637,18 +716,18 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copy2DRangeFrom(0, 0, dimX, dimY, inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final Int2 rsRslt = s.reduce_fz2(inputAllocation).get();
+        final Int2 rsResult = s.reduce_fz2(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
-        final int rsCellVal = inputArray[rsRslt.x + dimX * rsRslt.y];
+        final int rsCellVal = inputArray[rsResult.x + dimX * rsResult.y];
         final boolean success = (rsCellVal == 0);
         String status = (success ? "PASSED" : "FAILED");
         if (success)
             status += " " + timing.string(javaTimeStart, javaTimeEnd, rsTimeStart,
                                           copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation);
         Log.i(TAG,
-                "fz2: java input[" + javaRslt.x + ", " + javaRslt.y + "] == " + javaCellVal +
-                ", rs input[" + rsRslt.x + ", " + rsRslt.y + "] == " + rsCellVal + ": " + status);
+                "fz2: java input[" + javaResult.x + ", " + javaResult.y + "] == " + javaCellVal +
+                ", rs input[" + rsResult.x + ", " + rsResult.y + "] == " + rsCellVal + ": " + status);
         inputAllocation.destroy();
         return success;
     }
@@ -664,14 +743,14 @@ public class UT_reduce extends UnitTest {
         inputArray[(new Random(seed+1)).nextInt(inputLen)] = 0;
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final int javaRsltLinear = fz(inputArray);
+        final int javaResultLinear = fz(inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
-        final Int3 javaRslt = new Int3(
-            javaRsltLinear % dimX,
-            (javaRsltLinear / dimX) % dimY,
-            javaRsltLinear / (dimX * dimY));
-        final int javaCellVal = inputArray[javaRslt.x + dimX * javaRslt.y + dimX * dimY * javaRslt.z];
+        final Int3 javaResult = new Int3(
+            javaResultLinear % dimX,
+            (javaResultLinear / dimX) % dimY,
+            javaResultLinear / (dimX * dimY));
+        final int javaCellVal = inputArray[javaResult.x + dimX * javaResult.y + dimX * dimY * javaResult.z];
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
 
@@ -684,18 +763,18 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copy3DRangeFrom(0, 0, 0, dimX, dimY, dimZ, inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final Int3 rsRslt = s.reduce_fz3(inputAllocation).get();
+        final Int3 rsResult = s.reduce_fz3(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
-        final int rsCellVal = inputArray[rsRslt.x + dimX * rsRslt.y + dimX * dimY * rsRslt.z];
+        final int rsCellVal = inputArray[rsResult.x + dimX * rsResult.y + dimX * dimY * rsResult.z];
         final boolean success = (rsCellVal == 0);
         String status = (success ? "PASSED" : "FAILED");
         if (success)
             status += " " + timing.string(javaTimeStart, javaTimeEnd, rsTimeStart,
                                           copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation);
         Log.i(TAG,
-                "fz3: java input[" + javaRslt.x + ", " + javaRslt.y + ", " + javaRslt.z + "] == " + javaCellVal +
-                ", rs input[" + rsRslt.x + ", " + rsRslt.y + ", " + rsRslt.z + "] == " + rsCellVal + ": " + status);
+                "fz3: java input[" + javaResult.x + ", " + javaResult.y + ", " + javaResult.z + "] == " + javaCellVal +
+                ", rs input[" + rsResult.x + ", " + rsResult.y + ", " + rsResult.z + "] == " + rsCellVal + ": " + status);
         inputAllocation.destroy();
         return success;
     }
@@ -730,21 +809,21 @@ public class UT_reduce extends UnitTest {
     private boolean histogram_array(RenderScript RS, ScriptC_reduce s, int seed, int size[]) {
         final byte[] inputArray = createInputArrayByte(size[0], seed);
 
-        final long[] javaRslt = histogram(RS, inputArray);
-        assertEquals("javaRslt length", histogramBucketCount, javaRslt.length);
-        final long[] rsRslt = s.reduce_histogram(inputArray).get();
-        assertEquals("rsRslt length", histogramBucketCount, rsRslt.length);
+        final long[] javaResult = histogram(RS, inputArray);
+        assertEquals("javaResult length", histogramBucketCount, javaResult.length);
+        final long[] rsResult = s.reduce_histogram(inputArray).get();
+        assertEquals("rsResult length", histogramBucketCount, rsResult.length);
 
-        return result("histogram_array", new timing(size[0]), javaRslt, rsRslt);
+        return result("histogram_array", new timing(size[0]), javaResult, rsResult);
     }
 
     private boolean histogram(RenderScript RS, ScriptC_reduce s, int seed, int size[]) {
         final byte[] inputArray = createInputArrayByte(size[0], seed);
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final long[] javaRslt = histogram(RS, inputArray);
+        final long[] javaResult = histogram(RS, inputArray);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
-        assertEquals("javaRslt length", histogramBucketCount, javaRslt.length);
+        assertEquals("javaResult length", histogramBucketCount, javaResult.length);
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
 
@@ -755,16 +834,16 @@ public class UT_reduce extends UnitTest {
         inputAllocation.copyFrom(inputArray);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final long[] rsRslt = s.reduce_histogram(inputAllocation).get();
+        final long[] rsResult = s.reduce_histogram(inputAllocation).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
-        assertEquals("rsRslt length", histogramBucketCount, rsRslt.length);
+        assertEquals("rsResult length", histogramBucketCount, rsResult.length);
 
         // NOTE: The "java time" is actually for the RenderScript histogram intrinsic
         final boolean success =
                 result("histogram",
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart,
                                    copyTimeStart, kernelTimeStart, rsTimeEnd, inputAllocation),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocation.destroy();
         return success;
     }
@@ -780,18 +859,18 @@ public class UT_reduce extends UnitTest {
         final int inputLength = 1 << 18;
         final byte[] inputArray = createInputArrayByte(inputLength, 789);
 
-        final long[] javaRslt = histogram(RS, inputArray);
-        assertEquals("javaRslt length", histogramBucketCount, javaRslt.length);
+        final long[] javaResult = histogram(RS, inputArray);
+        assertEquals("javaResult length", histogramBucketCount, javaResult.length);
 
-        final ScriptC_reduce.resultArray256_uint rsRsltFuture = s.reduce_histogram(inputArray);
-        final long[] rsRslt1 = rsRsltFuture.get();
-        assertEquals("rsRslt1 length", histogramBucketCount, rsRslt1.length);
-        pass &= result("patternRedundantGet (1)", new timing(inputLength), javaRslt, rsRslt1);
+        final ScriptC_reduce.resultArray256_uint rsResultFuture = s.reduce_histogram(inputArray);
+        final long[] rsResult1 = rsResultFuture.get();
+        assertEquals("rsResult1 length", histogramBucketCount, rsResult1.length);
+        pass &= result("patternRedundantGet (1)", new timing(inputLength), javaResult, rsResult1);
 
-        final long[] rsRslt2 = rsRsltFuture.get();
-        pass &= result("patternRedundantGet (2)", new timing(inputLength), javaRslt, rsRslt2);
+        final long[] rsResult2 = rsResultFuture.get();
+        pass &= result("patternRedundantGet (2)", new timing(inputLength), javaResult, rsResult2);
 
-        final boolean success = (rsRslt1 == rsRslt2);
+        final boolean success = (rsResult1 == rsResult2);
         Log.i(TAG, "patternRedundantGet (object equality): " + (success ? "PASSED" : "FAILED"));
         pass &= success;
 
@@ -812,10 +891,10 @@ public class UT_reduce extends UnitTest {
     private boolean mode_array(RenderScript RS, ScriptC_reduce s, int seed, int size[]) {
         final byte[] inputArray = createInputArrayByte(size[0], seed);
 
-        final Int2 javaRslt = mode(RS, inputArray);
-        final Int2 rsRslt = s.reduce_mode(inputArray).get();
+        final Int2 javaResult = mode(RS, inputArray);
+        final Int2 rsResult = s.reduce_mode(inputArray).get();
 
-        return result("mode", new timing(size[0]), javaRslt, rsRslt);
+        return result("mode", new timing(size[0]), javaResult, rsResult);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -847,7 +926,7 @@ public class UT_reduce extends UnitTest {
         final int[] inputArrayB = createInputArrayInt(len, seed+1);
 
         final long javaTimeStart = java.lang.System.currentTimeMillis();
-        final long javaRslt = sumgcd(inputArrayA, inputArrayB);
+        final long javaResult = sumgcd(inputArrayA, inputArrayB);
         final long javaTimeEnd = java.lang.System.currentTimeMillis();
 
         final long rsTimeStart = java.lang.System.currentTimeMillis();
@@ -861,14 +940,14 @@ public class UT_reduce extends UnitTest {
         inputAllocationB.copyFrom(inputArrayB);
 
         final long kernelTimeStart = java.lang.System.currentTimeMillis();
-        final long rsRslt = s.reduce_sumgcd(inputAllocationA, inputAllocationB).get();
+        final long rsResult = s.reduce_sumgcd(inputAllocationA, inputAllocationB).get();
         final long rsTimeEnd = java.lang.System.currentTimeMillis();
 
         final boolean success =
                 result("sumgcd",
                         new timing(javaTimeStart, javaTimeEnd, rsTimeStart, copyTimeStart, kernelTimeStart, rsTimeEnd,
                                    inputAllocationA, inputAllocationB),
-                        javaRslt, rsRslt);
+                        javaResult, rsResult);
         inputAllocationA.destroy();
         inputAllocationB.destroy();
         return success;
@@ -991,19 +1070,27 @@ public class UT_reduce extends UnitTest {
         new TestDescription("addint1D_array", this::addint1D_array, 0, new int[]{100000}, 20),
         new TestDescription("addint2D", this::addint2D, 1, new int[]{450, 225}, 20, 5),
         new TestDescription("addint3D", this::addint3D, 2, new int[]{37, 48, 49}, 20, 7),
-        new TestDescription("findMinAndMax", this::findMinAndMax, 3, new int[]{100000}, 20),
-        new TestDescription("findMinAndMax_array", this::findMinAndMax_array, 3, new int[]{100000}, 20),
-        new TestDescription("findMinMat2", this::findMinMat2, 4, new int[]{25000}, 17),
-        new TestDescription("findMinMat4", this::findMinMat4, 5, new int[]{10000}, 15),
-        new TestDescription("fz", this::fz, 6, new int[]{100000}, 20),
-        new TestDescription("fz_array", this::fz_array, 6, new int[]{100000}, 20),
-        new TestDescription("fz2", this::fz2, 7, new int[]{225, 450}, 20, 5),
-        new TestDescription("fz3", this::fz3, 8, new int[]{59, 48, 37}, 20, 7),
-        new TestDescription("histogram", this::histogram, 9, new int[]{100000}, 20),
-        new TestDescription("histogram_array", this::histogram_array, 9, new int[]{100000}, 20),
-        // might want to add: new TestDescription("mode", this::mode, 10, new int[]{100000}, 20),
-        new TestDescription("mode_array", this::mode_array, 10, new int[]{100000}, 20),
-        new TestDescription("sumgcd", this::sumgcd, 11, new int[]{1 << 16}, 20)
+
+        // Bool and NaN variants of the same test will use the same
+        // seed, in case results need to be compared.
+        new TestDescription("findMinAbsBool", this::findMinAbsBool, 3, new int[]{100000}, 20),
+        new TestDescription("findMinAbsNaN", this::findMinAbsNaN, 3, new int[]{100000}, 20),
+        new TestDescription("findMinAbsBoolInf", this::findMinAbsBoolInf, 4, new int[]{100000}, 20),
+        new TestDescription("findMinAbsNaNInf", this::findMinAbsNaNInf, 4, new int[]{100000}, 20),
+
+        new TestDescription("findMinAndMax", this::findMinAndMax, 5, new int[]{100000}, 20),
+        new TestDescription("findMinAndMax_array", this::findMinAndMax_array, 5, new int[]{100000}, 20),
+        new TestDescription("findMinMat2", this::findMinMat2, 6, new int[]{25000}, 17),
+        new TestDescription("findMinMat4", this::findMinMat4, 7, new int[]{10000}, 15),
+        new TestDescription("fz", this::fz, 8, new int[]{100000}, 20),
+        new TestDescription("fz_array", this::fz_array, 8, new int[]{100000}, 20),
+        new TestDescription("fz2", this::fz2, 9, new int[]{225, 450}, 20, 5),
+        new TestDescription("fz3", this::fz3, 10, new int[]{59, 48, 37}, 20, 7),
+        new TestDescription("histogram", this::histogram, 11, new int[]{100000}, 20),
+        new TestDescription("histogram_array", this::histogram_array, 11, new int[]{100000}, 20),
+        // might want to add: new TestDescription("mode", this::mode, 12, new int[]{100000}, 20),
+        new TestDescription("mode_array", this::mode_array, 12, new int[]{100000}, 20),
+        new TestDescription("sumgcd", this::sumgcd, 13, new int[]{1 << 16}, 20)
     };
 
     private boolean runCorrectnessQuick(RenderScript RS, ScriptC_reduce s) {
