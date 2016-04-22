@@ -8,12 +8,90 @@
 
 float negInf, posInf;
 
+static bool IsNaN(float v) {
+  // a NaN (and only a NaN) compares unequal to everything
+  return v != v;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 #pragma rs reduce(addint) \
   accumulator(aiAccum)
 
 static void aiAccum(int *accum, int val) { *accum += val; }
+
+/////////////////////////////////////////////////////////////////////////
+
+// These kernels find an input value of minimum absolute value.
+//
+// If the input domain consists of all non-NaN values (including
+// infinities), we cannot pick an initializer from the input domain,
+// because there are two different members of the domain with maximum
+// absolute value -- positive and negative infinity.  Instead, we need
+// to pick some other distinguished initializer, and explicitly check
+// for and handle an accumulator with this distinguished value.
+//
+// The two kernels represent the distinguished value differently.
+
+//.......................................................................
+
+// The kernel findMinAbsNaN uses an initializer from outside the input
+// domain that is nonetheless representable as a float -- NaN.
+
+#pragma rs reduce(findMinAbsNaN) \
+  initializer(fMinAbsNaNInit) accumulator(fMinAbsNaNAccumulator) combiner(fMinAbsNaNCombiner)
+
+static void fMinAbsNaNInit(float *accum) {
+  *accum = nan(0);
+}
+
+static void fMinAbsNaNAccumulator(float *accum, float val) {
+  if (IsNaN(*accum) || (fabs(val) < fabs(*accum)))
+    *accum = val;
+}
+
+static void fMinAbsNaNCombiner(float *accum, const float *other) {
+  if (!IsNaN(*other))
+    fMinAbsNaNAccumulator(accum, *other);
+}
+
+//.......................................................................
+
+// The kernel findMinAbsBool represents its accumulator as a struct
+// with two fields -- a bool field to indicate whether or not the
+// accumulator has the distinguished initial value, and a float field
+// for a non-initial value.
+
+typedef struct FindMinAbsBoolAccumType {
+  // set to true by initializer function;
+  // set to false by accumulator function
+  bool onlyInitialized;
+  // only valid when onlyInitialized is false
+  float val;
+} FindMinAbsBoolAccumType;
+
+#pragma rs reduce(findMinAbsBool) \
+  initializer(fMinAbsBoolInit) accumulator(fMinAbsBoolAccumulator) combiner(fMinAbsBoolCombiner) \
+  outconverter(fMinAbsBoolOut)
+
+static void fMinAbsBoolInit(FindMinAbsBoolAccumType *accum) {
+  accum->onlyInitialized = true;
+}
+
+static void fMinAbsBoolAccumulator(FindMinAbsBoolAccumType *accum, float val) {
+  if (accum->onlyInitialized || (fabs(val) < fabs(accum->val)))
+    accum->val = val;
+  accum->onlyInitialized = false;
+}
+
+static void fMinAbsBoolCombiner(FindMinAbsBoolAccumType *accum, const FindMinAbsBoolAccumType *other) {
+  if (!other->onlyInitialized)
+    fMinAbsBoolAccumulator(accum, other->val);
+}
+
+static void fMinAbsBoolOut(float *out, const FindMinAbsBoolAccumType *accum) {
+  *out = accum->val;
+}
 
 /////////////////////////////////////////////////////////////////////////
 
