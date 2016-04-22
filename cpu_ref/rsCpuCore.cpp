@@ -316,7 +316,10 @@ RsdCpuReferenceImpl::~RsdCpuReferenceImpl() {
     for (uint32_t ct = 0; ct < mWorkers.mCount; ct++) {
         pthread_join(mWorkers.mThreadId[ct], &res);
     }
-    rsAssert(__sync_fetch_and_or(&mWorkers.mRunningCount, 0) == 0);
+    // b/23109602
+    // TODO: Refactor the implementation with threadpool to
+    // fix the race condition in the destuctor.
+    // rsAssert(__sync_fetch_and_or(&mWorkers.mRunningCount, 0) == 0);
     free(mWorkers.mThreadId);
     free(mWorkers.mNativeThreadId);
     delete[] mWorkers.mLaunchSignals;
