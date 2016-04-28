@@ -179,9 +179,6 @@ LOCAL_C_INCLUDES += frameworks/compile/libbcc/include
 LOCAL_CXX_STL := libc++
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
-# TODO: external/freetype still uses the register keyword
-# Bug: 17163086
-LOCAL_CFLAGS += -Wno-deprecated-register
 
 LOCAL_CPPFLAGS += -fno-exceptions
 
@@ -244,9 +241,6 @@ LOCAL_SHARED_LIBRARIES += libRS_internal
 LOCAL_SHARED_LIBRARIES += liblog
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
-# TODO: external/freetype still uses the register keyword
-# Bug: 17163086
-LOCAL_CFLAGS += -Wno-deprecated-register
 
 LOCAL_CPPFLAGS += -fno-exceptions
 
