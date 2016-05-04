@@ -183,15 +183,6 @@ void ScriptC::runForEach(Context *rsc,
                          const void * usr,
                          size_t usrBytes,
                          const RsScriptCall *sc) {
-    // Make a copy of RsScriptCall and zero out extra fields that are absent
-    // in API levels below 23.
-    RsScriptCall sc_copy;
-    if (sc != nullptr && getApiLevel() < 23) {
-        memset(&sc_copy, 0, sizeof(sc_copy));
-        memcpy(&sc_copy, sc, 7*4);
-        sc = &sc_copy;
-    }
-
     if (slot >= mHal.info.exportedForEachCount) {
         rsc->setError(RS_ERROR_BAD_SCRIPT,
                       "The forEach kernel index is out of bounds");
