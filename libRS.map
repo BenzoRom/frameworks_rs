@@ -84,7 +84,6 @@ libRS {
     rsScriptForEachMulti;
     rsScriptGetVarV;
     rsScriptGroup2Create;
-    rsScriptGroup2Create;
     rsScriptGroupCreate;
     rsScriptGroupExecute;
     rsScriptGroupSetInput;
