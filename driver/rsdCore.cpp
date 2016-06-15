@@ -101,8 +101,6 @@ extern "C" bool rsdHalQueryHal(RsHalInitEnums entry, void **fnPtr) {
         fnPtr[0] = (void *)rsdScriptUpdateCachedObject; break;
     case RS_HAL_SCRIPT_INVOKE_REDUCE:
         fnPtr[0] = (void *)rsdScriptInvokeReduce; break;
-    case RS_HAL_SCRIPT_INVOKE_REDUCE_NEW:
-        fnPtr[0] = (void *)rsdScriptInvokeReduceNew; break;
 
     case RS_HAL_ALLOCATION_INIT:
         fnPtr[0] = (void *)rsdAllocationInit; break;
@@ -265,7 +263,7 @@ extern "C" void rsdHalAbort(RsContext) {
 
 
 extern "C" bool rsdHalQueryVersion(uint32_t *major, uint32_t *minor) {
-    *major = 23;
+    *major = RS_HAL_VERSION;
     *minor = 0;
     return true;
 }

@@ -71,7 +71,6 @@ static bool LoadHalTable(Context *rsc, HalQueryHal fn, bool loadGraphics) {
     ret &= fn(RS_HAL_SCRIPT_INVOKE_ROOT, (void **)&rsc->mHal.funcs.script.invokeRoot);
     ret &= fn(RS_HAL_SCRIPT_INVOKE_FOR_EACH, (void **)&rsc->mHal.funcs.script.invokeForEach);
     ret &= fn(RS_HAL_SCRIPT_INVOKE_REDUCE, (void **)&rsc->mHal.funcs.script.invokeReduce);
-    ret &= fn(RS_HAL_SCRIPT_INVOKE_REDUCE_NEW, (void **)&rsc->mHal.funcs.script.invokeReduceNew);
     ret &= fn(RS_HAL_SCRIPT_INVOKE_INIT, (void **)&rsc->mHal.funcs.script.invokeInit);
     ret &= fn(RS_HAL_SCRIPT_INVOKE_FREE_CHILDREN, (void **)&rsc->mHal.funcs.script.invokeFreeChildren);
     ret &= fn(RS_HAL_SCRIPT_SET_GLOBAL_VAR, (void **)&rsc->mHal.funcs.script.setGlobalVar);
@@ -198,6 +197,12 @@ bool Context::loadRuntime(const char* filename) {
 
     if (!fnQueryVersion(&version_major, &version_minor)) {
         ALOGE("Error checking RS driver version, %s", filename);
+        goto error;
+    }
+
+    if (version_major != RS_HAL_VERSION) {
+        ALOGE("Mismatched RS HAL versions: %s is version %u but version %u is expected",
+              filename, version_major, RS_HAL_VERSION);
         goto error;
     }
 
