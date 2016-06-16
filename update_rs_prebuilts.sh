@@ -28,8 +28,6 @@ else
 
 fi
 
-echo "Using $NUM_CORES cores"
-
 # Turn off the build cache and make sure we build all of LLVM from scratch.
 export ANDROID_USE_BUILDCACHE=false
 export FORCE_BUILD_LLVM_COMPONENTS=true
@@ -58,10 +56,12 @@ HOST_LIB64_DIR=$ANDROID_HOST_OUT/lib64
 PREBUILTS_DIR=$MY_ANDROID_DIR/prebuilts/sdk/
 
 print_usage() {
-  echo "USAGE: $0 [-h|--help] [-n|--no-build] [-x]"
+  echo "USAGE: $0 [-h|--help] [-j <num>] [-n|--no-build] [--no-start] [-x]"
   echo "OPTIONS:"
+  echo "    -j <num>       : Specify parallelism for builds."
   echo "    -h, --help     : Display this help message."
   echo "    -n, --no-build : Skip the build step and just copy files."
+  echo "    --no-start     : Do not \"repo start\" a new branch for the copied files."
   echo "    -x             : Display commands before they are executed."
 }
 
@@ -84,14 +84,30 @@ build_rs_libs() {
 # Build everything by default
 build_rs=1
 
+# repo start by default
+repo_start=1
+
 while [ $# -gt 0 ]; do
   case "$1" in
     -h|--help)
       print_usage
       exit 0
       ;;
+    -j)
+      if [[ $# -gt 1 && "$2" =~  ^[0-9]+$ ]]; then
+        NUM_CORES="$2"
+        shift
+      else
+        echo Expected numeric argument after "$1"
+        print_usage
+        exit 99
+      fi
+      ;;
     -n|--no-build)
       build_rs=0
+      ;;
+    --no-start)
+      repo_start=0
       ;;
     -x)
       # set lets us enable bash -x mode.
@@ -113,6 +129,8 @@ if [ $build_rs -eq 1 ]; then
   echo !!! BUILDING RS PREBUILTS !!!
   echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+  echo "Using $NUM_CORES cores"
+
   source build/envsetup.sh
 
   for t in ${TARGETS[@]}; do
@@ -127,10 +145,23 @@ else
 
 fi
 
-DATE=`date +%Y%m%d`
-
 cd $PREBUILTS_DIR || exit 3
-repo start pb_$DATE .
+
+# Verify that project is "clean"
+if [ `git status --short --untracked-files=no | wc -l` -ne 0 ]; then
+  echo $PREBUILTS_DIR contains modified files -- aborting.
+  git status --untracked-files=no
+  exit 1
+fi
+
+if [ $repo_start -eq 1 ]; then
+  DATE=`date +%Y%m%d`
+  repo start pb_$DATE .
+  if [ $? -ne 0 ]; then
+    echo repo start failed -- aborting.
+    exit 1
+  fi
+fi
 
 # Don't copy device prebuilts on Darwin. We don't need/use them.
 if [ $DARWIN -eq 0 ]; then
