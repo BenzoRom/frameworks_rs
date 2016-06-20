@@ -1,13 +1,15 @@
 '''Module that contains the class UtilLLDB, which provides lldb utility
 methods.'''
 
-import util_constants
+from __future__ import absolute_import
+
+from . import util_constants
 
 try:
     import lldb
 except ImportError:
-    print 'unable to import lldb'
-    print 'please run "lldb -P" and add to $PYTHONPATH'
+    print('unable to import lldb')
+    print('please run "lldb -P" and add to $PYTHONPATH')
     quit(util_constants.RC_TEST_ERROR)
 
 
