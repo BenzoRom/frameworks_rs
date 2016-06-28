@@ -181,7 +181,8 @@ CpuScriptGroup2Impl::CpuScriptGroup2Impl(RsdCpuReferenceImpl *cpuRefImpl,
             mBatches.push_back(batch);
             std::stringstream ss;
             ss << "Batch" << ++i;
-            batch = new Batch(this, ss.str().c_str());
+            std::string batchStr(ss.str());
+            batch = new Batch(this, batchStr.c_str());
         }
 
         batch->mClosures.push_back(cc);
@@ -416,7 +417,7 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
 
     std::stringstream ss;
     ss << std::hex << checksum;
-    const char* checksumStr = ss.str().c_str();
+    std::string checksumStr(ss.str());
 
     //===--------------------------------------------------------------------===//
     // Try to load a shared lib from code cache matching filename and checksum
@@ -466,7 +467,7 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
     //===--------------------------------------------------------------------===//
 
     arguments.push_back("-build-checksum");
-    arguments.push_back(checksumStr);
+    arguments.push_back(checksumStr.c_str());
     arguments.push_back(nullptr);
 
     bool compiled = rsuExecuteCommand(RsdCpuScriptImpl::BCC_EXE_PATH,
