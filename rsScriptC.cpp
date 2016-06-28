@@ -197,7 +197,8 @@ void ScriptC::runForEach(Context *rsc,
     if (ATRACE_ENABLED()) {
         ss << "runForEach slot[" << slot << "]";
     }
-    ATRACE_NAME(ss.str().c_str());
+    std::string msgStr(ss.str());
+    ATRACE_NAME(msgStr.c_str());
 
     if (mRSC->hadFatalError()) return;
 
