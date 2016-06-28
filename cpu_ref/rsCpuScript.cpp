@@ -382,7 +382,8 @@ bool RsdCpuScriptImpl::init(char const *resName, char const *cacheDir,
     compileArguments.push_back("-build-checksum");
     std::stringstream ss;
     ss << std::hex << mBuildChecksum;
-    compileArguments.push_back(ss.str().c_str());
+    std::string checksumStr(ss.str());
+    compileArguments.push_back(checksumStr.c_str());
     compileArguments.push_back(nullptr);
 
     if (!is_force_recompile() && !useRSDebugContext) {
