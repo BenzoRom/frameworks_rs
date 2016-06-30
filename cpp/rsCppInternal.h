@@ -24,12 +24,12 @@
 #include "rsDispatch.h"
 
 #define tryDispatch(rs, dispatch)               \
-    if (rs->getError() == RS_SUCCESS) {         \
+    if ((rs)->getError() == RS_SUCCESS) {       \
         dispatch;                               \
     }
 
 #define createDispatch(rs, dispatch) \
-    rs->getError() == RS_SUCCESS ? dispatch : nullptr
+    rs->getError() == RS_SUCCESS ? (dispatch) : nullptr
 
 #undef LOG_TAG
 #undef LOG_NDEBUG
