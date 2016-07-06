@@ -506,11 +506,11 @@ public class UT_reduce extends UnitTest {
         int maxIdx = -1;
 
         for (int idx = 0; idx < input.length; ++idx) {
-            if (input[idx] < minVal) {
+            if ((minIdx < 0) || (input[idx] < minVal)) {
                 minVal = input[idx];
                 minIdx = idx;
             }
-            if (input[idx] > maxVal) {
+            if ((maxIdx < 0) || (input[idx] > maxVal)) {
                 maxVal = input[idx];
                 maxIdx = idx;
             }
@@ -566,6 +566,26 @@ public class UT_reduce extends UnitTest {
                         javaVal, rsVal);
         inputAllocation.destroy();
         return success;
+    }
+
+    //-----------------------------------------------------------------
+
+    private boolean patternFindMinAndMaxInf(RenderScript RS, ScriptC_reduce s) {
+        // Run this kernel on an input consisting solely of a single infinity.
+
+        final float[] input = new float[1];
+        input[0] = Float.POSITIVE_INFINITY;
+
+        final Int2 javaResult = findMinAndMax(input);
+        final Int2 rsResult = s.reduce_findMinAndMax(input).get();
+
+        // Note that the Java and RenderScript algorithms are not
+        // guaranteed to find the same cells -- but they should
+        // find cells of the same value.
+        final Float2 javaVal = new Float2(input[javaResult.x], input[javaResult.y]);
+        final Float2 rsVal = new Float2(input[rsResult.x], input[rsResult.y]);
+
+        return result("patternFindMinAndMaxInf", new timing(1), javaVal, rsVal);
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -1421,6 +1441,7 @@ public class UT_reduce extends UnitTest {
         boolean pass = true;
 
         pass &= patternDuplicateAnonymousResult(RS, s);
+        pass &= patternFindMinAndMaxInf(RS, s);
         pass &= patternInterleavedReduce(RS, s);
         pass &= patternRedundantGet(RS, s);
 
