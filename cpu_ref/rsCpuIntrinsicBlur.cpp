@@ -36,6 +36,10 @@ public:
     RsdCpuScriptIntrinsicBlur(RsdCpuReferenceImpl *ctx, const Script *s, const Element *e);
 
 protected:
+    // The size of the kernel radius is limited to 25 in ScriptIntrinsicBlur.java.
+    // So, the max kernel size is 51 (= 2 * 25 + 1).
+    // Considering SSSE3 case, which requires the size is multiple of 4,
+    // at least 52 words are necessary. Values outside of the kernel should be 0.
     float mFp[104];
     uint16_t mIp[104];
     void **mScratch;
@@ -406,7 +410,12 @@ void RsdCpuScriptIntrinsicBlur::kernelU1(const RsExpandKernelDriverInfo *info,
         if ((x1 + cp->mIradius) < x2) {
             uint32_t len = x2 - (x1 + cp->mIradius);
             len &= ~3;
-            if (len > 0) {
+
+            // rsdIntrinsicBlurHFU1_K() processes each four float values in |buf| at once, so it
+            // nees to ensure four more values can be accessed in order to avoid accessing
+            // uninitialized buffer.
+            if (len > 4) {
+                len -= 4;
                 rsdIntrinsicBlurHFU1_K(out, ((float *)buf) - cp->mIradius, cp->mFp,
                                        cp->mIradius * 2 + 1, x1, x1 + len);
                 out += len;
