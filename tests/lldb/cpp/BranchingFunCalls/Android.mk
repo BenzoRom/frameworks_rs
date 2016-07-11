@@ -7,7 +7,7 @@ LOCAL_MODULE := CppBranchingFunCalls
 
 LOCAL_SRC_FILES := \
 	BranchingFunCalls.cpp \
-	simple.rs
+	scalars.rs
 
 LOCAL_STATIC_LIBRARIES := libRScpp_static
 LOCAL_CFLAGS := --std=c++11

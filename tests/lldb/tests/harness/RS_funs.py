@@ -1,5 +1,7 @@
 '''A list of signatures for RS builtin functions and util functions for them.
 
+from __future__ import absolute_import
+
 Function signature syntax is usually C-like, however, fixed values can also be
 specified for those functions where the input range is restricted.
 Lines in the function table beginning with - are comments.

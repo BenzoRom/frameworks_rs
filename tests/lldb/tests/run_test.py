@@ -1,12 +1,14 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 '''This script will run one specific test.'''
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
+import os
 import sys
 import atexit
 import inspect
 import logging
-import os
+import argparse
+import warnings
 
 import harness
 from harness import util_constants
@@ -15,15 +17,22 @@ from harness import util_warnings
 from harness.util_functions import load_py_module
 from harness.util_lldb import UtilLLDB
 from harness.exception import DisconnectedException
-from harness.exception import TestSuiteException
+from harness.exception import TestSuiteException, TestIgnoredException
 from harness.util_timer import Timer
+
+
+class TestState(object):
+    '''Simple mutable mapping (like namedtuple)'''
+    def __init__(self, **kwargs):
+        for key, val in kwargs.items():
+            setattr(self, key, val)
 
 
 def _test_pre_run(state):
     '''This function is called before a test is executed (setup).
 
     Args:
-        state: Test suite state collection, instance of State.
+        state: Test suite state collection, instance of TestState.
 
     Returns:
         True if the pre_run step completed without error. Currently the pre-run
@@ -45,8 +54,18 @@ def _test_pre_run(state):
     state.bundle.delete_ndk_cache()
 
     # query our test case for the remote target app it needs
-    target_name = state.test.get_bundle_target()
-    if not target_name:
+    # First try the legacy behaviour
+    try:
+        target_name = state.test.get_bundle_target()
+        warnings.warn("get_bundle_target() is deprecated and will be removed soon"
+                      " - use the `bundle_target` dictionary attribute instead")
+    except AttributeError:
+        try:
+            target_name = state.test.bundle_target[state.bundle_type]
+        except KeyError:
+            raise TestIgnoredException()
+
+    if target_name is None:
         # test case doesn't require a remote process to debug
         return True
     else:
@@ -65,7 +84,7 @@ def _test_post_run(state):
     '''This function is called after a test is executed (cleanup).
 
     Args:
-        state: Test suite state collection, instance of State.
+        state: Test suite state collection, instance of TestState.
 
     Raises:
         AssertionError: If an assertion fails.
@@ -73,7 +92,17 @@ def _test_post_run(state):
     assert state.test
     assert state.bundle
 
-    target_name = state.test.get_bundle_target()
+    try:
+        target_name = state.test.get_bundle_target()
+        warnings.warn("get_bundle_target() is deprecated and will be removed soon"
+                      " - use the `bundle_target` dictionary attribute instead")
+    except AttributeError:
+        try:
+            target_name = state.test.bundle_target[state.bundle_type]
+        except KeyError:
+            raise TestIgnoredException()
+
+
     if target_name:
         if state.bundle.is_apk(target_name):
             state.android.stop_app(state.bundle.get_package(target_name))
@@ -82,10 +111,10 @@ def _test_post_run(state):
 
 
 def _test_run(state):
-    '''Execute a single test case.
+    '''Execute a single test suite.
 
     Args:
-        state: test suite state collection, instance of State.
+        state: test suite state collection, instance of TestState.
 
     Returns:
         True: if the test case ran successfully and passed.
@@ -98,9 +127,13 @@ def _test_run(state):
     assert state.lldb_module
     assert state.test
 
-    if not state.test.run(state.lldb, state.pid, state.lldb_module,
-                          state.wimpy):
-        util_log.get_logger().error('test {0} failed'.format(state.name))
+    test_failures = state.test.run(state.lldb, state.pid, state.lldb_module)
+
+    if test_failures:
+        log = util_log.get_logger()
+        for test, err in test_failures:
+            log.error('test %s:%s failed: %r' % (state.name, test, err))
+
         return False
 
     return True
@@ -151,15 +184,14 @@ def _quit_test(num, timer):
 
 
 def _execute_test(state):
-    '''Execute a test case.
+    '''Execute a test suite.
 
     Args:
-        state: The current State object.
-        log: The current Log object.
+        state: The current TestState object.
     '''
     log = util_log.get_logger()
 
-    state.test.test_setup(state.android)
+    state.test.setup(state.android)
     try:
         if not _test_pre_run(state):
             raise TestSuiteException('test_pre_run() failed')
@@ -170,7 +202,7 @@ def _execute_test(state):
 
     finally:
         state.test.post_run()
-        state.test.test_shutdown(state.android)
+        state.test.teardown(state.android)
 
 
 def _get_test_case_class(module):
@@ -179,16 +211,16 @@ def _get_test_case_class(module):
     Args:
         module: A loaded test case module.
     '''
-    for _, obj in inspect.getmembers(module):
-        if inspect.isclass(obj):
-            if (hasattr(module, "TestBase") and
-                issubclass(obj, module.TestBase) and
-                obj is not module.TestBase):
-                return obj
-            if (hasattr(module, "TestBaseRemote") and
-                issubclass(obj, module.TestBaseRemote) and
-                obj is not module.TestBaseRemote):
-                return obj
+    # We consider only subclasses of TestCase that have `test_` methods`
+    log = util_log.get_logger()
+    log.debug("loading test suites from %r", module)
+    for name, klass in inspect.getmembers(module, inspect.isclass):
+        for attr in dir(klass):
+            if attr.startswith('test_'):
+                log.info("Found test class %r", name)
+                return klass
+        else:
+            log.debug("class %r has no test_ methods", name)
     return None
 
 
@@ -222,57 +254,59 @@ def main():
     timer = None
     log = None
 
+    # parse the command line (positional arguments only)
+    truthy = lambda x: x.lower() in ('true', '1')
+    parser = argparse.ArgumentParser("Run a single RenderScript TestSuite against lldb")
+    for name, formatter in (
+       ('test_name', str),
+       ('log_file_path', str),
+       ('adb_path', str),
+       ('lldb_server_path_device', str),
+       ('aosp_product_path', str),
+       ('device_port', int),
+       ('device', str),
+       ('print_to_stdout', truthy),
+       ('verbose', truthy),
+       ('wimpy', truthy),
+       ('timeout', int),
+       ('bundle_type', str),
+    ):
+        parser.add_argument(name, type=formatter)
+
+    args = parser.parse_args()
+
     try:
-        # parse the command line
-        if len(sys.argv) < 12:
-            raise TestSuiteException('Invalid number of arguments')
-
-        assert sys.argv[8] in ('True', 'False')
-        args = dict(test_name=sys.argv[1],
-                    log_file_path=sys.argv[2],
-                    adb_path=sys.argv[3],
-                    lldb_server_path_device=sys.argv[4],
-                    aosp_product_path=sys.argv[5],
-                    device_port=int(sys.argv[6]),
-                    device=sys.argv[7],
-                    print_to_stdout=sys.argv[8] == 'True',
-                    verbose=sys.argv[9] == 'True',
-                    wimpy=sys.argv[10] == 'True',
-                    timeout=int(sys.argv[11]))
-
         # create utility classes
-        harness.util_log.initialise(args['test_name'],
-            print_to_stdout=args['print_to_stdout'],
-            level=logging.INFO if not args['verbose'] else logging.DEBUG,
-            file_path=args['log_file_path'],
+        harness.util_log.initialise(
+            '%s(%s)' % (args.test_name, args.bundle_type),
+            print_to_stdout=args.print_to_stdout,
+            level=logging.INFO if not args.verbose else logging.DEBUG,
+            file_path=args.log_file_path,
             file_mode='a'
         )
         log = util_log.get_logger()
         log.debug('Logger initialised')
 
-        android = harness.UtilAndroid(args['adb_path'],
-                                      args['lldb_server_path_device'],
-                                      args['device'])
+        android = harness.UtilAndroid(args.adb_path,
+                                      args.lldb_server_path_device,
+                                      args.device)
 
         # start the timeout counter
-        timer = _initialise_timer(android, args['timeout'])
+        timer = _initialise_timer(android, args.timeout)
 
         # startup lldb and register teardown handler
         atexit.register(UtilLLDB.stop)
         UtilLLDB.start()
 
-        current_test_dir = get_test_dir(args['test_name'])
+        current_test_dir = get_test_dir(args.test_name)
 
         # load a test case module
         test_module = load_py_module(os.path.join(current_test_dir,
-                                                  args['test_name']))
-        assert test_module
-        assert (hasattr(test_module, "TestBase") or
-                hasattr(test_module, "TestBaseRemote"))
+                                                  args.test_name))
+
 
         # inspect the test module and locate our test case class
         test_class = _get_test_case_class(test_module)
-        assert test_class
 
         # if our test inherits from TestBaseRemote, check we have a valid device
         if (hasattr(test_module, "TestBaseRemote") and
@@ -280,11 +314,16 @@ def main():
             android.validate_device()
 
         # create an instance of our test case
-        test_inst = test_class(args['device_port'], args['device'], timer)
-        assert test_inst
+        test_inst = test_class(
+            args.device_port,
+            args.device,
+            timer,
+            args.bundle_type,
+            wimpy=args.wimpy
+        )
 
         # instantiate a test target bundle
-        bundle = harness.UtilBundle(android, args['aosp_product_path'])
+        bundle = harness.UtilBundle(android, args.aosp_product_path)
 
         # execute the test case
         try:
@@ -294,19 +333,18 @@ def main():
                     lldb = UtilLLDB.create_debugger()
 
                     # create state object to encapsulate instances
-                    state = type('State',
-                                 (object,),
-                                 dict(
-                                     android=android,
-                                     bundle=bundle,
-                                     lldb=lldb,
-                                     lldb_module=UtilLLDB.get_module(),
-                                     test=test_inst,
-                                     pid=None,
-                                     name=args['test_name'],
-                                     device_port=args['device_port'],
-                                     wimpy=args['wimpy'])
-                                 )
+
+                    state = TestState(
+                         android=android,
+                         bundle=bundle,
+                         lldb=lldb,
+                         lldb_module=UtilLLDB.get_module(),
+                         test=test_inst,
+                         pid=None,
+                         name=args.test_name,
+                         device_port=args.device_port,
+                         bundle_type=args.bundle_type
+                    )
 
                     util_warnings.redirect_warnings()
 
@@ -333,11 +371,16 @@ def main():
         print('Internal test suite error', file=sys.stderr)
         _quit_test(util_constants.RC_TEST_FATAL, timer)
 
+    except TestIgnoredException:
+        if log:
+            log.warn("test ignored")
+        _quit_test(util_constants.RC_TEST_IGNORED, timer)
+
     except TestSuiteException as error:
         if log:
             log.exception(str(error))
         else:
-            print(str(error), file=sys.stderr)
+            print(error, file=sys.stderr)
         _quit_test(util_constants.RC_TEST_ERROR, timer)
 
     # use a global exception handler to be sure that we will
@@ -360,4 +403,5 @@ def main():
 
 # execution trampoline
 if __name__ == '__main__':
+    print(' '.join(sys.argv))
     main()

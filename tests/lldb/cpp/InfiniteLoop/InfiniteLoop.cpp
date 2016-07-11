@@ -3,7 +3,7 @@
 
 #include <RenderScript.h>
 
-#include "ScriptC_simple.h"
+#include "ScriptC_infiniteloop.h"
 
 using namespace android;
 using namespace RSC;
@@ -24,7 +24,7 @@ int main()
     auto a = Allocation::createTyped(rs, t);
     auto b = Allocation::createTyped(rs, t);
 
-    sp<ScriptC_simple> s = new ScriptC_simple(rs);
+    sp<ScriptC_infiniteloop> s = new ScriptC_infiniteloop(rs);
 
     // Test is designed to loop forever, waits for two seconds
     // between each invocation of the kernel

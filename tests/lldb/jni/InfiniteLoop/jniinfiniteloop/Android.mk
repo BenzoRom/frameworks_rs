@@ -5,7 +5,7 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_MODULE := libjniinfiniteloop
 
-LOCAL_SRC_FILES := jniinfiniteloop.cpp infiniteLoop.rs
+LOCAL_SRC_FILES := jniinfiniteloop.cpp infiniteloop.rs
 
 LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)
 LOCAL_C_INCLUDES += frameworks/rs/cpp
