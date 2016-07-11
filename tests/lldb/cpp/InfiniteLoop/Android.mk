@@ -7,7 +7,7 @@ LOCAL_MODULE := CppInfiniteLoop
 
 LOCAL_SRC_FILES := \
 	InfiniteLoop.cpp \
-	simple.rs
+	infiniteloop.rs
 
 LOCAL_STATIC_LIBRARIES := libRScpp_static
 LOCAL_CFLAGS := --std=c++11

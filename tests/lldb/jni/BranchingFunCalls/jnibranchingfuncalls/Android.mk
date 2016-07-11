@@ -5,7 +5,7 @@ LOCAL_MODULE_TAGS := tests
 
 LOCAL_MODULE := libjnibranchingfuncalls
 
-LOCAL_SRC_FILES := jnibranchingfuncalls.cpp simple.rs
+LOCAL_SRC_FILES := jnibranchingfuncalls.cpp scalars.rs
 
 LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)
 LOCAL_C_INCLUDES += frameworks/rs/cpp
