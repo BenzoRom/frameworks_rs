@@ -4,6 +4,8 @@ This file contains the default test suite config which will be used in the
 case a developer did not supply a custom one.'''
 
 import os
+from tests.harness.decorators import deprecated
+
 
 class Config(object):
     '''Test suite configuration object.
@@ -84,7 +86,7 @@ class Config(object):
 
         When multiple devices or emulators are present, a specific device to
         use while testing can be indicated here.'''
-        return os.environ.get('ANDROID_SERIAL', None)
+        return os.environ.get('ANDROID_SERIAL')
 
     @property
     def timeout(self):
@@ -92,6 +94,7 @@ class Config(object):
         return 60 * 15
 
     @property
+    @deprecated()
     def emu_cmd(self):
         '''The command line for the emulator (if using -run-emu).'''
         return os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',

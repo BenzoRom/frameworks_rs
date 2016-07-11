@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 '''Main test suite execution script.'''
 import argparse
 import inspect
@@ -8,15 +8,17 @@ import signal
 import subprocess
 import sys
 import time
+import collections
 import xml.etree.ElementTree as ET
 
 from config import Config
 from tests.harness import util_constants
-from tests.harness import TestSuiteException
+from tests.harness.exception import TestSuiteException, FailFastException
 from tests.harness import UtilAndroid
 from tests.harness import UtilBundle
 from tests.harness import util_log
 from tests.harness.util_functions import load_py_module
+from tests.harness.decorators import deprecated
 
 # For some reason pylint is not able to understand the class returned by
 # from util_log.get_logger() and generates a lot of false warnings
@@ -42,6 +44,17 @@ def _parse_args():
     parser.add_argument('--test', '-t',
                         metavar='path',
                         help='Specify a specific test to run.')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--wimpy', '-w',
+                        action='store_true',
+                        default=None,
+                        help='Test only a core subset of features.')
+    group.add_argument('--app-types',
+                        default=['java', 'cpp', 'jni'],
+                        nargs='*',
+                        help='Specify a list of Android app types against which'
+                             ' to run the tests',
+                        dest='bundle_types')
     parser.add_argument('--install-only',
                         action='store_true',
                         default=False,
@@ -69,10 +82,10 @@ def _parse_args():
                         action='store_true',
                         default=None,
                         help='Store extra info in the log.')
-    parser.add_argument('--wimpy', '-w',
+    parser.add_argument('--fail-fast',
                         action='store_true',
-                        default=None,
-                        help='Test only a core subset of features.')
+                        default=False,
+                        help='Exit the test suite immediately on the first failure.')
     parser.add_argument('--run-emu',
                         action='store_true',
                         default=None,
@@ -178,9 +191,11 @@ class State(object):
         self.print_to_stdout = args.print_to_stdout
         self.verbose = _choice(args.verbose, config.verbose)
         self.timeout = int(_choice(args.timeout, config.timeout))
-        self.wimpy = args.wimpy
         self.emu_cmd = _choice(args.emu_cmd, config.emu_cmd)
         self.run_emu = args.run_emu
+        self.wimpy = args.wimpy
+        self.bundle_types = args.bundle_types if not self.wimpy else ['java']
+        self.fail_fast = args.fail_fast
 
         # validate the param "verbose"
         if not isinstance(self.verbose, bool):
@@ -343,6 +358,7 @@ def _check_emulator_terminated():
             '\nstderr: {0}\nstdout: {1}.'.format(stderr, stdout))
 
 
+@deprecated()
 def _launch_emulator(state):
     '''Launch the emulator and wait for it to boot.
 
@@ -431,12 +447,13 @@ def _restart_emulator(state):
     _launch_emulator(state)
 
 
-def _run_test(state, name):
+def _run_test(state, name, bundle_type):
     '''Execute a single test case.
 
     Args:
         state: Test suite state collection, instance of State.
         name: String file name of the test to execute.
+        bundle_type: string for the installed app type (cpp|jni|java)
 
     Raises:
         AssertionError: When assertion fails.
@@ -468,19 +485,22 @@ def _run_test(state, name):
 
     log.debug('Giving up control to {0}...'.format(name))
 
-    params = [sys.executable,
-              run_test_path,
-              name,
-              state.log_file_path,
-              state.adb_path,
-              state.lldb_server_path_device,
-              state.aosp_product_path,
-              str(dport),
-              state.android.get_device_id(),
-              str(state.print_to_stdout),
-              str(state.verbose),
-              str(state.wimpy),
-              str(state.timeout)]
+    params = map(str, [
+        sys.executable,
+        run_test_path,
+        name,
+        state.log_file_path,
+        state.adb_path,
+        state.lldb_server_path_device,
+        state.aosp_product_path,
+        dport,
+        state.android.get_device_id(),
+        state.print_to_stdout,
+        state.verbose,
+        state.wimpy,
+        state.timeout,
+        bundle_type
+    ])
 
     return_code = subprocess.call(params)
 
@@ -488,10 +508,21 @@ def _run_test(state, name):
     log.seek_to_end()
 
     # report in sys.stdout the result
-    print('Running {0}: {1}'.format(name,
-          ('PASS' if return_code == util_constants.RC_TEST_OK else 'FAIL')))
+    status_names = collections.defaultdict(lambda: 'FAIL', (
+            (util_constants.RC_TEST_OK, 'PASS'),
+            (util_constants.RC_TEST_IGNORED, 'IGNORED'),
+        )
+    )
+    log.info('Running %s: %s', name, status_names[return_code])
+    success = return_code == util_constants.RC_TEST_OK
+    if return_code == util_constants.RC_TEST_IGNORED:
+        log.info("%s was ignored", name)
+        return
 
-    if return_code == util_constants.RC_TEST_OK:
+    if state.fail_fast and not success:
+        raise FailFastException(name)
+
+    if success:
         state.add_result(name, 'pass')
         log.info('Test {0} passed'.format(name))
     elif return_code == util_constants.RC_TEST_TIMEOUT:
@@ -506,7 +537,7 @@ def _run_test(state, name):
                         .format(name, return_code))
 
     # print a running total pass rate
-    passes = sum(1 for key, value in state.results.iteritems() if value == 'pass')
+    passes = sum(1 for key, value in state.results.items() if value == 'pass')
     log.info('Current pass rate: {0} of {1}.'.format(passes, len(state.results)))
     if state.test_count:
         percent = (len(state.results)*100) / state.test_count
@@ -607,6 +638,8 @@ def _suite_post_run(state):
 
     Args:
         state: Test suite state collection, instance of State.
+    Returns:
+        Number of failures
     '''
     log = util_log.get_logger()
 
@@ -624,7 +657,7 @@ def _suite_post_run(state):
     results = ET.Element('testsuite')
     results.attrib['name'] = 'LLDB RS Test Suite'
 
-    for key, value in state.results.iteritems():
+    for key, value in state.results.items():
         total += 1
         if value == 'pass':
             passes += 1
@@ -654,6 +687,8 @@ def _suite_post_run(state):
     results.attrib['tests'] = str(total)
     state.results_file.write(ET.tostring(results, encoding='iso-8859-1'))
 
+    return failures
+
 
 def _discover_tests(state):
     '''Discover all tests in the tests directory.
@@ -674,9 +709,6 @@ def _discover_tests(state):
                 dir_name = os.path.basename(current_test_dir)
 
                 if dir_name == 'harness':
-                    continue
-
-                if state.wimpy and dir_name != 'java':
                     continue
 
                 for item in os.listdir(current_test_dir):
@@ -757,26 +789,29 @@ def main():
                               '--install-only option')
         else:
             # run the tests
-            for item in tests:
-                _run_test(state, item)
-            # post run step
-            _suite_post_run(state)
-
-        # success
-        quit(0)
+            for bundle_type in state.bundle_types:
+                log.info("Running bundle type '%s'", bundle_type)
+                for item in tests:
+                    _run_test(state, item, bundle_type)
+                # post run step
+            quit(0 if _suite_post_run(state) == 0 else 1)
 
     except AssertionError:
         if log:
             log.exception('Internal test suite error')
 
-        print 'Internal test suite error'
+        print('Internal test suite error')
+        quit(1)
+
+    except FailFastException:
+        log.exception('Early exit after first test failure')
         quit(1)
 
     except TestSuiteException as error:
         if log:
             log.exception('Test suite exception')
 
-        print '{0}'.format(str(error))
+        print('{0}'.format(str(error)))
         quit(2)
 
     finally:
@@ -787,7 +822,7 @@ def signal_handler(_, _unused):
     '''Signal handler for SIGINT, caused by the user typing Ctrl-C.'''
     # pylint: disable=unused-argument
     # pylint: disable=protected-access
-    print 'Ctrl+C!'
+    print('Ctrl+C!')
     os._exit(1)
 
 

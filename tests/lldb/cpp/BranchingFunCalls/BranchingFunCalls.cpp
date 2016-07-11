@@ -1,6 +1,6 @@
 #include <RenderScript.h>
 
-#include "ScriptC_simple.h"
+#include "ScriptC_scalars.h"
 
 using namespace android;
 using namespace RSC;
@@ -29,7 +29,7 @@ int main()
     delete [] input;
 
     // Script is executed once, then the data is copied back when finished
-    sp<ScriptC_simple> s = new ScriptC_simple(rs);
+    sp<ScriptC_scalars> s = new ScriptC_scalars(rs);
     s->invoke_addToGlobal(234);
     s->forEach_simple_kernel(a, b);
     rs->finish();

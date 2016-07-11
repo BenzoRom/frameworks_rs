@@ -1,5 +1,7 @@
 '''Initialise the Python logging facility for the test suite.
 
+from __future__ import absolute_import
+
 It provides the function to initialise the logging facility and retrieve an
 instance of the logger class. It also contains the definition of the internal
 logger class.

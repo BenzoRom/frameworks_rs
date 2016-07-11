@@ -1,14 +1,21 @@
 '''Module that contains the class UtilAndroid, providing utility method to
 interface with Android ADB.'''
 
+from __future__ import absolute_import
+
 import logging
 import re
 import subprocess
 import time
 import collections
 import multiprocessing
-import Queue
-from exception import TestSuiteException
+try:
+    # Python 3
+    import queue
+except ImportError:
+    import Queue as queue
+
+from .exception import TestSuiteException
 from . import util_log
 
 
@@ -512,7 +519,7 @@ class UtilAndroid(object):
         if not output:
             return False
 
-        cmd = 'am start -S -n {0}/{0}.{1}'.format(name, activity)
+        cmd = 'am start -S -W {0}/{0}.{1}'.format(name, activity)
         stdout = self.shell(cmd)
 
         self._log.info(str(stdout))
@@ -687,7 +694,7 @@ class UtilAndroid(object):
         # wait for the result
         try:
             return_code, output = channel.get(True, timeout)
-        except Queue.Empty:
+        except queue.Empty:
             # timeout hit, the remote process has not fulfilled our request by
             # the given time. We are going to return <None, None>, nothing to
             # do here as it already holds return_code = output = None.
