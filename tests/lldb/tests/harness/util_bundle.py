@@ -1,11 +1,13 @@
 '''Module that contains the class UtilBundle, representing a collection of RS
 binaries.'''
 
+from __future__ import absolute_import
+
 import os
 import time
 from . import util_constants
 from . import util_log
-from exception import TestSuiteException
+from .exception import TestSuiteException
 
 
 class UtilBundle(object):
@@ -19,7 +21,8 @@ class UtilBundle(object):
         'BranchingFunCalls': 'com.android.rs.branchingfuncalls',
         'KernelVariables': 'com.android.rs.kernelvariables',
         'Allocations': 'com.android.rs.allocations',
-        'MultipleRSFiles': 'com.android.rs.multiplersfiles'
+        'MultipleRSFiles': 'com.android.rs.multiplersfiles',
+        'SingleSource': 'com.android.rs.singlesource'
     }
 
     _tests_jni = {
@@ -37,11 +40,10 @@ class UtilBundle(object):
                   'CppKernelVariables', 'CppAllocations', 'CppMultipleRSFiles'}
 
     _missing_path_msg = (
-        'No product path has been provided, if using the '
-        'default environmental variable check it is set '
-        'by running lunch. Alternatively hardcode '
-        'your own path in the config file or set it via the '
-        'command line.'
+        'No product path has been provided. If using `lunch` ensure '
+        'the `ANDROID_PRODUCT_OUT` environment variable has been set correctly. '
+        'Alternatively, include it in the config file or specify it explicitly '
+        'on the command line (`--aosp-product-path`)'
     )
 
     def __init__(self, android, aosp_product_path):
@@ -193,7 +195,7 @@ class UtilBundle(object):
         Raises:
             TestSuiteException: An apk could not be installed.
         '''
-        for app, package in self._tests_apk.iteritems():
+        for app, package in self._tests_apk.items():
             self._install_apk(app, package)
 
     def _push_all_ndk(self):
@@ -241,7 +243,7 @@ class UtilBundle(object):
         # Ensure the system/lib directory is writable
         self._android.make_device_writeable()
 
-        for app, package in self._tests_jni.iteritems():
+        for app, package in self._tests_jni.items():
             self._install_apk(app, package)
             output = self._android.adb('push %s/lib%s.so /system/lib' %
                                        (app_folder, app.lower()), False, True,
@@ -320,8 +322,6 @@ class UtilBundle(object):
                     ' is not installed. Try removing the --no-install option?')
                 return None
 
-            # Give the app time to crash if it needs to
-            time.sleep(2)
             return self._android.find_app_pid(package)
         else:
             self._log.error('Executable {0} neither Java nor NDK.'
@@ -336,8 +336,6 @@ class UtilBundle(object):
                 ' is not installed. Try removing the --no-install option?')
             return None
 
-        # Give the app time to crash if it needs to
-        time.sleep(20)
         return self._android.find_app_pid(process_name)
 
     def check_apps_installed(self, java_only):
@@ -357,7 +355,7 @@ class UtilBundle(object):
 
         installed = self._android.shell('pm list packages -f')
 
-        for app, package in java_and_jni_apks.iteritems():
+        for app, package in java_and_jni_apks.items():
             if package not in installed:
                 raise TestSuiteException('apk %s is not installed.' % app)
 

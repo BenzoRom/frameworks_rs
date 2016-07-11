@@ -1,9 +1,11 @@
 '''Module that contains the base class TestBaseRemote'''
 
+from __future__ import absolute_import
+
 import os
 import re
 
-from test_base import TestBase
+from .test_base import TestBase
 from . import util_log
 
 
@@ -13,8 +15,8 @@ class TestBaseRemote(TestBase):
     Provides common functionality to set up the connection and tear it down.
     '''
 
-    def __init__(self, device_port, device, timer):
-        super(TestBaseRemote, self).__init__(device_port, device, timer)
+    def __init__(self, device_port, device, timer, *args, **kwargs):
+        super(TestBaseRemote, self).__init__(device_port, device, timer, *args, **kwargs)
         # port used by lldb-server on the device.
         self._device_port = device_port
         self._platform = None
@@ -62,15 +64,6 @@ class TestBaseRemote(TestBase):
         '''Clean up after execution.'''
         if self._platform:
             self._platform.DisconnectRemote()
-
-    def test_case(self, _):
-        '''Run the lldb commands that are being tested.
-
-        Raises:
-            TestFail: One of the lldb commands did not provide the expected
-                      output.
-        '''
-        raise NotImplementedError
 
     def _connect_to_platform(self, lldb_module, dbg, remote_pid):
         '''Connect to an lldb platform that has been started elsewhere.
@@ -136,18 +129,17 @@ class TestBaseRemote(TestBase):
 
         return True
 
-    def run(self, dbg, remote_pid, lldb, wimpy):
-        '''Execute the actual test.
+    def run(self, dbg, remote_pid, lldb):
+        '''Execute the actual testsuite.
 
         Args:
             dbg: The instance of the SBDebugger that is used to test commands.
             remote_pid: The integer that is the process id of the binary that
                         the debugger is attached to.
             lldb: A handle to the lldb module.
-            wimpy: Boolean to specify only a subset of the commands be executed.
 
-        Returns:
-            True if the test passed, or False if not.
+        Returns: list of (test, failure) tuples.
+
         '''
         assert dbg
         assert remote_pid
@@ -155,17 +147,12 @@ class TestBaseRemote(TestBase):
 
         self._lldb = lldb
 
-        try:
-            self.test_assert(self._connect_to_platform(lldb, dbg, remote_pid))
-            self._ci = dbg.GetCommandInterpreter()
-            assert self._ci
+        self.assert_true(self._connect_to_platform(lldb, dbg, remote_pid))
+        self._ci = dbg.GetCommandInterpreter()
+        assert self._ci
 
-            self.test_assert(self._ci.IsValid())
-            self.test_assert(self._ci.HasCommands())
+        self.assert_true(self._ci.IsValid())
+        self.assert_true(self._ci.HasCommands())
 
-            self.test_case(wimpy)
+        return super(TestBaseRemote, self).run(dbg, remote_pid, lldb)
 
-        except self.TestFail:
-            return False
-
-        return True

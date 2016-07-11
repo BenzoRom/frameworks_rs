@@ -1,77 +1,23 @@
 '''Module that contains TestBase, the base class of all tests.'''
 
+from __future__ import absolute_import
+
 import logging
 import os
 import re
 import tempfile
+import inspect
 import traceback
 
-from exception import DisconnectedException
+from .exception import DisconnectedException, TestSuiteException
 
 from . import util_log
+
 
 class TestBase(object):
     '''Base class for all tests. Provides some common functionality.'''
 
-    def __init__(self, device_port, device, timer):
-        # Keep argument names for documentation purposes. This method is
-        # overwritten by test_base_remote.
-        # pylint: disable=unused-argument
-        self._lldb = None # handle to the lldb module
-        self._ci = None # instance of the lldb command interpreter for this test
-        self._timer = timer # timer instance, to check whether the test froze
-
-    def get_bundle_target(self):
-        '''Return string with name of bundle executable to run.
-
-        Returns:
-            String that is the name of the binary that this test should be run
-            with.
-        '''
-        raise NotImplementedError
-
-    def test_setup(self, android):
-        '''Set up environment for the test.
-
-        Override to specify commands to be run before the test APK launch.
-        Useful for setting Android properties or environment variables. See also
-        the test_shutdown method.
-
-        Args:
-            android: Handler to the android device, see the UtilAndroid class.
-        '''
-        pass
-
-    def test_shutdown(self, android):
-        '''Clean up environment after test.
-
-        Override this procedure to specify commands to be run after the test has
-        finished. This method is run regardless the outcome of the test.
-        Ideally, it should revert the changes introduced by test_setup.
-
-        Args:
-            android: Handler to the android device, see the UtilAndroid class.
-        '''
-        pass
-
-    def run(self, dbg, remote_pid, lldb, wimpy):
-        '''Execute the actual test.
-
-        Args:
-            dbg: The instance of the SBDebugger that is used to test commands.
-            remote_pid: The integer that is the process id of the binary that
-                        the debugger is attached to.
-            lldb: A handle to the lldb module.
-            wimpy: Boolean to specify only a subset of the commands be executed.
-
-        Returns:
-            True if the test passed, or False if not.
-        '''
-        raise NotImplementedError
-
-    def post_run(self):
-        '''Clean up after test execution.'''
-        pass
+    bundle_target = {}
 
     class TestFail(Exception):
         '''Exception that is thrown when a line in a test fails.
@@ -81,7 +27,86 @@ class TestBase(object):
         '''
         pass
 
-    def test_assert(self, cond):
+    def __init__(self, device_port, device, timer, app_type, wimpy=False, **kwargs):
+        # Keep argument names for documentation purposes. This method is
+        # overwritten by test_base_remote.
+        # pylint: disable=unused-argument
+        self._lldb = None # handle to the lldb module
+        self._ci = None # instance of the lldb command interpreter for this test
+        self._timer = timer # timer instance, to check whether the test froze
+        self.app_type = app_type # The type of bundle that is being executed
+        self.wimpy = wimpy
+
+    def setup(self, android):
+        '''Set up environment for the test.
+
+        Override to specify commands to be run before the test APK launch.
+        Useful for setting Android properties or environment variables. See also
+        the teardown method.
+
+        Args:
+            android: Handler to the android device, see the UtilAndroid class.
+        '''
+        pass
+
+    def teardown(self, android):
+        '''Clean up environment after test.
+
+        Override this procedure to specify commands to be run after the test has
+        finished. This method is run regardless the outcome of the test.
+
+        Args:
+            android: Handler to the android device, see the UtilAndroid class.
+        '''
+        pass
+
+    def run(self, dbg, remote_pid, lldb):
+        '''Execute the actual test suite.
+
+        Args:
+            dbg: The instance of the SBDebugger that is used to test commands.
+            remote_pid: The integer that is the process id of the binary that
+                        the debugger is attached to.
+            lldb: A handle to the lldb module.
+
+        Returns:
+            A list of (test, failure) tuples.
+        '''
+        log = util_log.get_logger()
+
+        def predicate(obj):
+            '''check whether we're interested in the function'''
+            if not callable(obj):
+                return False
+            if self.wimpy and not getattr(obj, 'wimpy', False):
+                log.debug("skipping non-wimpy test in wimpy mode:%r", obj)
+                return False
+            return True
+
+        test_methods = [
+            method for name, method in inspect.getmembers(self, predicate)
+            if name.startswith('test_')
+        ]
+        log.debug("Found the following tests %r", test_methods)
+        test_errors = []
+
+        for test in sorted(
+            test_methods,
+            key=lambda item: getattr(item, 'test_order', float('Inf'))
+        ):
+            try:
+                log.info("running test %r", test.__name__)
+                result = test()
+            except (self.TestFail, TestSuiteException) as e:
+                test_errors.append((method, e))
+
+        return test_errors
+
+    def post_run(self):
+        '''Clean up after test execution.'''
+        pass
+
+    def assert_true(self, cond):
         '''Check a given condition and raise TestFail if it is False.
 
         Args:
@@ -255,3 +280,33 @@ class TestBase(object):
         os.remove(name)
         return name
 
+
+class TestBaseNoTargetProcess(TestBase):
+    '''lldb target that doesn't require a binary to be running.'''
+
+    def get_bundle_target(self):
+        '''Get bundle executable to run.
+
+        Returns: None
+        '''
+        return None
+
+    @property
+    def bundle_target(self):
+        return self.get_bundle_target()
+
+    def run(self, dbg, remote_pid, lldb):
+        '''Execute the test case.
+
+        Args:
+            dbg: The instance of the SBDebugger that is used to test commands.
+            lldb: A handle to the lldb module.
+
+        Returns:
+            True: test passed, False: test failed.
+        '''
+        self._lldb = lldb
+        self._dbg = dbg
+        self._ci = dbg.GetCommandInterpreter()
+        assert self._ci.IsValid()
+        return super(TestBaseNoTargetProcess, self).run(self, dbg, remote_pid)
