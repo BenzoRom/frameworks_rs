@@ -1,5 +1,7 @@
 '''Module that contains TestSuiteException.'''
 
+from __future__ import absolute_import
+
 class TestSuiteException(Exception):
     '''Exception that is thrown whenever an internal error is encountered.
 
@@ -12,4 +14,14 @@ class DisconnectedException(Exception):
 
     Just contains a message.
     '''
+    pass
+
+
+class FailFastException(TestSuiteException):
+    '''Quick Bailout'''
+    pass
+
+
+class TestIgnoredException(TestSuiteException):
+    '''Raised when a testcase is ignored.'''
     pass

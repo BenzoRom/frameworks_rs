@@ -1,6 +1,8 @@
 '''This file contains utility functions used by both the test suite and the
 single test executor.'''
 
+from __future__ import absolute_import
+
 import os
 import importlib
 import sys
@@ -18,7 +20,7 @@ def load_py_module(path):
     assert isinstance(path, str)
     try:
         if not os.path.exists(path):
-            print 'Path does not exist: ' + path
+            print('Path does not exist: ' + path)
             return None
         path = os.path.abspath(path)
         module_dir, module_file = os.path.split(path)
@@ -30,7 +32,7 @@ def load_py_module(path):
         sys.path.pop(0)
         return module_obj
     except ImportError as err:
-        print str(err)
-        print "Looking in directory "
-        print module_dir
+        print(str(err))
+        print("Looking in directory ")
+        print(module_dir)
         return None
