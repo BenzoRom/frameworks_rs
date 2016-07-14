@@ -9,7 +9,8 @@ import android.renderscript.*;
 public class MainActivity extends Activity {
 
     private RenderScript mRS;
-    private Allocation mAllocIn;
+    private Allocation mAllocIn1;
+    private Allocation mAllocIn2;
     private Allocation mAllocOut;
     private ScriptC_rs_single_source mScript;
 
@@ -20,22 +21,41 @@ public class MainActivity extends Activity {
 
         setContentView(R.layout.main_layout);
 
+        // create renderscript context
         mRS = RenderScript.create(
               this,
               RenderScript.ContextType.NORMAL,
-              RenderScript.CREATE_FLAG_LOW_LATENCY |
-              RenderScript.CREATE_FLAG_WAIT_FOR_ATTACH);
+              RenderScript.CREATE_FLAG_WAIT_FOR_ATTACH |
+              RenderScript.CREATE_FLAG_LOW_LATENCY);
 
+        // create a new instance of the script
         mScript = new ScriptC_rs_single_source(mRS);
 
-        float [] input = new float[]{ 1.f, 2.f, 3.f, 4.f };
-        float [] output = new float[4];
+        // create the first input allocation
+        mAllocIn1 = Allocation.createSized(mRS, Element.F32(mRS), 4);
+        float [] in1 = new float[]{ 1.f, 2.f, 3.f, 4.f };
+        mAllocIn1.copyFrom(in1);
 
-        mAllocIn  = Allocation.createSized(mRS, Element.F32(mRS), 4);
+        // create second input allocation
+        mAllocIn2 = Allocation.createSized(mRS, Element.F32(mRS), 4);
+        float [] in2 = new float[]{ 5.f, 6.f, 7.f, 8.f };
+        mAllocIn2.copyFrom(in2);
+
+        // create output allocation
         mAllocOut = Allocation.createSized(mRS, Element.F32(mRS), 4);
 
-        mAllocIn.copyFrom(input);
+        // setup the global output allocation
+        mScript.set_global_alloc(Allocation.createSized(mRS, Element.F32(mRS), 4));
 
-        mScript.invoke_script_invoke(mAllocOut, mAllocIn);
+        // invoke static function 1
+        mScript.invoke_script_invoke_1(mAllocOut, mAllocIn1, mAllocIn2);
+
+        // invoke static function 2
+        mScript.invoke_script_invoke_2();
+
+        // invoke void kernel
+        Script.LaunchOptions options = new Script.LaunchOptions();
+        options.setX(0, 4);
+        mScript.forEach_void_kernel_1(options);
     }
 }
