@@ -51,22 +51,19 @@ public class BlasBenchmark extends Activity {
     private TextView mTextView;
     private boolean mToggleLong;
     private boolean mTogglePause;
-    private boolean mDemoMode;
 
     // In demo mode this is used to count updates in the pipeline.  It's
     // incremented when work is submitted to RS and decremented when invalidate is
     // called to display a result.
+    private boolean mDemoMode;
 
-    // Message processor to handle notifications for when kernel completes
-    private class MessageProcessor extends RenderScript.RSMessageHandler {
-        MessageProcessor() {
-        }
-
-        public void run() {
-            synchronized(mProcessor) {
-                mProcessor.notifyAll();
-            }
-        }
+    // Initialize the parameters for Instrumentation tests.
+    protected void prepareInstrumentationTest() {
+        mTestList = new int[1];
+        mTestResults = new float[1];
+        mTestInfo = new String[1];
+        mDemoMode = false;
+        mProcessor = new Processor(RenderScript.create(this), !mDemoMode);
     }
 
 
@@ -89,15 +86,20 @@ public class BlasBenchmark extends Activity {
 
         Processor(RenderScript rs, boolean benchmarkMode) {
             mRS = rs;
-            mRS.setMessageHandler(new MessageProcessor());
             mBenchmarkMode = benchmarkMode;
-            start();
         }
 
         class Result {
             float totalTime;
             int iterations;
             String testInfo;
+        }
+
+        // Method to retreive benchmark results for instrumentation tests.
+        float getInstrumentationResult(BlasTestList.TestName t) {
+            mTest = changeTest(t, false);
+            Result r = getBenchmark();
+            return r.totalTime / r.iterations * 1000.f;
         }
 
         // Run one loop of kernels for at least the specified minimum time.
@@ -111,8 +113,6 @@ public class BlasBenchmark extends Activity {
                 // Run the kernel
                 mTest.runTest();
                 r.iterations ++;
-                // Send our RS message handler a message so we know when this work has completed
-                mRS.sendMessage(0, null);
 
                 long t2 = java.lang.System.currentTimeMillis();
                 r.totalTime += (t2 - t) / 1000.f;
@@ -146,7 +146,7 @@ public class BlasBenchmark extends Activity {
             Result r = runBenchmarkLoop(runtime);
 
             Log.v("rs", "Test: time=" + r.totalTime +"s,  iterations=" + r.iterations +
-                  ", avg=" + r.totalTime / r.iterations * 1000.f);
+                  ", avg=" + r.totalTime / r.iterations * 1000.f + " " + r.testInfo);
 
             mDoingBenchmark = false;
             return r;
@@ -199,8 +199,6 @@ public class BlasBenchmark extends Activity {
                 } else {
                     // Run the kernel
                     runTest();
-                    // Send our RS message handler a message so we know when this work has completed
-                    mRS.sendMessage(0, null);
                 }
             }
 
@@ -254,7 +252,9 @@ public class BlasBenchmark extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        mProcessor.exit();
+        if (mProcessor != null) {
+            mProcessor.exit();
+        }
     }
 
     public void onBenchmarkFinish(boolean ok) {
@@ -270,14 +270,6 @@ public class BlasBenchmark extends Activity {
         finish();
     }
 
-
-    void startProcessor() {
-        mProcessor = new Processor(RenderScript.create(this), !mDemoMode);
-        if (mDemoMode) {
-            mProcessor.mTest = changeTest(mTestList[0], true);
-        }
-    }
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -288,10 +280,15 @@ public class BlasBenchmark extends Activity {
         mTogglePause = i.getBooleanExtra("enable pause", false);
         mDemoMode = i.getBooleanExtra("demo", false);
 
-        mTestResults = new float[mTestList.length];
-        mTestInfo = new String[mTestList.length];
-
-        startProcessor();
+        if (mTestList != null) {
+            mTestResults = new float[mTestList.length];
+            mTestInfo = new String[mTestList.length];
+            mProcessor = new Processor(RenderScript.create(this), !mDemoMode);
+            if (mDemoMode) {
+                mProcessor.mTest = changeTest(mTestList[0], true);
+            }
+            mProcessor.start();
+        }
     }
 
     protected void onDestroy() {

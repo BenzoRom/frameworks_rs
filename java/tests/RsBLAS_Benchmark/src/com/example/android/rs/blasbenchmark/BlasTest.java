@@ -17,43 +17,46 @@
 package com.example.android.rs.blasbenchmark;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.android.rs.blasbenchmark.BlasTestList.TestName;
-import com.example.android.rs.blasbenchmark.BlasTestRunner;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.MediumTest;
 
 /**
  * BLAS benchmark test.
  * To run the test, please use command
  *
- * adb shell am instrument -e iteration <n> -w com.example.android.rs.blasbenchmark/.BlasTestRunner
+ * adb shell am instrument -w com.example.android.rs.blasbenchmark/android.support.test.runner.AndroidJUnitRunner
  *
  */
 public class BlasTest extends ActivityInstrumentationTestCase2<BlasBenchmark> {
     private final String TAG = "BLAS Test";
     private final String TEST_NAME = "Testname";
-    private final String ITERATIONS = "Iterations";
     private final String BENCHMARK = "Benchmark";
-    private static int INSTRUMENTATION_IN_PROGRESS = 2;
-    private int mIteration;
+    // Only run 1 iteration now to fit the MediumTest time requirement.
+    // One iteration means running the tests continuous for 1s.
+    private int mIteration = 1;
     private BlasBenchmark mActivity;
 
     public BlasTest() {
         super(BlasBenchmark.class);
     }
 
+    // Initialize the parameter for ImageProcessingActivityJB.
+    protected void prepareTest() {
+        mActivity = getActivity();
+        mActivity.prepareInstrumentationTest();
+    }
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        prepareTest();
         setActivityInitialTouchMode(false);
-        mActivity = getActivity();
-        BlasTestRunner mRunner = (BlasTestRunner) getInstrumentation();
-        mIteration = mRunner.mIteration;
-        assertTrue("please enter a valid iteration value", mIteration > 0);
    }
 
     @Override
@@ -68,8 +71,7 @@ public class BlasTest extends ActivityInstrumentationTestCase2<BlasBenchmark> {
             mTestName = testName;
         }
         public void run() {
-            mActivity.changeTest(mTestName, false);
-            //mResult = mActivity.getBenchmark();
+            mResult = mActivity.mProcessor.getInstrumentationResult(mTestName);
             Log.v(TAG, "Benchmark for test \"" + mTestName.toString() + "\" is: " + mResult);
             synchronized(this) {
                 this.notify();
@@ -107,50 +109,77 @@ public class BlasTest extends ActivityInstrumentationTestCase2<BlasBenchmark> {
         // post result to INSTRUMENTATION_STATUS
         Bundle results = new Bundle();
         results.putString(TEST_NAME, testName);
-        results.putInt(ITERATIONS, mIteration);
         results.putFloat(BENCHMARK, avgResult);
-        getInstrumentation().sendStatus(INSTRUMENTATION_IN_PROGRESS, results);
+        getInstrumentation().sendStatus(Activity.RESULT_OK, results);
     }
 
     // Test case 0: SGEMM Test Small
-    @LargeTest
+    @MediumTest
     public void testSGEMMSmall() {
         TestAction ta = new TestAction(TestName.SGEMM_SMALL);
         runTest(ta, TestName.SGEMM_SMALL.name());
     }
 
     // Test case 1: SGEMM Test Medium
-    @LargeTest
+    @MediumTest
     public void testSGEMMedium() {
         TestAction ta = new TestAction(TestName.SGEMM_MEDIUM);
         runTest(ta, TestName.SGEMM_MEDIUM.name());
     }
 
     // Test case 2: SGEMM Test Large
-    @LargeTest
+    @MediumTest
     public void testSGEMMLarge() {
         TestAction ta = new TestAction(TestName.SGEMM_LARGE);
         runTest(ta, TestName.SGEMM_LARGE.name());
     }
 
     // Test case 3: 8Bit GEMM Test Small
-    @LargeTest
+    @MediumTest
     public void testBNNMSmall() {
         TestAction ta = new TestAction(TestName.BNNM_SMALL);
         runTest(ta, TestName.BNNM_SMALL.name());
     }
 
     // Test case 4: 8Bit GEMM Test Medium
-    @LargeTest
+    @MediumTest
     public void testBNNMMMedium() {
         TestAction ta = new TestAction(TestName.BNNM_MEDIUM);
         runTest(ta, TestName.BNNM_MEDIUM.name());
     }
 
     // Test case 5: 8Bit GEMM Test Large
-    @LargeTest
+    @MediumTest
     public void testBNNMLarge() {
         TestAction ta = new TestAction(TestName.BNNM_LARGE);
         runTest(ta, TestName.BNNM_LARGE.name());
+    }
+
+    // Test case 6: SGEMM GoogLeNet Test
+    @MediumTest
+    public void testSGEMMGoogLeNet() {
+        TestAction ta = new TestAction(TestName.SGEMM_GoogLeNet);
+        runTest(ta, TestName.SGEMM_GoogLeNet.name());
+    }
+
+    // Test case 7: 8Bit GEMM GoogLeNet Test
+    @MediumTest
+    public void testBNNMGoogLeNet() {
+        TestAction ta = new TestAction(TestName.BNNM_GoogLeNet);
+        runTest(ta, TestName.BNNM_GoogLeNet.name());
+    }
+
+    // Test case 8: SGEMM GoogLeNet Test Padded
+    @MediumTest
+    public void testSGEMMGoogLeNetPadded() {
+        TestAction ta = new TestAction(TestName.SGEMM_GoogLeNet_Padded);
+        runTest(ta, TestName.SGEMM_GoogLeNet_Padded.name());
+    }
+
+    // Test case 9: 8Bit GEMM GoogLeNet Test Padded
+    @MediumTest
+    public void testBNNMGoogLeNetPadded() {
+        TestAction ta = new TestAction(TestName.BNNM_GoogLeNet_Padded);
+        runTest(ta, TestName.BNNM_GoogLeNet_Padded.name());
     }
 }

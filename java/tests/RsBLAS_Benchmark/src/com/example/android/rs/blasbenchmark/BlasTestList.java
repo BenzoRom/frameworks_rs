@@ -34,7 +34,11 @@ public class BlasTestList {
         SGEMM_LARGE ("SGEMM Test LARGE", 1.f),
         BNNM_SMALL ("8Bit GEMM Test Small", 1.f),
         BNNM_MEDIUM ("8Bit GEMM Test Medium", 1.f),
-        BNNM_LARGE ("8Bit GEMM Test Large", 1.f);
+        BNNM_LARGE ("8Bit GEMM Test Large", 1.f),
+        SGEMM_GoogLeNet ("GoogLeNet SGEMM Test", 1.f),
+        BNNM_GoogLeNet ("GoogLeNet BNNM Test", 1.f),
+        SGEMM_GoogLeNet_Padded ("GoogLeNet SGEMM Test Padded", 1.f),
+        BNNM_GoogLeNet_Padded ("GoogLeNet BNNM Test Padded", 1.f);
 
         private final String name;
         public final float baseline;
@@ -68,6 +72,14 @@ public class BlasTestList {
             return new BNNMTest(2);
         case BNNM_LARGE:
             return new BNNMTest(3);
+        case SGEMM_GoogLeNet:
+            return new GoogLeNet(1);
+        case BNNM_GoogLeNet:
+            return new GoogLeNet(2);
+        case SGEMM_GoogLeNet_Padded:
+            return new GoogLeNet(3);
+        case BNNM_GoogLeNet_Padded:
+            return new GoogLeNet(4);
         }
 
         return null;
