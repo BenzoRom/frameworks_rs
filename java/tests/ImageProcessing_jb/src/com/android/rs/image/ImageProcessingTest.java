@@ -35,8 +35,6 @@ import android.test.suitebuilder.annotation.MediumTest;
  */
 public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageProcessingActivityJB> {
     private final String TAG = "ImageProcessingTest";
-    private final String TEST_NAME = "Testname";
-    private final String BENCHMARK = "Benchmark";
     // Only run 1 iteration now to fit the MediumTest time requirement.
     // One iteration means running the tests continuous for 1s.
     private int mIteration = 1;
@@ -110,8 +108,7 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
 
         // post result to INSTRUMENTATION_STATUS
         Bundle results = new Bundle();
-        results.putString(TEST_NAME, testName);
-        results.putFloat(BENCHMARK, avgResult);
+        results.putFloat(testName + "_avg", avgResult);
         getInstrumentation().sendStatus(Activity.RESULT_OK, results);
     }
 
