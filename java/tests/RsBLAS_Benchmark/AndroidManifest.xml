@@ -19,11 +19,14 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-sdk android:minSdkVersion="23" />
-    <application android:label="RsBlasBenchmark">
-        <activity android:name="BlasBenchmark"
-                  android:hardwareAccelerated="true">
+    <application android:label="RsBlasBenchmark"
+                 android:hardwareAccelerated="true">
+        <uses-library android:name="android.test.runner" />
+        <activity android:name="BlasBenchmark">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
-
         <activity class=".BlasControls" android:name="BlasControls">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,4 +34,6 @@
             </intent-filter>
         </activity>
     </application>
+    <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
+        android:targetPackage="com.example.android.rs.blasbenchmark"/>
 </manifest>
