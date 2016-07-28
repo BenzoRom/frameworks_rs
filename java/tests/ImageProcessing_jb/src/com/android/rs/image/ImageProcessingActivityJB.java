@@ -20,10 +20,6 @@ import android.app.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -35,13 +31,8 @@ import android.graphics.Point;
 import android.view.WindowManager;
 
 import android.util.Log;
-import android.renderscript.ScriptC;
-import android.renderscript.RenderScript;
-import android.renderscript.Type;
 import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.Script;
-
+import android.renderscript.RenderScript;
 
 public class ImageProcessingActivityJB extends Activity
                                        implements SeekBar.OnSeekBarChangeListener,
@@ -93,6 +84,15 @@ public class ImageProcessingActivityJB extends Activity
     // called to display a result.
     private int mShowsPending;
 
+    // Initialize the parameters for Instrumentation tests.
+    protected void prepareInstrumentationTest() {
+        mTestList = new int[1];
+        mBitmapWidth = 1920;
+        mBitmapHeight = 1080;
+        mTestResults = new float[1];
+
+        startProcessor();
+    }
 
     static public class SizedTV extends TextureView {
         int mWidth;
@@ -303,6 +303,11 @@ public class ImageProcessingActivityJB extends Activity
             return r;
         }
 
+        // Method to retreive benchmark results for instrumentation tests.
+        float getInstrumentationResult(IPTestListJB.TestName t) {
+            mTest = changeTest(t, false);
+            return getBenchmark();
+        }
 
         // Get a benchmark result for a specific test
         private float getBenchmark() {
@@ -653,7 +658,9 @@ public class ImageProcessingActivityJB extends Activity
     @Override
     protected void onPause() {
         super.onPause();
-        mProcessor.exit();
+        if (mProcessor != null) {
+            mProcessor.exit();
+        }
     }
 
     public void onBenchmarkFinish(boolean ok) {
@@ -670,10 +677,6 @@ public class ImageProcessingActivityJB extends Activity
 
 
     void startProcessor() {
-        if (!mDemoMode) {
-            hideBars();
-        }
-
         Point size = new Point();
         getWindowManager().getDefaultDisplay().getSize(size);
 
@@ -726,9 +729,16 @@ public class ImageProcessingActivityJB extends Activity
         mBitmapHeight = i.getIntExtra("resolution Y", 0);
         mDemoMode = i.getBooleanExtra("demo", false);
 
-        mTestResults = new float[mTestList.length];
-
-        startProcessor();
+        // Hide the bars in demo mode.
+        // Calling from onResume() to make sure the operation is on the UI thread.
+        if (!mDemoMode) {
+            hideBars();
+        }
+        // Start the processor only when a non-empty list received from the intent.
+        if (mTestList != null) {
+            mTestResults = new float[mTestList.length];
+            startProcessor();
+        }
     }
 
     protected void onDestroy() {
