@@ -19,27 +19,27 @@ package com.android.rs.imagejb;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.app.Activity;
 
 import com.android.rs.imagejb.IPTestListJB.TestName;
-import com.android.rs.imagejb.ImageProcessingTestRunner;
 
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.suitebuilder.annotation.LargeTest;
+import android.test.suitebuilder.annotation.MediumTest;
 
 /**
  * ImageProcessing benchmark test.
  * To run the test, please use command
  *
- * adb shell am instrument -e iteration <n> -w com.android.rs.image/.ImageProcessingTestRunner
+ * adb shell am instrument -w com.android.rs.imagejb/android.support.test.runner.AndroidJUnitRunner
  *
  */
 public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageProcessingActivityJB> {
     private final String TAG = "ImageProcessingTest";
     private final String TEST_NAME = "Testname";
-    private final String ITERATIONS = "Iterations";
     private final String BENCHMARK = "Benchmark";
-    private static int INSTRUMENTATION_IN_PROGRESS = 2;
-    private int mIteration;
+    // Only run 1 iteration now to fit the MediumTest time requirement.
+    // One iteration means running the tests continuous for 1s.
+    private int mIteration = 1;
     private ImageProcessingActivityJB mActivity;
 
     public ImageProcessingTest() {
@@ -47,27 +47,17 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
     }
 
 
-    protected void prepareTest(int test) {
-        /*
-        mActivity.mTestList = new int[1];
-        mActivity.mTestList[0] = test;
-
-        mActivity.mBitmapWidth = 1920;
-        mActivity.mBitmapHeight = 1080;
-
-        mActivity.mTestResults = new float[1];
-
-        mActivity.startProcessor();*/
+    // Initialize the parameter for ImageProcessingActivityJB.
+    protected void prepareTest() {
+        mActivity = getActivity();
+        mActivity.prepareInstrumentationTest();
     }
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        prepareTest();
         setActivityInitialTouchMode(false);
-        mActivity = getActivity();
-        ImageProcessingTestRunner mRunner = (ImageProcessingTestRunner) getInstrumentation();
-        mIteration = mRunner.mIteration;
-        assertTrue("please enter a valid iteration value", mIteration > 0);
    }
 
     @Override
@@ -82,8 +72,7 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
             mTestName = testName;
         }
         public void run() {
-            mActivity.changeTest(mTestName, false);
-            //mResult = mActivity.getBenchmark();
+            mResult = mActivity.mProcessor.getInstrumentationResult(mTestName);
             Log.v(TAG, "Benchmark for test \"" + mTestName.toString() + "\" is: " + mResult);
             synchronized(this) {
                 this.notify();
@@ -108,6 +97,7 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
         }
     }
 
+    // TODO: Report more info: mean, median, std, etc.
     public void runTest(TestAction ta, String testName) {
         float sum = 0;
         for (int i = 0; i < mIteration; i++) {
@@ -121,302 +111,336 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
         // post result to INSTRUMENTATION_STATUS
         Bundle results = new Bundle();
         results.putString(TEST_NAME, testName);
-        results.putInt(ITERATIONS, mIteration);
         results.putFloat(BENCHMARK, avgResult);
-        getInstrumentation().sendStatus(INSTRUMENTATION_IN_PROGRESS, results);
+        getInstrumentation().sendStatus(Activity.RESULT_OK, results);
     }
 
     // Test case 0: Levels Vec3 Relaxed
-    @LargeTest
+    @MediumTest
     public void testLevelsVec3Relaxed() {
         TestAction ta = new TestAction(TestName.LEVELS_VEC3_RELAXED);
         runTest(ta, TestName.LEVELS_VEC3_RELAXED.name());
     }
 
     // Test case 1: Levels Vec4 Relaxed
-    @LargeTest
+    @MediumTest
     public void testLevelsVec4Relaxed() {
         TestAction ta = new TestAction(TestName.LEVELS_VEC4_RELAXED);
         runTest(ta, TestName.LEVELS_VEC4_RELAXED.name());
     }
 
     // Test case 2: Levels Vec3 Full
-    @LargeTest
+    @MediumTest
     public void testLevelsVec3Full() {
         TestAction ta = new TestAction(TestName.LEVELS_VEC3_FULL);
         runTest(ta, TestName.LEVELS_VEC3_FULL.name());
     }
 
     // Test case 3: Levels Vec4 Full
-    @LargeTest
+    @MediumTest
     public void testLevelsVec4Full() {
         TestAction ta = new TestAction(TestName.LEVELS_VEC4_FULL);
         runTest(ta, TestName.LEVELS_VEC4_FULL.name());
     }
 
     // Test case 4: Blur Radius 25
-    @LargeTest
+    @MediumTest
     public void testBlurRadius25() {
         TestAction ta = new TestAction(TestName.BLUR_RADIUS_25);
         runTest(ta, TestName.BLUR_RADIUS_25.name());
     }
 
     // Test case 5: Intrinsic Blur Radius 25
-    @LargeTest
+    @MediumTest
     public void testIntrinsicBlurRadius25() {
         TestAction ta = new TestAction(TestName.INTRINSIC_BLUR_RADIUS_25);
         runTest(ta, TestName.INTRINSIC_BLUR_RADIUS_25.name());
     }
 
     // Test case 6: Greyscale
-    @LargeTest
+    @MediumTest
     public void testGreyscale() {
         TestAction ta = new TestAction(TestName.GREYSCALE);
         runTest(ta, TestName.GREYSCALE.name());
     }
 
     // Test case 7: Grain
-    @LargeTest
+    @MediumTest
     public void testGrain() {
         TestAction ta = new TestAction(TestName.GRAIN);
         runTest(ta, TestName.GRAIN.name());
     }
 
     // Test case 8: Fisheye Full
-    @LargeTest
+    @MediumTest
     public void testFisheyeFull() {
         TestAction ta = new TestAction(TestName.FISHEYE_FULL);
         runTest(ta, TestName.FISHEYE_FULL.name());
     }
 
     // Test case 9: Fisheye Relaxed
-    @LargeTest
+    @MediumTest
     public void testFishEyeRelaxed() {
         TestAction ta = new TestAction(TestName.FISHEYE_RELAXED);
         runTest(ta, TestName.FISHEYE_RELAXED.name());
     }
 
     // Test case 10: Fisheye Approximate Full
-    @LargeTest
+    @MediumTest
     public void testFisheyeApproximateFull() {
         TestAction ta = new TestAction(TestName.FISHEYE_APPROXIMATE_FULL);
         runTest(ta, TestName.FISHEYE_APPROXIMATE_FULL.name());
     }
 
     // Test case 11: Fisheye Approximate Relaxed
-    @LargeTest
+    @MediumTest
     public void testFisheyeApproximateRelaxed() {
         TestAction ta = new TestAction(TestName.FISHEYE_APPROXIMATE_RELAXED);
         runTest(ta, TestName.FISHEYE_APPROXIMATE_RELAXED.name());
     }
 
     // Test case 12: Vignette Full
-    @LargeTest
+    @MediumTest
     public void testVignetteFull() {
         TestAction ta = new TestAction(TestName.VIGNETTE_FULL);
         runTest(ta, TestName.VIGNETTE_FULL.name());
     }
 
     // Test case 13: Vignette Relaxed
-    @LargeTest
+    @MediumTest
     public void testVignetteRelaxed() {
         TestAction ta = new TestAction(TestName.VIGNETTE_RELAXED);
         runTest(ta, TestName.VIGNETTE_RELAXED.name());
     }
 
     // Test case 14: Vignette Approximate Full
-    @LargeTest
+    @MediumTest
     public void testVignetteApproximateFull() {
         TestAction ta = new TestAction(TestName.VIGNETTE_APPROXIMATE_FULL);
         runTest(ta, TestName.VIGNETTE_APPROXIMATE_FULL.name());
     }
 
     // Test case 15: Vignette Approximate Relaxed
-    @LargeTest
+    @MediumTest
     public void testVignetteApproximateRelaxed() {
         TestAction ta = new TestAction(TestName.VIGNETTE_APPROXIMATE_RELAXED);
         runTest(ta, TestName.VIGNETTE_APPROXIMATE_RELAXED.name());
     }
 
     // Test case 16: Group Test (emulated)
-    @LargeTest
+    @MediumTest
     public void testGroupTestEmulated() {
         TestAction ta = new TestAction(TestName.GROUP_TEST_EMULATED);
         runTest(ta, TestName.GROUP_TEST_EMULATED.name());
     }
 
     // Test case 17: Group Test (native)
-    @LargeTest
+    @MediumTest
     public void testGroupTestNative() {
         TestAction ta = new TestAction(TestName.GROUP_TEST_NATIVE);
         runTest(ta, TestName.GROUP_TEST_NATIVE.name());
     }
 
     // Test case 18: Convolve 3x3
-    @LargeTest
+    @MediumTest
     public void testConvolve3x3() {
         TestAction ta = new TestAction(TestName.CONVOLVE_3X3);
         runTest(ta, TestName.CONVOLVE_3X3.name());
     }
 
     // Test case 19: Intrinsics Convolve 3x3
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsConvolve3x3() {
         TestAction ta = new TestAction(TestName.INTRINSICS_CONVOLVE_3X3);
         runTest(ta, TestName.INTRINSICS_CONVOLVE_3X3.name());
     }
 
     // Test case 20: ColorMatrix
-    @LargeTest
+    @MediumTest
     public void testColorMatrix() {
         TestAction ta = new TestAction(TestName.COLOR_MATRIX);
         runTest(ta, TestName.COLOR_MATRIX.name());
     }
 
     // Test case 21: Intrinsics ColorMatrix
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsColorMatrix() {
         TestAction ta = new TestAction(TestName.INTRINSICS_COLOR_MATRIX);
         runTest(ta, TestName.INTRINSICS_COLOR_MATRIX.name());
     }
 
     // Test case 22: Intrinsics ColorMatrix Grey
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsColorMatrixGrey() {
         TestAction ta = new TestAction(TestName.INTRINSICS_COLOR_MATRIX_GREY);
         runTest(ta, TestName.INTRINSICS_COLOR_MATRIX_GREY.name());
     }
 
     // Test case 23: Copy
-    @LargeTest
+    @MediumTest
     public void testCopy() {
         TestAction ta = new TestAction(TestName.COPY);
         runTest(ta, TestName.COPY.name());
     }
 
     // Test case 24: CrossProcess (using LUT)
-    @LargeTest
+    @MediumTest
     public void testCrossProcessUsingLUT() {
         TestAction ta = new TestAction(TestName.CROSS_PROCESS_USING_LUT);
         runTest(ta, TestName.CROSS_PROCESS_USING_LUT.name());
     }
 
     // Test case 25: Convolve 5x5
-    @LargeTest
+    @MediumTest
     public void testConvolve5x5() {
         TestAction ta = new TestAction(TestName.CONVOLVE_5X5);
         runTest(ta, TestName.CONVOLVE_5X5.name());
     }
 
     // Test case 26: Intrinsics Convolve 5x5
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsConvolve5x5() {
         TestAction ta = new TestAction(TestName.INTRINSICS_CONVOLVE_5X5);
         runTest(ta, TestName.INTRINSICS_CONVOLVE_5X5.name());
     }
 
     // Test case 27: Mandelbrot
-    @LargeTest
+    @MediumTest
     public void testMandelbrot() {
         TestAction ta = new TestAction(TestName.MANDELBROT_FLOAT);
         runTest(ta, TestName.MANDELBROT_FLOAT.name());
     }
 
     // Test case 28: Intrinsics Blend
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsBlend() {
         TestAction ta = new TestAction(TestName.INTRINSICS_BLEND);
         runTest(ta, TestName.INTRINSICS_BLEND.name());
     }
 
     // Test case 29: Intrinsics Blur 25 uchar
-    @LargeTest
+    @MediumTest
     public void testIntrinsicsBlur25G() {
         TestAction ta = new TestAction(TestName.INTRINSICS_BLUR_25G);
         runTest(ta, TestName.INTRINSICS_BLUR_25G.name());
     }
 
     // Test case 30: Vibrance
-    @LargeTest
+    @MediumTest
     public void testVibrance() {
         TestAction ta = new TestAction(TestName.VIBRANCE);
         runTest(ta, TestName.VIBRANCE.name());
     }
 
     // Test case 31: BWFilter
-    @LargeTest
+    @MediumTest
     public void testBWFilter() {
         TestAction ta = new TestAction(TestName.BW_FILTER);
         runTest(ta, TestName.BW_FILTER.name());
     }
 
     // Test case 32: Shadows
-    @LargeTest
+    @MediumTest
     public void testShadows() {
         TestAction ta = new TestAction(TestName.SHADOWS);
         runTest(ta, TestName.SHADOWS.name());
     }
 
     // Test case 33: Contrast
-    @LargeTest
+    @MediumTest
     public void testContrast() {
         TestAction ta = new TestAction(TestName.CONTRAST);
         runTest(ta, TestName.CONTRAST.name());
     }
 
     // Test case 34: Exposure
-    @LargeTest
+    @MediumTest
     public void testExposure(){
         TestAction ta = new TestAction(TestName.EXPOSURE);
         runTest(ta, TestName.EXPOSURE.name());
     }
 
     // Test case 35: White Balance
-    @LargeTest
+    @MediumTest
     public void testWhiteBalance() {
         TestAction ta = new TestAction(TestName.WHITE_BALANCE);
         runTest(ta, TestName.WHITE_BALANCE.name());
     }
 
     // Test case 36: Color Cube
-    @LargeTest
+    @MediumTest
     public void testColorCube() {
         TestAction ta = new TestAction(TestName.COLOR_CUBE);
         runTest(ta, TestName.COLOR_CUBE.name());
     }
 
     // Test case 37: Color Cube (3D Intrinsic)
-    @LargeTest
+    @MediumTest
     public void testColorCube3DIntrinsic() {
         TestAction ta = new TestAction(TestName.COLOR_CUBE_3D_INTRINSIC);
         runTest(ta, TestName.COLOR_CUBE_3D_INTRINSIC.name());
     }
-/*
-    // Test case 38: Usage io
-    @LargeTest
-    public void testUsageIO() {
-        TestAction ta = new TestAction(TestName.USAGE_IO);
-        runTest(ta, TestName.USAGE_IO.name());
-    }
-    // Test case 39: Artistic 1
-    @LargeTest
+
+    // Test case 38: Artistic 1
+    @MediumTest
     public void testArtistic1() {
-        TestAction ta = new TestAction(TestName.ARTISTIC_1);
-        runTest(ta, TestName.ARTISTIC_1.name());
+        TestAction ta = new TestAction(TestName.ARTISTIC1);
+        runTest(ta, TestName.ARTISTIC1.name());
     }
 
-    // Test case 40 Histogram
-    @LargeTest
-    public void testHistogram() {
-        TestAction ta = new TestAction(TestName.HISTOGRAM);
-        runTest(ta, TestName.HISTOGRAM.name());
+    // Test case 39: Resize BiCubic Script
+    @MediumTest
+    public void testResizeBiCubicScript() {
+        TestAction ta = new TestAction(TestName.RESIZE_BI_SCRIPT);
+        runTest(ta, TestName.RESIZE_BI_SCRIPT.name());
     }
 
-    // Test case 41: Mandelbrot fp64
-    @LargeTest
+    // Test case 40: Resize BiCubic Intrinsic
+    @MediumTest
+    public void testResizeBiCubicIntrinsic() {
+        TestAction ta = new TestAction(TestName.RESIZE_BI_INTRINSIC);
+        runTest(ta, TestName.RESIZE_BI_INTRINSIC.name());
+    }
+
+    // Test case 41: Posterize with invoke
+    @MediumTest
+    public void testPosterizeInvoke() {
+        TestAction ta = new TestAction(TestName.POSTERIZE_INVOKE);
+        runTest(ta, TestName.POSTERIZE_INVOKE.name());
+    }
+
+    // Test case 42: Posterize with set
+    @MediumTest
+    public void testPosterizeSet() {
+        TestAction ta = new TestAction(TestName.POSTERIZE_SET);
+        runTest(ta, TestName.POSTERIZE_SET.name());
+    }
+
+    // Test case 43 Histogram intrinsic
+    @MediumTest
+    public void testHistogramIntrinsic() {
+        TestAction ta = new TestAction(TestName.HISTOGRAM_INTRINSIC);
+        runTest(ta, TestName.HISTOGRAM_INTRINSIC.name());
+    }
+
+    // Test case 44 Histogram script
+    @MediumTest
+    public void testHistogramScript() {
+        TestAction ta = new TestAction(TestName.HISTOGRAM_SCRIPT);
+        runTest(ta, TestName.HISTOGRAM_SCRIPT.name());
+    }
+
+    // Test case 45: Mandelbrot fp64
+    @MediumTest
     public void testMandelbrotfp64() {
         TestAction ta = new TestAction(TestName.MANDELBROT_DOUBLE);
         runTest(ta, TestName.MANDELBROT_DOUBLE.name());
     }
-*/
+
+    // Test case 46: Blur Radius 25 Half Precision
+    @MediumTest
+    public void testBlurRadius25Half() {
+        TestAction ta = new TestAction(TestName.BLUR_RADIUS_25_HALF);
+        runTest(ta, TestName.BLUR_RADIUS_25_HALF.name());
+    }
 }
