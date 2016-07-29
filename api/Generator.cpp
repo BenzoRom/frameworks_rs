@@ -62,7 +62,6 @@
  * [version: ({Starting API level} [ {Last API level that supports this.}] | UNRELEASED)
  * [size: {32 or 64.  Used if this is available only for 32 or 64 bit code.}]
  * value: {The value of the constant.}
- * type: {The type of the constant.}
  * [hidden:]   ...If present, don't document the constant.  Omit the following two fields.
  * [deprecated: [{Deprecation message.}]   ... This is deprecated.  Compiler will issue a wrning.
  * summary: {A one line string describing this section.}
