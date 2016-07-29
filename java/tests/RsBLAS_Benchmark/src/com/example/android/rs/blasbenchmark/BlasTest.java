@@ -35,8 +35,6 @@ import android.test.suitebuilder.annotation.MediumTest;
  */
 public class BlasTest extends ActivityInstrumentationTestCase2<BlasBenchmark> {
     private final String TAG = "BLAS Test";
-    private final String TEST_NAME = "Testname";
-    private final String BENCHMARK = "Benchmark";
     // Only run 1 iteration now to fit the MediumTest time requirement.
     // One iteration means running the tests continuous for 1s.
     private int mIteration = 1;
@@ -108,8 +106,7 @@ public class BlasTest extends ActivityInstrumentationTestCase2<BlasBenchmark> {
 
         // post result to INSTRUMENTATION_STATUS
         Bundle results = new Bundle();
-        results.putString(TEST_NAME, testName);
-        results.putFloat(BENCHMARK, avgResult);
+        results.putFloat(testName + "_avg", avgResult);
         getInstrumentation().sendStatus(Activity.RESULT_OK, results);
     }
 
