@@ -58,22 +58,14 @@
  *
  * The inverse of pi, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_1_PI;
-#else
 #define M_1_PI 0.318309886183790671537767526745028724f
-#endif
 
 /*
  * M_2_PI: 2 / pi, as a 32 bit float
  *
  * 2 divided by pi, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_2_PI;
-#else
 #define M_2_PI 0.636619772367581343075535053490057448f
-#endif
 
 /*
  * M_2_PIl: 2 / pi, as a 32 bit float
@@ -82,132 +74,84 @@ extern const float M_2_PI;
  *
  * 2 divided by pi, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_2_PIl;
-#else
 #define M_2_PIl 0.636619772367581343075535053490057448f
-#endif
 
 /*
  * M_2_SQRTPI: 2 / sqrt(pi), as a 32 bit float
  *
  * 2 divided by the square root of pi, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_2_SQRTPI;
-#else
 #define M_2_SQRTPI 1.128379167095512573896158903121545172f
-#endif
 
 /*
  * M_E: e, as a 32 bit float
  *
  * The number e, the base of the natural logarithm, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_E;
-#else
 #define M_E 2.718281828459045235360287471352662498f
-#endif
 
 /*
  * M_LN10: log_e(10), as a 32 bit float
  *
  * The natural logarithm of 10, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_LN10;
-#else
 #define M_LN10 2.302585092994045684017991454684364208f
-#endif
 
 /*
  * M_LN2: log_e(2), as a 32 bit float
  *
  * The natural logarithm of 2, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_LN2;
-#else
 #define M_LN2 0.693147180559945309417232121458176568f
-#endif
 
 /*
  * M_LOG10E: log_10(e), as a 32 bit float
  *
  * The logarithm base 10 of e, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_LOG10E;
-#else
 #define M_LOG10E 0.434294481903251827651128918916605082f
-#endif
 
 /*
  * M_LOG2E: log_2(e), as a 32 bit float
  *
  * The logarithm base 2 of e, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_LOG2E;
-#else
 #define M_LOG2E 1.442695040888963407359924681001892137f
-#endif
 
 /*
  * M_PI: pi, as a 32 bit float
  *
  * The constant pi, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_PI;
-#else
 #define M_PI 3.141592653589793238462643383279502884f
-#endif
 
 /*
  * M_PI_2: pi / 2, as a 32 bit float
  *
  * Pi divided by 2, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_PI_2;
-#else
 #define M_PI_2 1.570796326794896619231321691639751442f
-#endif
 
 /*
  * M_PI_4: pi / 4, as a 32 bit float
  *
  * Pi divided by 4, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_PI_4;
-#else
 #define M_PI_4 0.785398163397448309615660845819875721f
-#endif
 
 /*
  * M_SQRT1_2: 1 / sqrt(2), as a 32 bit float
  *
  * The inverse of the square root of 2, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_SQRT1_2;
-#else
 #define M_SQRT1_2 0.707106781186547524400844362104849039f
-#endif
 
 /*
  * M_SQRT2: sqrt(2), as a 32 bit float
  *
  * The square root of 2, as a 32 bit float.
  */
-#if (defined(RS_VERSION) && (RS_VERSION >= UNRELEASED))
-extern const float M_SQRT2;
-#else
 #define M_SQRT2 1.414213562373095048801688724209698079f
-#endif
 
 /*
  * abs: Absolute value of an integer
