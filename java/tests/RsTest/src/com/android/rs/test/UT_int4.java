@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_int4 extends UnitTest {
-    private Resources mRes;
 
-    protected UT_int4(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_int4(RSTestCore rstc, Context ctx) {
         super(rstc, "int4", ctx);
-        mRes = res;
     }
 
     public void run() {

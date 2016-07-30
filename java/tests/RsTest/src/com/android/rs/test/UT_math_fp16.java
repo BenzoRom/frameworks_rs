@@ -17,17 +17,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 // IMPORTANT: This whole test fails on 32-bit x86.
 public class UT_math_fp16 extends UnitTest {
-    private Resources mRes;
     private Allocation testAllocation1, testAllocation2;
 
-    protected UT_math_fp16(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_math_fp16(RSTestCore rstc, Context ctx) {
         super(rstc, "Math_fp16", ctx);
-        mRes = res;
     }
 
     public void run() {

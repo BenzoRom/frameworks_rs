@@ -17,15 +17,11 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.renderscript.Element.*;
-import android.renderscript.Element.DataKind.*;
-import android.renderscript.Element.DataType.*;
+import android.renderscript.Element.DataKind;
+import android.renderscript.Element.DataType;
 
 public class UT_element extends UnitTest {
-    private Resources mRes;
-
     Element simpleElem;
     Element complexElem;
 
@@ -68,9 +64,8 @@ public class UT_element extends UnitTest {
         80,
     };
 
-    protected UT_element(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_element(RSTestCore rstc, Context ctx) {
         super(rstc, "Element", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_element s) {

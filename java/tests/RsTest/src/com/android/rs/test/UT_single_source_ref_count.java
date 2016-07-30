@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_single_source_ref_count extends UnitTest {
-    private Resources mRes;
 
-    protected UT_single_source_ref_count(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_single_source_ref_count(RSTestCore rstc, Context ctx) {
         super(rstc, "SingleSourceRefCount", ctx);
-        mRes = res;
     }
 
     public void run() {
