@@ -16,36 +16,19 @@
 
 package com.android.rs.test;
 
-import android.renderscript.RenderScript;
-
 import android.app.ListActivity;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.provider.Settings.System;
+import android.renderscript.RenderScript;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.ArrayAdapter;
-
-import java.lang.Runtime;
 
 public class RSTest extends ListActivity {
 
     private static final String LOG_TAG = "RSTest";
-    private static final boolean DEBUG  = false;
+    private static final boolean DEBUG = false;
     private static final boolean LOG_ENABLED = false;
 
     private RenderScript mRS;
     private RSTestCore RSTC;
-
-    String mTestNames[];
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -53,7 +36,7 @@ public class RSTest extends ListActivity {
         mRS = RenderScript.create(this);
 
         RSTC = new RSTestCore(this);
-        RSTC.init(mRS, getResources());
+        RSTC.init(mRS);
     }
 
     static void log(String message) {

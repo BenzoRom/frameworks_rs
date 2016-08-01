@@ -15,22 +15,16 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 import android.util.Log;
-import java.lang.Thread;
-import java.util.HashMap;
 
 public class UT_script_group2_float extends UnitTest {
-    private Resources mRes;
-
     private static final int ARRAY_SIZE = 8;
 
     private static final String TAG = "ScritGroup2 (Floating Point Test)";
 
-    protected UT_script_group2_float(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_script_group2_float(RSTestCore rstc, Context ctx) {
         super(rstc, TAG, ctx);
-        mRes = res;
     }
 
     public void run() {

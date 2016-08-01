@@ -15,9 +15,10 @@
  */
 
 package com.android.rs.test;
+
 import android.content.Context;
-import android.util.Log;
 import android.renderscript.RenderScript.RSMessageHandler;
+import android.util.Log;
 
 public class UnitTest extends Thread {
     public String name;
@@ -30,6 +31,8 @@ public class UnitTest extends Thread {
     /* These constants must match those in shared.rsh */
     public static final int RS_MSG_TEST_PASSED = 100;
     public static final int RS_MSG_TEST_FAILED = 101;
+    public static final int TEST_PASSED = 1;
+    public static final int TEST_FAILED = -1;
 
     private static int numTests = 0;
     public int testID;
@@ -49,31 +52,33 @@ public class UnitTest extends Thread {
     }
 
     protected UnitTest(RSTestCore rstc, Context ctx) {
-        this (rstc, "<Unknown>", ctx);
+        this(rstc, "<Unknown>", ctx);
     }
 
     protected UnitTest(Context ctx) {
-        this (null, ctx);
+        this(null, ctx);
     }
 
     protected void _RS_ASSERT(String message, boolean b) {
-        if(b == false) {
+        if (b == false) {
             Log.e(name, message + " FAILED");
             failTest();
         }
     }
 
     private void updateUI() {
+        msgHandled = true;
         if (mItem != null) {
             mItem.result = result;
-            msgHandled = true;
-            try {
-                mRSTC.refreshTestResults();
-            }
-            catch (IllegalStateException e) {
+            if (mRSTC != null) {
+                // Add null check for mRSTC, for instrumentation tests.
+                try {
+                    mRSTC.refreshTestResults();
+                } catch (IllegalStateException e) {
                 /* Ignore the case where our message receiver has been
                    disconnected. This happens when we leave the application
                    before it finishes running all of the unit tests. */
+                }
             }
         }
     }
@@ -83,10 +88,10 @@ public class UnitTest extends Thread {
             if (result == 0) {
                 switch (mID) {
                     case RS_MSG_TEST_PASSED:
-                        result = 1;
+                        result = TEST_PASSED;
                         break;
                     case RS_MSG_TEST_FAILED:
-                        result = -1;
+                        result = TEST_FAILED;
                         break;
                     default:
                         RSTest.log("Unit test got unexpected message");
@@ -109,23 +114,22 @@ public class UnitTest extends Thread {
     }
 
     public void failTest() {
-        result = -1;
+        result = TEST_FAILED;
         updateUI();
     }
 
     public void passTest() {
-        if (result != -1) {
-            result = 1;
+        if (result != TEST_FAILED) {
+            result = TEST_PASSED;
         }
         updateUI();
     }
 
     public String toString() {
         String out = name;
-        if (result == 1) {
+        if (result == TEST_PASSED) {
             out += " - PASSED";
-        }
-        else if (result == -1) {
+        } else if (result == TEST_FAILED) {
             out += " - FAILED";
         }
         return out;

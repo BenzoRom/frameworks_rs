@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_min extends UnitTest {
-    private Resources mRes;
 
-    protected UT_min(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_min(RSTestCore rstc, Context ctx) {
         super(rstc, "Min (relaxed)", ctx);
-        mRes = res;
     }
 
     public void run() {
