@@ -17,21 +17,17 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_sampler extends UnitTest {
-    private Resources mRes;
-
     Sampler minification;
     Sampler magnification;
     Sampler wrapS;
     Sampler wrapT;
     Sampler anisotropy;
 
-    protected UT_sampler(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_sampler(RSTestCore rstc, Context ctx) {
         super(rstc, "Sampler", ctx);
-        mRes = res;
     }
 
     private Sampler.Builder getDefaultBuilder(RenderScript RS) {

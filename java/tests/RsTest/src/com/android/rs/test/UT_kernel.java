@@ -17,18 +17,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.util.Log;
 
 public class UT_kernel extends UnitTest {
-    private Resources mRes;
     private Allocation A;
     private Allocation B;
 
-    protected UT_kernel(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_kernel(RSTestCore rstc, Context ctx) {
         super(rstc, "Kernels (pass-by-value)", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_kernel s) {

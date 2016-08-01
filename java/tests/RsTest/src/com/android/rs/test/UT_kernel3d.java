@@ -17,18 +17,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.util.Log;
 
 public class UT_kernel3d extends UnitTest {
-    private Resources mRes;
     private Allocation A;
     private Allocation B;
 
-    protected UT_kernel3d(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_kernel3d(RSTestCore rstc, Context ctx) {
         super(rstc, "Kernel 3d (pass-by-value)", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_kernel3d s) {

@@ -17,7 +17,6 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_fp16_globals extends UnitTest {
@@ -26,7 +25,7 @@ public class UT_fp16_globals extends UnitTest {
     private static final short mHalfConst2 = (short) 0xca00; // -12.f
     private static final short mHalfConst3 = (short) 0xca80; // -13.f
 
-    protected UT_fp16_globals(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_fp16_globals(RSTestCore rstc, Context ctx) {
         super(rstc, "Fp16 Globals", ctx);
     }
 

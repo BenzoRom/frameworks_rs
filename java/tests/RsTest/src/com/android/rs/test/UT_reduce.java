@@ -23,20 +23,19 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 import android.util.Log;
-import java.lang.Float;
-import java.lang.Math;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
 import static junit.framework.Assert.*;
 
 public class UT_reduce extends UnitTest {
     private static final String TAG = "reduce";
 
-    protected UT_reduce(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_reduce(RSTestCore rstc, Context ctx) {
         super(rstc, "reduce", ctx);
     }
 

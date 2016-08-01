@@ -17,12 +17,9 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.util.Log;
 
 public class UT_foreach_multi extends UnitTest {
-    private Resources mRes;
     private Allocation Ain0;
     private Allocation Ain1;
     private Allocation Ain2;
@@ -33,9 +30,8 @@ public class UT_foreach_multi extends UnitTest {
     private Allocation Out2;
     private Allocation Out3;
 
-    protected UT_foreach_multi(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_foreach_multi(RSTestCore rstc, Context ctx) {
         super(rstc, "Foreach Multi-input", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_foreach_multi s) {

@@ -17,13 +17,9 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
-import java.lang.reflect.Method;
-
 public class UT_single_source_alloc extends UnitTest {
-    private Resources mRes;
     private int dimX = 3;
     private int dimY = 4;
     private int dimZ = 5;
@@ -33,9 +29,8 @@ public class UT_single_source_alloc extends UnitTest {
     // order
     private int rsDataTypes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 
-    protected UT_single_source_alloc(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_single_source_alloc(RSTestCore rstc, Context ctx) {
         super(rstc, "SingleSourceAllocation", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_single_source_alloc s, int nDims) {

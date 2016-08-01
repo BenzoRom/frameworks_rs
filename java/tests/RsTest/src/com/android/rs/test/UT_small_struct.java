@@ -17,7 +17,6 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_small_struct extends UnitTest {
@@ -26,7 +25,7 @@ public class UT_small_struct extends UnitTest {
     private static final int dimX = 3;
     private static final int dimY = 2;
 
-    protected UT_small_struct(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_small_struct(RSTestCore rstc, Context ctx) {
         super(rstc, "Small Structs", ctx);
     }
 

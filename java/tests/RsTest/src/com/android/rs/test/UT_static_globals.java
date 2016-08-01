@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_static_globals extends UnitTest {
-    private Resources mRes;
 
-    protected UT_static_globals(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_static_globals(RSTestCore rstc, Context ctx) {
         super(rstc, "Static Globals", ctx);
-        mRes = res;
     }
 
     public void run() {

@@ -17,19 +17,16 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_fp16 extends UnitTest {
-    private Resources mRes;
     private int dimX = 7;
     private int dimY = 5;
     private int dimZ = 3;
     private Allocation alloc;
 
-    protected UT_fp16(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_fp16(RSTestCore rstc, Context ctx) {
         super(rstc, "Fp16", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_fp16 s, Element e, int nDims) {

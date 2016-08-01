@@ -16,16 +16,15 @@
 
 package com.android.rs.test;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.renderscript.*;
-import android.util.Log;
+import android.app.ListActivity;
+import android.renderscript.Allocation;
+import android.renderscript.RenderScript;
+import android.widget.ArrayAdapter;
+
 import java.util.ArrayList;
 import java.util.ListIterator;
 import java.util.Timer;
 import java.util.TimerTask;
-import android.app.ListActivity;
-import android.widget.ArrayAdapter;
 
 public class RSTestCore {
     ListActivity mCtx;
@@ -34,7 +33,6 @@ public class RSTestCore {
         mCtx = ctx;
     }
 
-    private Resources mRes;
     private RenderScript mRS;
 
     private ArrayList<UnitTest> unitTests;
@@ -50,68 +48,64 @@ public class RSTestCore {
     private Timer mTimer;
     public static final int RS_TIMER_PERIOD = 100;
 
-    public void init(RenderScript rs, Resources res) {
+    public void init(RenderScript rs) {
         mRS = rs;
-        mRes = res;
         stopTesting = false;
 
         unitTests = new ArrayList<UnitTest>();
 
-        unitTests.add(new UT_primitives(this, mRes, mCtx));
-        unitTests.add(new UT_constant(this, mRes, mCtx));
-        unitTests.add(new UT_vector(this, mRes, mCtx));
-        unitTests.add(new UT_unsigned(this, mRes, mCtx));
-        unitTests.add(new UT_array_init(this, mRes, mCtx));
-        unitTests.add(new UT_array_alloc(this, mRes, mCtx));
-        unitTests.add(new UT_kernel(this, mRes, mCtx));
-        unitTests.add(new UT_kernel_struct(this, mRes, mCtx));
-        unitTests.add(new UT_kernel2d(this, mRes, mCtx));
-        unitTests.add(new UT_kernel3d(this, mRes, mCtx));
-        unitTests.add(new UT_kernel2d_oldstyle(this, mRes, mCtx));
-        unitTests.add(new UT_ctxt_default(this, mRes, mCtx));
-        unitTests.add(new UT_bug_char(this, mRes, mCtx));
-        unitTests.add(new UT_clamp(this, mRes, mCtx));
-        unitTests.add(new UT_clamp_relaxed(this, mRes, mCtx));
-        unitTests.add(new UT_convert(this, mRes, mCtx));
-        unitTests.add(new UT_convert_relaxed(this, mRes, mCtx));
-        unitTests.add(new UT_copy_test(this, mRes, mCtx));
-        unitTests.add(new UT_rsdebug(this, mRes, mCtx));
-        unitTests.add(new UT_rstime(this, mRes, mCtx));
-        unitTests.add(new UT_rstypes(this, mRes, mCtx));
-        unitTests.add(new UT_alloc(this, mRes, mCtx));
-        unitTests.add(new UT_check_dims(this, mRes, mCtx));
-        unitTests.add(new UT_static_globals(this, mRes, mCtx));
-        unitTests.add(new UT_refcount(this, mRes, mCtx));
-        unitTests.add(new UT_foreach(this, mRes, mCtx));
-        unitTests.add(new UT_foreach_bounds(this, mRes, mCtx));
-        unitTests.add(new UT_noroot(this, mRes, mCtx));
-        unitTests.add(new UT_single_source_alloc(this, mRes, mCtx));
-        unitTests.add(new UT_single_source_script(this, mRes, mCtx));
-        unitTests.add(new UT_single_source_ref_count(this, mRes, mCtx));
-        unitTests.add(new UT_script_group2_pointwise(this, mRes, mCtx));
-        unitTests.add(new UT_script_group2_gatherscatter(this, mRes, mCtx));
-        unitTests.add(new UT_script_group2_nochain(this, mRes, mCtx));
-        unitTests.add(new UT_script_group2_float(this, mRes, mCtx));
-        unitTests.add(new UT_atomic(this, mRes, mCtx));
-        unitTests.add(new UT_struct(this, mRes, mCtx));
-        unitTests.add(new UT_math(this, mRes, mCtx));
-        unitTests.add(new UT_math_conformance(this, mRes, mCtx));
-        unitTests.add(new UT_math_agree(this, mRes, mCtx));
-        unitTests.add(new UT_fp16(this, mRes, mCtx));
-        unitTests.add(new UT_math_fp16(this, mRes, mCtx));
-        unitTests.add(new UT_fp16_globals(this, mRes, mCtx));
-        unitTests.add(new UT_min(this, mRes, mCtx));
-        unitTests.add(new UT_int4(this, mRes, mCtx));
-        unitTests.add(new UT_element(this, mRes, mCtx));
-        unitTests.add(new UT_sampler(this, mRes, mCtx));
-        /*unitTests.add(new UT_program_store(this, mRes, mCtx));
-        unitTests.add(new UT_program_raster(this, mRes, mCtx));
-        unitTests.add(new UT_mesh(this, mRes, mCtx));*/
-        unitTests.add(new UT_foreach_multi(this, mRes, mCtx));
-        unitTests.add(new UT_fp_mad(this, mRes, mCtx));
-        unitTests.add(new UT_reduce(this, mRes, mCtx));
-        unitTests.add(new UT_reduce_backward(this, mRes, mCtx));
-        unitTests.add(new UT_small_struct(this, mRes, mCtx));
+        unitTests.add(new UT_primitives(this, mCtx));
+        unitTests.add(new UT_constant(this, mCtx));
+        unitTests.add(new UT_vector(this, mCtx));
+        unitTests.add(new UT_unsigned(this, mCtx));
+        unitTests.add(new UT_array_init(this, mCtx));
+        unitTests.add(new UT_array_alloc(this, mCtx));
+        unitTests.add(new UT_kernel(this, mCtx));
+        unitTests.add(new UT_kernel_struct(this, mCtx));
+        unitTests.add(new UT_kernel2d(this, mCtx));
+        unitTests.add(new UT_kernel3d(this, mCtx));
+        unitTests.add(new UT_kernel2d_oldstyle(this, mCtx));
+        unitTests.add(new UT_ctxt_default(this, mCtx));
+        unitTests.add(new UT_bug_char(this, mCtx));
+        unitTests.add(new UT_clamp(this, mCtx));
+        unitTests.add(new UT_clamp_relaxed(this, mCtx));
+        unitTests.add(new UT_convert(this, mCtx));
+        unitTests.add(new UT_convert_relaxed(this, mCtx));
+        unitTests.add(new UT_copy_test(this, mCtx));
+        unitTests.add(new UT_rsdebug(this, mCtx));
+        unitTests.add(new UT_rstime(this, mCtx));
+        unitTests.add(new UT_rstypes(this, mCtx));
+        unitTests.add(new UT_alloc(this, mCtx));
+        unitTests.add(new UT_check_dims(this, mCtx));
+        unitTests.add(new UT_static_globals(this, mCtx));
+        unitTests.add(new UT_refcount(this, mCtx));
+        unitTests.add(new UT_foreach(this, mCtx));
+        unitTests.add(new UT_foreach_bounds(this, mCtx));
+        unitTests.add(new UT_noroot(this, mCtx));
+        unitTests.add(new UT_single_source_alloc(this, mCtx));
+        unitTests.add(new UT_single_source_script(this, mCtx));
+        unitTests.add(new UT_single_source_ref_count(this, mCtx));
+        unitTests.add(new UT_script_group2_pointwise(this, mCtx));
+        unitTests.add(new UT_script_group2_gatherscatter(this, mCtx));
+        unitTests.add(new UT_script_group2_nochain(this, mCtx));
+        unitTests.add(new UT_script_group2_float(this, mCtx));
+        unitTests.add(new UT_atomic(this, mCtx));
+        unitTests.add(new UT_struct(this, mCtx));
+        unitTests.add(new UT_math(this, mCtx));
+        unitTests.add(new UT_math_conformance(this, mCtx));
+        unitTests.add(new UT_math_agree(this, mCtx));
+        unitTests.add(new UT_fp16(this, mCtx));
+        unitTests.add(new UT_math_fp16(this, mCtx));
+        unitTests.add(new UT_fp16_globals(this, mCtx));
+        unitTests.add(new UT_min(this, mCtx));
+        unitTests.add(new UT_int4(this, mCtx));
+        unitTests.add(new UT_element(this, mCtx));
+        unitTests.add(new UT_sampler(this, mCtx));
+        unitTests.add(new UT_foreach_multi(this, mCtx));
+        unitTests.add(new UT_fp_mad(this, mCtx));
+        unitTests.add(new UT_reduce(this, mCtx));
+        unitTests.add(new UT_reduce_backward(this, mCtx));
+        unitTests.add(new UT_small_struct(this, mCtx));
 
         /*
         unitTests.add(new UnitTest(null, "<Pass>", 1));
@@ -123,7 +117,7 @@ public class RSTestCore {
         }
         */
 
-        UnitTest [] uta = new UnitTest[unitTests.size()];
+        UnitTest[] uta = new UnitTest[unitTests.size()];
         uta = unitTests.toArray(uta);
 
         mListAllocs = new ScriptField_ListAllocs_s(mRS, uta.length);
@@ -155,19 +149,18 @@ public class RSTestCore {
 
     public void checkAndRunNextTest() {
         mCtx.runOnUiThread(new Runnable() {
-                public void run() {
-                    if (testAdapter != null)
-                        testAdapter.notifyDataSetChanged();
-                }
-            });
+            public void run() {
+                if (testAdapter != null)
+                    testAdapter.notifyDataSetChanged();
+            }
+        });
 
         if (activeTest != null) {
             if (!activeTest.isAlive()) {
                 /* Properly clean up on our last test */
                 try {
                     activeTest.join();
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                 }
                 activeTest = null;
             }
@@ -180,8 +173,7 @@ public class RSTestCore {
                 /* This routine will only get called once when a new test
                  * should start running. The message handler in UnitTest.java
                  * ensures this. */
-            }
-            else {
+            } else {
                 if (mTimer != null) {
                     mTimer.cancel();
                     mTimer.purge();
@@ -210,8 +202,7 @@ public class RSTestCore {
         if (t != null) {
             try {
                 t.join();
-            }
-            catch (InterruptedException e) {
+            } catch (InterruptedException e) {
             }
             t = null;
         }
