@@ -17,16 +17,13 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_noroot extends UnitTest {
-    private Resources mRes;
     private Allocation A;
 
-    protected UT_noroot(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_noroot(RSTestCore rstc, Context ctx) {
         super(rstc, "ForEach (no root)", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_noroot s) {

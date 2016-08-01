@@ -17,18 +17,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.util.Log;
 
 public class UT_ctxt_default extends UnitTest {
-    private Resources mRes;
     private Allocation A;
     private Allocation B;
 
-    protected UT_ctxt_default(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_ctxt_default(RSTestCore rstc, Context ctx) {
         super(rstc, "Kernel context default", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_ctxt_default s) {

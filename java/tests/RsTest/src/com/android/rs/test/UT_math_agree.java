@@ -17,19 +17,15 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
-import android.util.Log;
-import java.util.Arrays;
+
 import java.util.Random;
 
 public class UT_math_agree extends UnitTest {
-    private Resources mRes;
     private Random rand;
 
-    protected UT_math_agree(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_math_agree(RSTestCore rstc, Context ctx) {
         super(rstc, "Math Agreement", ctx);
-        mRes = res;
         rand = new Random();
     }
 

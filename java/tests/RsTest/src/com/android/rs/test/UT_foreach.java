@@ -17,16 +17,13 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_foreach extends UnitTest {
-    private Resources mRes;
     private Allocation A;
 
-    protected UT_foreach(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_foreach(RSTestCore rstc, Context ctx) {
         super(rstc, "ForEach", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_foreach s) {

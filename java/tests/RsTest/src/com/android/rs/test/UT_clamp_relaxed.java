@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_clamp_relaxed extends UnitTest {
-    private Resources mRes;
 
-    protected UT_clamp_relaxed(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_clamp_relaxed(RSTestCore rstc, Context ctx) {
         super(rstc, "Clamp (Relaxed)", ctx);
-        mRes = res;
     }
 
     public void run() {

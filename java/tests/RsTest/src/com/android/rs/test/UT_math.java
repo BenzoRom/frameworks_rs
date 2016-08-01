@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_math extends UnitTest {
-    private Resources mRes;
 
-    protected UT_math(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_math(RSTestCore rstc, Context ctx) {
         super(rstc, "Math", ctx);
-        mRes = res;
     }
 
     public void run() {
