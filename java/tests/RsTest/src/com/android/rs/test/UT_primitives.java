@@ -17,7 +17,7 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.RenderScript;
 
 public class UT_primitives extends UnitTest {
 
@@ -42,13 +42,13 @@ public class UT_primitives extends UnitTest {
         if (pC != -8) {
             return false;
         }
-        s.set_charTest((byte)-16);
+        s.set_charTest((byte) -16);
 
         short pS = s.get_shortTest();
         if (pS != -16) {
             return false;
         }
-        s.set_shortTest((short)-32);
+        s.set_shortTest((short) -32);
 
         int pI = s.get_intTest();
         if (pI != -32) {

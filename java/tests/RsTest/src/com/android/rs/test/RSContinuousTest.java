@@ -33,22 +33,22 @@ import org.junit.Test;
  * adb shell am instrument -w com.android.rs.test/android.support.test.runner.AndroidJUnitRunner
  *
  */
-public class RSInstrumentationTest {
-    private Context mStubContext;
+public class RSContinuousTest {
+    private Context mContext;
 
     @Rule
     // A rule to create stub activity for RenderScript context.
-    public ActivityTestRule<RsStubActivity> mActivityRule = new ActivityTestRule(RsStubActivity.class);
+    public ActivityTestRule<RSContinuousTestActivity> mActivityRule = new ActivityTestRule(RSContinuousTestActivity.class);
 
     @Before
     public void before() throws RemoteException {
-        mStubContext = mActivityRule.getActivity().getApplication().getApplicationContext();
+        mContext = mActivityRule.getActivity().getApplication().getApplicationContext();
     }
 
     @Test
     @MediumTest
     public void test_UT_alloc() {
-        UT_alloc test = new UT_alloc(null, mStubContext);
+        UT_alloc test = new UT_alloc(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -56,7 +56,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_array_alloc() {
-        UT_array_alloc test = new UT_array_alloc(null, mStubContext);
+        UT_array_alloc test = new UT_array_alloc(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -64,7 +64,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_array_init() {
-        UT_array_init test = new UT_array_init(null, mStubContext);
+        UT_array_init test = new UT_array_init(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -72,7 +72,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_atomic() {
-        UT_atomic test = new UT_atomic(null, mStubContext);
+        UT_atomic test = new UT_atomic(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -80,7 +80,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_bug_char() {
-        UT_bug_char test = new UT_bug_char(null, mStubContext);
+        UT_bug_char test = new UT_bug_char(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -88,7 +88,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_check_dims() {
-        UT_check_dims test = new UT_check_dims(null, mStubContext);
+        UT_check_dims test = new UT_check_dims(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -96,7 +96,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_clamp() {
-        UT_clamp test = new UT_clamp(null, mStubContext);
+        UT_clamp test = new UT_clamp(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -104,7 +104,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_clamp_relaxed() {
-        UT_clamp_relaxed test = new UT_clamp_relaxed(null, mStubContext);
+        UT_clamp_relaxed test = new UT_clamp_relaxed(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -112,7 +112,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_constant() {
-        UT_constant test = new UT_constant(null, mStubContext);
+        UT_constant test = new UT_constant(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -120,7 +120,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_convert() {
-        UT_convert test = new UT_convert(null, mStubContext);
+        UT_convert test = new UT_convert(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -128,7 +128,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_convert_relaxed() {
-        UT_convert_relaxed test = new UT_convert_relaxed(null, mStubContext);
+        UT_convert_relaxed test = new UT_convert_relaxed(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -136,7 +136,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_copy_test() {
-        UT_copy_test test = new UT_copy_test(null, mStubContext);
+        UT_copy_test test = new UT_copy_test(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -144,7 +144,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_ctxt_default() {
-        UT_ctxt_default test = new UT_ctxt_default(null, mStubContext);
+        UT_ctxt_default test = new UT_ctxt_default(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -152,7 +152,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_element() {
-        UT_element test = new UT_element(null, mStubContext);
+        UT_element test = new UT_element(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -160,7 +160,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_foreach() {
-        UT_foreach test = new UT_foreach(null, mStubContext);
+        UT_foreach test = new UT_foreach(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -168,7 +168,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_foreach_bounds() {
-        UT_foreach_bounds test = new UT_foreach_bounds(null, mStubContext);
+        UT_foreach_bounds test = new UT_foreach_bounds(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -176,7 +176,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_foreach_multi() {
-        UT_foreach_multi test = new UT_foreach_multi(null, mStubContext);
+        UT_foreach_multi test = new UT_foreach_multi(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -184,7 +184,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_fp16() {
-        UT_fp16 test = new UT_fp16(null, mStubContext);
+        UT_fp16 test = new UT_fp16(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -192,7 +192,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_fp16_globals() {
-        UT_fp16_globals test = new UT_fp16_globals(null, mStubContext);
+        UT_fp16_globals test = new UT_fp16_globals(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -200,7 +200,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_fp_mad() {
-        UT_fp_mad test = new UT_fp_mad(null, mStubContext);
+        UT_fp_mad test = new UT_fp_mad(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -208,7 +208,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_int4() {
-        UT_int4 test = new UT_int4(null, mStubContext);
+        UT_int4 test = new UT_int4(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -216,7 +216,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_kernel() {
-        UT_kernel test = new UT_kernel(null, mStubContext);
+        UT_kernel test = new UT_kernel(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -224,7 +224,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_kernel2d() {
-        UT_kernel2d test = new UT_kernel2d(null, mStubContext);
+        UT_kernel2d test = new UT_kernel2d(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -232,7 +232,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_kernel2d_oldstyle() {
-        UT_kernel2d_oldstyle test = new UT_kernel2d_oldstyle(null, mStubContext);
+        UT_kernel2d_oldstyle test = new UT_kernel2d_oldstyle(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -240,7 +240,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_kernel3d() {
-        UT_kernel3d test = new UT_kernel3d(null, mStubContext);
+        UT_kernel3d test = new UT_kernel3d(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -248,7 +248,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_kernel_struct() {
-        UT_kernel_struct test = new UT_kernel_struct(null, mStubContext);
+        UT_kernel_struct test = new UT_kernel_struct(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -256,7 +256,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_math() {
-        UT_math test = new UT_math(null, mStubContext);
+        UT_math test = new UT_math(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -264,7 +264,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_math_agree() {
-        UT_math_agree test = new UT_math_agree(null, mStubContext);
+        UT_math_agree test = new UT_math_agree(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -272,7 +272,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_math_conformance() {
-        UT_math_conformance test = new UT_math_conformance(null, mStubContext);
+        UT_math_conformance test = new UT_math_conformance(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -280,7 +280,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_math_fp16() {
-        UT_math_fp16 test = new UT_math_fp16(null, mStubContext);
+        UT_math_fp16 test = new UT_math_fp16(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -288,7 +288,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_min() {
-        UT_min test = new UT_min(null, mStubContext);
+        UT_min test = new UT_min(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -296,7 +296,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_noroot() {
-        UT_noroot test = new UT_noroot(null, mStubContext);
+        UT_noroot test = new UT_noroot(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -304,7 +304,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_primitives() {
-        UT_primitives test = new UT_primitives(null, mStubContext);
+        UT_primitives test = new UT_primitives(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -312,7 +312,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_reduce() {
-        UT_reduce test = new UT_reduce(null, mStubContext);
+        UT_reduce test = new UT_reduce(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -320,7 +320,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_reduce_backward() {
-        UT_reduce_backward test = new UT_reduce_backward(null, mStubContext);
+        UT_reduce_backward test = new UT_reduce_backward(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -328,7 +328,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_refcount() {
-        UT_refcount test = new UT_refcount(null, mStubContext);
+        UT_refcount test = new UT_refcount(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -336,7 +336,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_rsdebug() {
-        UT_rsdebug test = new UT_rsdebug(null, mStubContext);
+        UT_rsdebug test = new UT_rsdebug(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -344,7 +344,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_rstime() {
-        UT_rstime test = new UT_rstime(null, mStubContext);
+        UT_rstime test = new UT_rstime(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -352,7 +352,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_rstypes() {
-        UT_rstypes test = new UT_rstypes(null, mStubContext);
+        UT_rstypes test = new UT_rstypes(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -360,7 +360,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_sampler() {
-        UT_sampler test = new UT_sampler(null, mStubContext);
+        UT_sampler test = new UT_sampler(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -368,7 +368,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_script_group2_float() {
-        UT_script_group2_float test = new UT_script_group2_float(null, mStubContext);
+        UT_script_group2_float test = new UT_script_group2_float(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -376,7 +376,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_script_group2_gatherscatter() {
-        UT_script_group2_gatherscatter test = new UT_script_group2_gatherscatter(null, mStubContext);
+        UT_script_group2_gatherscatter test = new UT_script_group2_gatherscatter(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -384,7 +384,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_script_group2_nochain() {
-        UT_script_group2_nochain test = new UT_script_group2_nochain(null, mStubContext);
+        UT_script_group2_nochain test = new UT_script_group2_nochain(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -392,7 +392,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_script_group2_pointwise() {
-        UT_script_group2_pointwise test = new UT_script_group2_pointwise(null, mStubContext);
+        UT_script_group2_pointwise test = new UT_script_group2_pointwise(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -400,7 +400,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_single_source_alloc() {
-        UT_single_source_alloc test = new UT_single_source_alloc(null, mStubContext);
+        UT_single_source_alloc test = new UT_single_source_alloc(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -408,7 +408,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_single_source_ref_count() {
-        UT_single_source_ref_count test = new UT_single_source_ref_count(null, mStubContext);
+        UT_single_source_ref_count test = new UT_single_source_ref_count(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -416,7 +416,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_single_source_script() {
-        UT_single_source_script test = new UT_single_source_script(null, mStubContext);
+        UT_single_source_script test = new UT_single_source_script(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -424,7 +424,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_small_struct() {
-        UT_small_struct test = new UT_small_struct(null, mStubContext);
+        UT_small_struct test = new UT_small_struct(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -432,7 +432,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_static_globals() {
-        UT_static_globals test = new UT_static_globals(null, mStubContext);
+        UT_static_globals test = new UT_static_globals(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -440,7 +440,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_struct() {
-        UT_struct test = new UT_struct(null, mStubContext);
+        UT_struct test = new UT_struct(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -448,7 +448,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_unsigned() {
-        UT_unsigned test = new UT_unsigned(null, mStubContext);
+        UT_unsigned test = new UT_unsigned(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }
@@ -456,7 +456,7 @@ public class RSInstrumentationTest {
     @Test
     @MediumTest
     public void test_UT_vector() {
-        UT_vector test = new UT_vector(null, mStubContext);
+        UT_vector test = new UT_vector(null, mContext);
         test.run();
         Assert.assertTrue(test.getResult() == UnitTest.TEST_PASSED);
     }

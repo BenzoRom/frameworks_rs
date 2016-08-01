@@ -17,7 +17,10 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.RenderScript;
+import android.renderscript.Short2;
+import android.renderscript.Short3;
+import android.renderscript.Short4;
 
 public class UT_fp16_globals extends UnitTest {
     private static final short mHalfConst0 = (short) 0x4900; // 10.f

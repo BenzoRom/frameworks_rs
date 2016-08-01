@@ -17,7 +17,8 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Byte2;
+import android.renderscript.RenderScript;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class UT_bug_char extends UnitTest {
     private byte min(byte v1, byte v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private byte[] min(byte[] v1, byte[] v2) {
         assert v1.length == v2.length;
         byte[] rv = new byte[v1.length];
@@ -47,12 +49,12 @@ public class UT_bug_char extends UnitTest {
     }
 
     private void initializeValues(ScriptC_bug_char s) {
-        byte rand_sc1_0 = (byte)7;
+        byte rand_sc1_0 = (byte) 7;
         byte[] rand_sc2_0 = new byte[2];
         rand_sc2_0[0] = 11;
         rand_sc2_0[1] = 21;
         Log.i("bug_char", "Generated sc2_0 to " + Arrays.toString(rand_sc2_0));
-        byte rand_sc1_1 = (byte)10;
+        byte rand_sc1_1 = (byte) 10;
         byte[] rand_sc2_1 = new byte[2];
         rand_sc2_1[0] = 13;
         rand_sc2_1[1] = 15;
@@ -66,10 +68,10 @@ public class UT_bug_char extends UnitTest {
         s.set_min_rand_sc1_sc1(min(rand_sc1_0, rand_sc1_1));
         byte[] min_rand_sc2_raw = min(rand_sc2_0, rand_sc2_1);
         Log.i("bug_char", "Generating min_rand_sc2_sc2 to " +
-              Arrays.toString(min_rand_sc2_raw));
+                Arrays.toString(min_rand_sc2_raw));
         Byte2 min_rand_sc2 = pack_b2(min_rand_sc2_raw);
         Log.i("bug_char", "Setting min_rand_sc2_sc2 to [" + min_rand_sc2.x +
-              ", " + min_rand_sc2.y + "]");
+                ", " + min_rand_sc2.y + "]");
         s.set_min_rand_sc2_sc2(min_rand_sc2);
     }
 

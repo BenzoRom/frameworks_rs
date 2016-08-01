@@ -23,7 +23,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.Float2;
+import android.renderscript.Int2;
+import android.renderscript.Int3;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicHistogram;
+import android.renderscript.Type;
 import android.util.Log;
 
 import java.util.Random;
@@ -69,7 +76,7 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = javaRslt.equals(rsRslt);
         Log.i(TAG,
                 testName + ": java " + javaRslt + ", rs " + rsRslt + ": " +
-                (success ? "PASSED" : "FAILED"));
+                        (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -77,9 +84,9 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = (javaRslt.x == rsRslt.x) && (javaRslt.y == rsRslt.y);
         Log.i(TAG,
                 testName +
-                ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
-                ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
-                ": " + (success ? "PASSED" : "FAILED"));
+                        ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
+                        ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
+                        ": " + (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -87,9 +94,9 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = (javaRslt.x == rsRslt.x) && (javaRslt.y == rsRslt.y);
         Log.i(TAG,
                 testName +
-                ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
-                ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
-                ": " + (success ? "PASSED" : "FAILED"));
+                        ": java (" + javaRslt.x + ", " + javaRslt.y + ")" +
+                        ", rs (" + rsRslt.x + ", " + rsRslt.y + ")" +
+                        ": " + (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -176,7 +183,7 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = (input[rsRslt] == 0);
         Log.i(TAG,
                 "fz: input[" + rsRslt + "] == " + input[rsRslt] + ": " +
-                (success ? "PASSED" : "FAILED"));
+                        (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -201,7 +208,7 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = (cellVal == 0);
         Log.i(TAG,
                 "fz2: input[" + rsRslt.x + ", " + rsRslt.y + "] == " + cellVal + ": " +
-                (success ? "PASSED" : "FAILED"));
+                        (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -226,7 +233,7 @@ public class UT_reduce_backward extends UnitTest {
         final boolean success = (cellVal == 0);
         Log.i(TAG,
                 "fz3: input[" + rsRslt.x + ", " + rsRslt.y + ", " + rsRslt.z + "] == " + cellVal + ": " +
-                (success ? "PASSED" : "FAILED"));
+                        (success ? "PASSED" : "FAILED"));
         return success;
     }
 
@@ -249,7 +256,7 @@ public class UT_reduce_backward extends UnitTest {
 
         long[] outputArray = new long[histogramBucketCount];
         for (int i = 0; i < histogramBucketCount; ++i)
-            outputArray[i] = outputArrayMistyped[i] & (long)0xffffffff;
+            outputArray[i] = outputArrayMistyped[i] & (long) 0xffffffff;
         return outputArray;
     }
 
@@ -280,8 +287,8 @@ public class UT_reduce_backward extends UnitTest {
 
         int modeIdx = 0;
         for (int i = 1; i < hsg.length; ++i)
-            if (hsg[i] > hsg[modeIdx]) modeIdx =i;
-        return new Int2(modeIdx, (int)hsg[modeIdx]);
+            if (hsg[i] > hsg[modeIdx]) modeIdx = i;
+        return new Int2(modeIdx, (int) hsg[modeIdx]);
     }
 
     private boolean mode(RenderScript RS, ScriptC_reduce_backward s) {

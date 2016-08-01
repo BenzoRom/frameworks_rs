@@ -15,7 +15,11 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptGroup;
+import android.renderscript.Type;
 import android.util.Log;
 
 public class UT_script_group2_pointwise extends UnitTest {
@@ -48,26 +52,26 @@ public class UT_script_group2_pointwise extends UnitTest {
 
         ScriptGroup.Closure c0 =
                 builder.addKernel(s_inc.getKernelID_increment(),
-                                  Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                                  unbound);
+                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
+                        unbound);
 
         ScriptGroup.Closure c1 =
                 builder.addKernel(s_double.getKernelID_doubleKernel(),
-                                  Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                                  c0.getReturn());
+                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
+                        c0.getReturn());
 
         ScriptGroup group = builder.create("AddDouble", c1.getReturn());
 
         int[] a = new int[ARRAY_SIZE * 4];
-        ((Allocation)group.execute(input)[0]).copyTo(a);
+        ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
         pRS.destroy();
 
         boolean failed = false;
         for (int i = 0; i < ARRAY_SIZE * 4; i++) {
-            if (a[i] != (i+1) * 2) {
-                Log.e(TAG, "a["+i+"]="+a[i]+", should be "+ ((i+1) * 2));
+            if (a[i] != (i + 1) * 2) {
+                Log.e(TAG, "a[" + i + "]=" + a[i] + ", should be " + ((i + 1) * 2));
                 failed = true;
             }
         }
