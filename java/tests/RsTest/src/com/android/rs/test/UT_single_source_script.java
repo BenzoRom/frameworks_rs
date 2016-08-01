@@ -17,16 +17,13 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_single_source_script extends UnitTest {
-    private Resources mRes;
     private Allocation testAllocation1, testAllocation2;
 
-    protected UT_single_source_script(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_single_source_script(RSTestCore rstc, Context ctx) {
         super(rstc, "SingleSourceScript", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_single_source_script s) {

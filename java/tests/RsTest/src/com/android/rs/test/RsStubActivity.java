@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2016 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,9 @@
 
 package com.android.rs.test;
 
-import android.content.Context;
-import android.renderscript.*;
+import android.app.Activity;
 
-public class UT_rsdebug extends UnitTest {
-
-    protected UT_rsdebug(RSTestCore rstc, Context ctx) {
-        super(rstc, "rsDebug", ctx);
-    }
-
-    public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
-        ScriptC_rsdebug s = new ScriptC_rsdebug(pRS);
-        pRS.setMessageHandler(mRsMessage);
-        s.invoke_test_rsdebug(0, 0);
-        pRS.finish();
-        waitForMessage();
-        pRS.destroy();
-    }
+// A stub activity for creating RenderScript context
+// in the instrumentation tests.
+public class RsStubActivity extends Activity {
 }
