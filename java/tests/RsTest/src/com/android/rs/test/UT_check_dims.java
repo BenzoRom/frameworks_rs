@@ -17,19 +17,16 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_check_dims extends UnitTest {
-    private Resources mRes;
     byte mFailedArr[];
     int mData[];
     Allocation mA;
     static final int Pattern = 0xA5A5A5A5;
 
-    protected UT_check_dims(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_check_dims(RSTestCore rstc, Context ctx) {
         super(rstc, "Check Dims", ctx);
-        mRes = res;
     }
 
     private void initializeGlobals(RenderScript RS, ScriptC_check_dims s) {

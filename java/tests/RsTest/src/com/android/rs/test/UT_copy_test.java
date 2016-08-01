@@ -17,17 +17,14 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 import android.util.Log;
 
 public class UT_copy_test extends UnitTest {
-    private Resources mRes;
     boolean pass = true;
 
-    protected UT_copy_test(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_copy_test(RSTestCore rstc, Context ctx) {
         super(rstc, "Copy", ctx);
-        mRes = res;
     }
 
     void testFloat2(RenderScript rs, ScriptC_copy_test s) {

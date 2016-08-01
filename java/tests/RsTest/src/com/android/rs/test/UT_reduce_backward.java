@@ -23,16 +23,15 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 import android.util.Log;
-import java.lang.Float;
+
 import java.util.Random;
 
 public class UT_reduce_backward extends UnitTest {
     private static final String TAG = "reduce_backward";
 
-    protected UT_reduce_backward(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_reduce_backward(RSTestCore rstc, Context ctx) {
         super(rstc, "reduce_backward", ctx);
     }
 

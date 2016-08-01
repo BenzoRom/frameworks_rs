@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_struct extends UnitTest {
-    private Resources mRes;
 
-    protected UT_struct(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_struct(RSTestCore rstc, Context ctx) {
         super(rstc, "Struct", ctx);
-        mRes = res;
     }
 
     public void run() {

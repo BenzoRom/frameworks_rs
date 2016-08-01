@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_fp_mad extends UnitTest {
-    private Resources mRes;
 
-    protected UT_fp_mad(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_fp_mad(RSTestCore rstc, Context ctx) {
         super(rstc, "Fp_Mad", ctx);
-        mRes = res;
     }
 
     public void run() {

@@ -17,15 +17,12 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.renderscript.*;
 
 public class UT_atomic extends UnitTest {
-    private Resources mRes;
 
-    protected UT_atomic(RSTestCore rstc, Resources res, Context ctx) {
+    protected UT_atomic(RSTestCore rstc, Context ctx) {
         super(rstc, "Atomics", ctx);
-        mRes = res;
     }
 
     public void run() {
