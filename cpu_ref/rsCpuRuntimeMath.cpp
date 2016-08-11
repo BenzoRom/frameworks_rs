@@ -47,7 +47,7 @@ using namespace android::renderscript;
 // Handle missing Gingerbread functions like tgammaf.
 float SC_tgammaf(float x) {
 #ifdef RS_COMPATIBILITY_LIB
-    return tgamma(x);
+    return __builtin_tgamma(x);
 #else
     return tgammaf(x);
 #endif
