@@ -164,6 +164,7 @@ bool FileA3D::load(FILE *f) {
 
     len = fread(headerData, 1, headerSize, f);
     if (len != headerSize) {
+        free(headerData);
         return false;
     }
 
