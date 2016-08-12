@@ -17,7 +17,7 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.RenderScript;
 
 public class UT_single_source_alloc extends UnitTest {
     private int dimX = 3;
@@ -35,8 +35,8 @@ public class UT_single_source_alloc extends UnitTest {
 
     private void initializeGlobals(RenderScript RS, ScriptC_single_source_alloc s, int nDims) {
         s.set_gDimX(dimX);
-        s.set_gDimY(nDims > 1? dimY: 0);
-        s.set_gDimZ(nDims > 2? dimZ: 0);
+        s.set_gDimY(nDims > 1 ? dimY : 0);
+        s.set_gDimZ(nDims > 2 ? dimZ : 0);
         s.set_gStart(start);
 
         return;
@@ -49,9 +49,9 @@ public class UT_single_source_alloc extends UnitTest {
 
         // Test 1-D, 2-D and 3-D Allocations of basic RenderScript types by creating Allocations and
         // invoking a kernel on them.
-        for (int dataType: rsDataTypes) {
-            for (int vecSize = 1; vecSize <= 4; vecSize ++) {
-                for (int nDims = 1; nDims <= 3; nDims ++) {
+        for (int dataType : rsDataTypes) {
+            for (int vecSize = 1; vecSize <= 4; vecSize++) {
+                for (int nDims = 1; nDims <= 3; nDims++) {
                     initializeGlobals(pRS, s, nDims);
                     s.invoke_CreateAndTestAlloc(dataType, vecSize);
                 }

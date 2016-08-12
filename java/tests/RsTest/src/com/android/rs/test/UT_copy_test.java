@@ -17,7 +17,9 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
 import android.util.Log;
 
 public class UT_copy_test extends UnitTest {
@@ -33,15 +35,15 @@ public class UT_copy_test extends UnitTest {
 
         float[] f1 = new float[1024 * 2];
         float[] f2 = new float[1024 * 2];
-        for (int ct=0; ct < f1.length; ct++) {
-            f1[ct] = (float)ct;
+        for (int ct = 0; ct < f1.length; ct++) {
+            f1[ct] = (float) ct;
         }
         a1.copyFrom(f1);
 
         s.forEach_copyFloat2(a1, a2);
 
         a2.copyTo(f2);
-        for (int ct=0; ct < f1.length; ct++) {
+        for (int ct = 0; ct < f1.length; ct++) {
             if (f1[ct] != f2[ct]) {
                 failTest();
                 Log.v("RS Test", "Compare failed at " + ct + ", " + f1[ct] + ", " + f2[ct]);
@@ -57,16 +59,16 @@ public class UT_copy_test extends UnitTest {
 
         float[] f1 = new float[1024 * 4];
         float[] f2 = new float[1024 * 4];
-        for (int ct=0; ct < f1.length; ct++) {
-            f1[ct] = (float)ct;
+        for (int ct = 0; ct < f1.length; ct++) {
+            f1[ct] = (float) ct;
         }
         a1.copyFrom(f1);
 
         s.forEach_copyFloat3(a1, a2);
 
         a2.copyTo(f2);
-        for (int ct=0; ct < f1.length; ct++) {
-            if ((f1[ct] != f2[ct]) && ((ct&3) != 3)) {
+        for (int ct = 0; ct < f1.length; ct++) {
+            if ((f1[ct] != f2[ct]) && ((ct & 3) != 3)) {
                 failTest();
                 Log.v("RS Test", "Compare failed at " + ct + ", " + f1[ct] + ", " + f2[ct]);
             }
@@ -81,15 +83,15 @@ public class UT_copy_test extends UnitTest {
 
         float[] f1 = new float[1024 * 4];
         float[] f2 = new float[1024 * 4];
-        for (int ct=0; ct < f1.length; ct++) {
-            f1[ct] = (float)ct;
+        for (int ct = 0; ct < f1.length; ct++) {
+            f1[ct] = (float) ct;
         }
         a1.copyFrom(f1);
 
         s.forEach_copyFloat4(a1, a2);
 
         a2.copyTo(f2);
-        for (int ct=0; ct < f1.length; ct++) {
+        for (int ct = 0; ct < f1.length; ct++) {
             if (f1[ct] != f2[ct]) {
                 failTest();
                 Log.v("RS Test", "Compare failed at " + ct + ", " + f1[ct] + ", " + f2[ct]);
