@@ -17,7 +17,22 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Byte2;
+import android.renderscript.Byte3;
+import android.renderscript.Byte4;
+import android.renderscript.Float2;
+import android.renderscript.Float3;
+import android.renderscript.Float4;
+import android.renderscript.Int2;
+import android.renderscript.Int3;
+import android.renderscript.Int4;
+import android.renderscript.Long2;
+import android.renderscript.Long3;
+import android.renderscript.Long4;
+import android.renderscript.RenderScript;
+import android.renderscript.Short2;
+import android.renderscript.Short3;
+import android.renderscript.Short4;
 
 import java.util.Random;
 
@@ -34,58 +49,72 @@ public class UT_math_agree extends UnitTest {
         assert val.length == 2;
         return new Float2(val[0], val[1]);
     }
+
     private Float3 pack_f3(float[] val) {
         assert val.length == 3;
         return new Float3(val[0], val[1], val[2]);
     }
+
     private Float4 pack_f4(float[] val) {
         assert val.length == 4;
         return new Float4(val[0], val[1], val[2], val[3]);
     }
+
     private Byte2 pack_b2(byte[] val) {
         assert val.length == 2;
         return new Byte2(val[0], val[1]);
     }
+
     private Byte3 pack_b3(byte[] val) {
         assert val.length == 3;
         return new Byte3(val[0], val[1], val[2]);
     }
+
     private Byte4 pack_b4(byte[] val) {
         assert val.length == 4;
         return new Byte4(val[0], val[1], val[2], val[3]);
     }
+
     private Short2 pack_s2(short[] val) {
         assert val.length == 2;
         return new Short2(val[0], val[1]);
     }
+
     private Short3 pack_s3(short[] val) {
         assert val.length == 3;
         return new Short3(val[0], val[1], val[2]);
     }
+
     private Short4 pack_s4(short[] val) {
         assert val.length == 4;
         return new Short4(val[0], val[1], val[2], val[3]);
     }
+
     private Int2 pack_i2(int[] val) {
         assert val.length == 2;
         return new Int2(val[0], val[1]);
     }
+
     private Int3 pack_i3(int[] val) {
         assert val.length == 3;
         return new Int3(val[0], val[1], val[2]);
     }
+
     private Int4 pack_i4(int[] val) {
         assert val.length == 4;
         return new Int4(val[0], val[1], val[2], val[3]);
     }
+
     private Long2 pack_l2(long[] val) {
         assert val.length == 2;
         return new Long2(val[0], val[1]);
     }
+
     private Long3 pack_l3(long[] val) {
         assert val.length == 3;
         return new Long3(val[0], val[1], val[2]);
     }
+
     private Long4 pack_l4(long[] val) {
         assert val.length == 4;
         return new Long4(val[0], val[1], val[2], val[3]);
@@ -98,41 +127,48 @@ public class UT_math_agree extends UnitTest {
             fv[i] = rand.nextFloat();
         return fv;
     }
+
     private byte[] randvec_char(int dim) {
         byte[] cv = new byte[dim];
         rand.nextBytes(cv);
         return cv;
     }
+
     private short[] randvec_uchar(int dim) {
-       short[] ucv = new short[dim];
-       for (int i = 0; i < dim; ++i)
-           ucv[i] = (short)rand.nextInt(0x1 << 8);
-       return ucv;
+        short[] ucv = new short[dim];
+        for (int i = 0; i < dim; ++i)
+            ucv[i] = (short) rand.nextInt(0x1 << 8);
+        return ucv;
     }
+
     private short[] randvec_short(int dim) {
         short[] sv = new short[dim];
         for (int i = 0; i < dim; ++i)
-            sv[i] = (short)rand.nextInt(0x1 << 16);
+            sv[i] = (short) rand.nextInt(0x1 << 16);
         return sv;
     }
+
     private int[] randvec_ushort(int dim) {
         int[] usv = new int[dim];
         for (int i = 0; i < dim; ++i)
             usv[i] = rand.nextInt(0x1 << 16);
         return usv;
     }
+
     private int[] randvec_int(int dim) {
         int[] iv = new int[dim];
         for (int i = 0; i < dim; ++i)
             iv[i] = rand.nextInt();
         return iv;
     }
+
     private long[] randvec_uint(int dim) {
         long[] uiv = new long[dim];
         for (int i = 0; i < dim; ++i)
-            uiv[i] = (long)rand.nextInt() - (long)Integer.MIN_VALUE;
+            uiv[i] = (long) rand.nextInt() - (long) Integer.MIN_VALUE;
         return uiv;
     }
+
     private long[] randvec_long(int dim) {
         long[] lv = new long[dim];
         for (int i = 0; i < dim; ++i)
@@ -145,6 +181,7 @@ public class UT_math_agree extends UnitTest {
     private float min(float v1, float v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private float[] min(float[] v1, float[] v2) {
         assert v1.length == v2.length;
         float[] rv = new float[v1.length];
@@ -152,9 +189,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = min(v1[i], v2[i]);
         return rv;
     }
+
     private byte min(byte v1, byte v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private byte[] min(byte[] v1, byte[] v2) {
         assert v1.length == v2.length;
         byte[] rv = new byte[v1.length];
@@ -162,9 +201,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = min(v1[i], v2[i]);
         return rv;
     }
+
     private short min(short v1, short v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private short[] min(short[] v1, short[] v2) {
         assert v1.length == v2.length;
         short[] rv = new short[v1.length];
@@ -172,9 +213,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = min(v1[i], v2[i]);
         return rv;
     }
+
     private int min(int v1, int v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private int[] min(int[] v1, int[] v2) {
         assert v1.length == v2.length;
         int[] rv = new int[v1.length];
@@ -182,9 +225,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = min(v1[i], v2[i]);
         return rv;
     }
+
     private long min(long v1, long v2) {
         return v1 < v2 ? v1 : v2;
     }
+
     private long[] min(long[] v1, long[] v2) {
         assert v1.length == v2.length;
         long[] rv = new long[v1.length];
@@ -198,6 +243,7 @@ public class UT_math_agree extends UnitTest {
     private float max(float v1, float v2) {
         return v1 > v2 ? v1 : v2;
     }
+
     private float[] max(float[] v1, float[] v2) {
         assert v1.length == v2.length;
         float[] rv = new float[v1.length];
@@ -205,9 +251,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = max(v1[i], v2[i]);
         return rv;
     }
+
     private byte max(byte v1, byte v2) {
         return v1 > v2 ? v1 : v2;
     }
+
     private byte[] max(byte[] v1, byte[] v2) {
         assert v1.length == v2.length;
         byte[] rv = new byte[v1.length];
@@ -215,9 +263,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = max(v1[i], v2[i]);
         return rv;
     }
+
     private short max(short v1, short v2) {
         return v1 > v2 ? v1 : v2;
     }
+
     private short[] max(short[] v1, short[] v2) {
         assert v1.length == v2.length;
         short[] rv = new short[v1.length];
@@ -225,9 +275,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = max(v1[i], v2[i]);
         return rv;
     }
+
     private int max(int v1, int v2) {
         return v1 > v2 ? v1 : v2;
     }
+
     private int[] max(int[] v1, int[] v2) {
         assert v1.length == v2.length;
         int[] rv = new int[v1.length];
@@ -235,9 +287,11 @@ public class UT_math_agree extends UnitTest {
             rv[i] = max(v1[i], v2[i]);
         return rv;
     }
+
     private long max(long v1, long v2) {
         return v1 > v2 ? v1 : v2;
     }
+
     private long[] max(long[] v1, long[] v2) {
         assert v1.length == v2.length;
         long[] rv = new long[v1.length];
@@ -251,9 +305,11 @@ public class UT_math_agree extends UnitTest {
     private float fmin(float v1, float v2) {
         return min(v1, v2);
     }
+
     private float[] fmin(float[] v1, float[] v2) {
         return min(v1, v2);
     }
+
     private float[] fmin(float[] v1, float v2) {
         float[] rv = new float[v1.length];
         for (int i = 0; i < v1.length; ++i)
@@ -265,9 +321,11 @@ public class UT_math_agree extends UnitTest {
     private float fmax(float v1, float v2) {
         return max(v1, v2);
     }
+
     private float[] fmax(float[] v1, float[] v2) {
         return max(v1, v2);
     }
+
     private float[] fmax(float[] v1, float v2) {
         float[] rv = new float[v1.length];
         for (int i = 0; i < v1.length; ++i)
@@ -295,19 +353,19 @@ public class UT_math_agree extends UnitTest {
         float[] rand_f2_1 = randvec_float(2);
         float[] rand_f3_1 = randvec_float(3);
         float[] rand_f4_1 = randvec_float(4);
-        short rand_uc1_0 = (short)rand.nextInt(0x1 << 8);
+        short rand_uc1_0 = (short) rand.nextInt(0x1 << 8);
         short[] rand_uc2_0 = randvec_uchar(2);
         short[] rand_uc3_0 = randvec_uchar(3);
         short[] rand_uc4_0 = randvec_uchar(4);
-        short rand_uc1_1 = (short)rand.nextInt(0x1 << 8);
+        short rand_uc1_1 = (short) rand.nextInt(0x1 << 8);
         short[] rand_uc2_1 = randvec_uchar(2);
         short[] rand_uc3_1 = randvec_uchar(3);
         short[] rand_uc4_1 = randvec_uchar(4);
-        short rand_ss1_0 = (short)rand.nextInt(0x1 << 16);
+        short rand_ss1_0 = (short) rand.nextInt(0x1 << 16);
         short[] rand_ss2_0 = randvec_short(2);
         short[] rand_ss3_0 = randvec_short(3);
         short[] rand_ss4_0 = randvec_short(4);
-        short rand_ss1_1 = (short)rand.nextInt(0x1 << 16);
+        short rand_ss1_1 = (short) rand.nextInt(0x1 << 16);
         short[] rand_ss2_1 = randvec_short(2);
         short[] rand_ss3_1 = randvec_short(3);
         short[] rand_ss4_1 = randvec_short(4);
@@ -327,11 +385,11 @@ public class UT_math_agree extends UnitTest {
         int[] rand_si2_1 = randvec_int(2);
         int[] rand_si3_1 = randvec_int(3);
         int[] rand_si4_1 = randvec_int(4);
-        long rand_ui1_0 = (long)rand.nextInt() - (long)Integer.MIN_VALUE;
+        long rand_ui1_0 = (long) rand.nextInt() - (long) Integer.MIN_VALUE;
         long[] rand_ui2_0 = randvec_uint(2);
         long[] rand_ui3_0 = randvec_uint(3);
         long[] rand_ui4_0 = randvec_uint(4);
-        long rand_ui1_1 = (long)rand.nextInt() - (long)Integer.MIN_VALUE;
+        long rand_ui1_1 = (long) rand.nextInt() - (long) Integer.MIN_VALUE;
         long[] rand_ui2_1 = randvec_uint(2);
         long[] rand_ui3_1 = randvec_uint(3);
         long[] rand_ui4_1 = randvec_uint(4);
@@ -343,11 +401,11 @@ public class UT_math_agree extends UnitTest {
         long[] rand_sl2_1 = randvec_long(2);
         long[] rand_sl3_1 = randvec_long(3);
         long[] rand_sl4_1 = randvec_long(4);
-        byte rand_sc1_0 = (byte)rand.nextInt(0x1 << 8);
+        byte rand_sc1_0 = (byte) rand.nextInt(0x1 << 8);
         byte[] rand_sc2_0 = randvec_char(2);
         byte[] rand_sc3_0 = randvec_char(3);
         byte[] rand_sc4_0 = randvec_char(4);
-        byte rand_sc1_1 = (byte)rand.nextInt(0x1 << 8);
+        byte rand_sc1_1 = (byte) rand.nextInt(0x1 << 8);
         byte[] rand_sc2_1 = randvec_char(2);
         byte[] rand_sc3_1 = randvec_char(3);
         byte[] rand_sc4_1 = randvec_char(4);
