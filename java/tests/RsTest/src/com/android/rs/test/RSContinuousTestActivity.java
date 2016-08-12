@@ -20,5 +20,5 @@ import android.app.Activity;
 
 // A stub activity for creating RenderScript context
 // in the instrumentation tests.
-public class RsStubActivity extends Activity {
+public class RSContinuousTestActivity extends Activity {
 }
