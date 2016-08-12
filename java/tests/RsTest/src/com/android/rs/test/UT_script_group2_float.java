@@ -15,7 +15,11 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptGroup;
+import android.renderscript.Type;
 import android.util.Log;
 
 public class UT_script_group2_float extends UnitTest {
@@ -51,25 +55,25 @@ public class UT_script_group2_float extends UnitTest {
         final long longVal = 0x100000000L;
         ScriptGroup.Closure c0 =
                 builder.addKernel(s_float.getKernelID_foo(),
-                                  Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
-                                  unbound,
-                                  new ScriptGroup.Binding(s_float.getFieldID_floatVal(),
-                                                          floatVal),
-                                  new ScriptGroup.Binding(s_float.getFieldID_val(),
-                                                          doubleVal));
+                        Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
+                        unbound,
+                        new ScriptGroup.Binding(s_float.getFieldID_floatVal(),
+                                floatVal),
+                        new ScriptGroup.Binding(s_float.getFieldID_val(),
+                                doubleVal));
 
         ScriptGroup.Closure c1 =
                 builder.addKernel(s_float.getKernelID_goo(),
-                                  Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
-                                  c0.getReturn(),
-                                  new ScriptGroup.Binding(s_float.getFieldID_valLong(),
-                                                          longVal));
+                        Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
+                        c0.getReturn(),
+                        new ScriptGroup.Binding(s_float.getFieldID_valLong(),
+                                longVal));
 
 
         ScriptGroup group = builder.create("TestFloatAnd64bit", c1.getReturn());
 
         double[] a = new double[ARRAY_SIZE];
-        ((Allocation)group.execute(input)[0]).copyTo(a);
+        ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
         pRS.destroy();
@@ -77,7 +81,7 @@ public class UT_script_group2_float extends UnitTest {
         boolean failed = false;
         for (int i = 0; i < ARRAY_SIZE; i++) {
             if (a[i] != doubleVal + longVal + floatVal) {
-                Log.e(TAG, "a["+i+"]="+a[i]+", should be " + (doubleVal + longVal));
+                Log.e(TAG, "a[" + i + "]=" + a[i] + ", should be " + (doubleVal + longVal));
                 failed = true;
             }
         }

@@ -15,7 +15,11 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptGroup;
+import android.renderscript.Type;
 import android.util.Log;
 
 public class UT_script_group2_gatherscatter extends UnitTest {
@@ -33,10 +37,10 @@ public class UT_script_group2_gatherscatter extends UnitTest {
         mArray = new int[ARRAY_SIZE * 4];
 
         for (int i = 0; i < ARRAY_SIZE; i++) {
-            mArray[i*4] = i * 7;
-            mArray[i*4 + 1] = i * 7 + 1;
-            mArray[i*4 + 2] = i * 7 + 2;
-            mArray[i*4 + 3] = i * 7 + 3;
+            mArray[i * 4] = i * 7;
+            mArray[i * 4 + 1] = i * 7 + 1;
+            mArray[i * 4 + 2] = i * 7 + 2;
+            mArray[i * 4 + 3] = i * 7 + 3;
         }
     }
 
@@ -79,9 +83,9 @@ public class UT_script_group2_gatherscatter extends UnitTest {
                 binding = new ScriptGroup.Binding(s.getFieldID_a_in(), f);
             }
             c = builder.addKernel(s.getKernelID_add(),
-                                  Type.createX(pRS, Element.I32_4(pRS), stride),
-                                  new ScriptGroup.Binding(s.getFieldID_reduction_stride(), stride),
-                                  binding);
+                    Type.createX(pRS, Element.I32_4(pRS), stride),
+                    new ScriptGroup.Binding(s.getFieldID_reduction_stride(), stride),
+                    binding);
             f = c.getReturn();
         }
 
@@ -92,7 +96,7 @@ public class UT_script_group2_gatherscatter extends UnitTest {
         }
 
         int[] a = new int[4];
-        ((Allocation)group.execute(input)[0]).copyTo(a);
+        ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
         pRS.destroy();
@@ -100,9 +104,9 @@ public class UT_script_group2_gatherscatter extends UnitTest {
         boolean failed = false;
         for (int i = 0; i < 4; i++) {
             if (failed == false &&
-                a[i] != ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2 + i * ARRAY_SIZE) {
-                Log.e(TAG, "a["+i+"]="+a[i]+", should be "+
-                      (ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2 + i * ARRAY_SIZE));
+                    a[i] != ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2 + i * ARRAY_SIZE) {
+                Log.e(TAG, "a[" + i + "]=" + a[i] + ", should be " +
+                        (ARRAY_SIZE * (ARRAY_SIZE - 1) * 7 / 2 + i * ARRAY_SIZE));
                 failed = true;
             }
         }

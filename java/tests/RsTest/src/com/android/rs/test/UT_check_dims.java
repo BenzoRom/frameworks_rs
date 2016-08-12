@@ -17,7 +17,10 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.Type;
 
 public class UT_check_dims extends UnitTest {
     byte mFailedArr[];
@@ -46,8 +49,8 @@ public class UT_check_dims extends UnitTest {
         mA = Allocation.createTyped(RS, typeBuilder.create());
         s.set_pattern(Pattern);
 
-        mData = new int[X*Y];
-        for (int i = 0; i < X*Y; i++) {
+        mData = new int[X * Y];
+        for (int i = 0; i < X * Y; i++) {
             mData[i] = Pattern;
         }
         mA.copyFrom(mData);
