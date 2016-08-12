@@ -17,7 +17,7 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.RenderScript;
 
 public class UT_unsigned extends UnitTest {
 
@@ -30,7 +30,7 @@ public class UT_unsigned extends UnitTest {
         if (pUC != 5) {
             return false;
         }
-        s.set_uc((short)129);
+        s.set_uc((short) 129);
 
         long pUI = s.get_ui();
         if (pUI != 37) {

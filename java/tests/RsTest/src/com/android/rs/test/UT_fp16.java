@@ -17,7 +17,10 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.Type;
 
 public class UT_fp16 extends UnitTest {
     private int dimX = 7;
@@ -31,7 +34,7 @@ public class UT_fp16 extends UnitTest {
 
     private void initializeGlobals(RenderScript RS, ScriptC_fp16 s, Element e, int nDims) {
         Type.Builder typeBuilder = new Type.Builder(RS, e);
-        switch(nDims) {
+        switch (nDims) {
             case 1:
                 typeBuilder.setX(dimX);
                 break;
@@ -45,8 +48,8 @@ public class UT_fp16 extends UnitTest {
         alloc = Allocation.createTyped(RS, typeBuilder.create());
 
         s.set_gDimX(dimX);
-        s.set_gDimY(nDims > 1? dimY: 0);
-        s.set_gDimZ(nDims > 2? dimZ: 0);
+        s.set_gDimY(nDims > 1 ? dimY : 0);
+        s.set_gDimZ(nDims > 2 ? dimZ : 0);
         s.set_gAlloc(alloc);
     }
 
@@ -108,7 +111,7 @@ public class UT_fp16 extends UnitTest {
         pRS.setMessageHandler(mRsMessage);
         ScriptC_fp16 s = new ScriptC_fp16(pRS);
 
-        for (int nDims = 1; nDims <= 3; nDims ++) {
+        for (int nDims = 1; nDims <= 3; nDims++) {
             TestHalf(pRS, s, nDims);
             TestHalf2(pRS, s, nDims);
             TestHalf3(pRS, s, nDims);

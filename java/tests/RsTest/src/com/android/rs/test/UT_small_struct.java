@@ -17,7 +17,9 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.RenderScript;
+import android.renderscript.Type;
 
 public class UT_small_struct extends UnitTest {
     private Allocation A;

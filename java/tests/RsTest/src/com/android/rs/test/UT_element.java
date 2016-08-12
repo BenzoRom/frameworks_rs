@@ -17,51 +17,52 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Element;
 import android.renderscript.Element.DataKind;
 import android.renderscript.Element.DataType;
+import android.renderscript.RenderScript;
 
 public class UT_element extends UnitTest {
     Element simpleElem;
     Element complexElem;
 
     final String subElemNames[] = {
-        "subElem0",
-        "subElem1",
-        "subElem2",
-        "arrayElem0",
-        "arrayElem1",
-        "subElem3",
-        "subElem4",
-        "subElem5",
-        "subElem6",
-        "subElem_7",
+            "subElem0",
+            "subElem1",
+            "subElem2",
+            "arrayElem0",
+            "arrayElem1",
+            "subElem3",
+            "subElem4",
+            "subElem5",
+            "subElem6",
+            "subElem_7",
     };
 
     final int subElemArraySizes[] = {
-        1,
-        1,
-        1,
-        2,
-        5,
-        1,
-        1,
-        1,
-        1,
-        1,
+            1,
+            1,
+            1,
+            2,
+            5,
+            1,
+            1,
+            1,
+            1,
+            1,
     };
 
     final int subElemOffsets[] = {
-        0,
-        4,
-        8,
-        12,
-        20,
-        40,
-        44,
-        48,
-        64,
-        80,
+            0,
+            4,
+            8,
+            12,
+            20,
+            40,
+            44,
+            48,
+            64,
+            80,
     };
 
     protected UT_element(RSTestCore rstc, Context ctx) {
@@ -92,26 +93,26 @@ public class UT_element extends UnitTest {
         int subElemCount = simpleElem.getSubElementCount();
         _RS_ASSERT("subElemCount == 0", subElemCount == 0);
         _RS_ASSERT("simpleElem.getDataKind() == USER",
-                   simpleElem.getDataKind() == DataKind.USER);
+                simpleElem.getDataKind() == DataKind.USER);
         _RS_ASSERT("simpleElem.getDataType() == FLOAT_32",
-                   simpleElem.getDataType() == DataType.FLOAT_32);
+                simpleElem.getDataType() == DataType.FLOAT_32);
 
         subElemCount = complexElem.getSubElementCount();
         _RS_ASSERT("subElemCount == 10", subElemCount == 10);
         _RS_ASSERT("complexElem.getDataKind() == USER",
-                   complexElem.getDataKind() == DataKind.USER);
+                complexElem.getDataKind() == DataKind.USER);
         _RS_ASSERT("complexElemsimpleElem.getDataType() == NONE",
-                   complexElem.getDataType() == DataType.NONE);
+                complexElem.getDataType() == DataType.NONE);
 
-        for (int i = 0; i < subElemCount; i ++) {
+        for (int i = 0; i < subElemCount; i++) {
             _RS_ASSERT("complexElem.getSubElement(i) != null",
-                       complexElem.getSubElement(i) != null);
+                    complexElem.getSubElement(i) != null);
             _RS_ASSERT("complexElem.getSubElementName(i).equals(subElemNames[i])",
-                       complexElem.getSubElementName(i).equals(subElemNames[i]));
+                    complexElem.getSubElementName(i).equals(subElemNames[i]));
             _RS_ASSERT("complexElem.getSubElementArraySize(i) == subElemArraySizes[i]",
-                       complexElem.getSubElementArraySize(i) == subElemArraySizes[i]);
+                    complexElem.getSubElementArraySize(i) == subElemArraySizes[i]);
             _RS_ASSERT("complexElem.getSubElementOffsetBytes(i) == subElemOffsets[i]",
-                       complexElem.getSubElementOffsetBytes(i) == subElemOffsets[i]);
+                    complexElem.getSubElementOffsetBytes(i) == subElemOffsets[i]);
         }
     }
 

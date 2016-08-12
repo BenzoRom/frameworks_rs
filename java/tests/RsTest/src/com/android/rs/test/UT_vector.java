@@ -17,7 +17,25 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Byte2;
+import android.renderscript.Byte3;
+import android.renderscript.Byte4;
+import android.renderscript.Double2;
+import android.renderscript.Double3;
+import android.renderscript.Double4;
+import android.renderscript.Float2;
+import android.renderscript.Float3;
+import android.renderscript.Float4;
+import android.renderscript.Int2;
+import android.renderscript.Int3;
+import android.renderscript.Int4;
+import android.renderscript.Long2;
+import android.renderscript.Long3;
+import android.renderscript.Long4;
+import android.renderscript.RenderScript;
+import android.renderscript.Short2;
+import android.renderscript.Short3;
+import android.renderscript.Short4;
 
 public class UT_vector extends UnitTest {
 

@@ -17,7 +17,8 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.Allocation;
+import android.renderscript.RenderScript;
 
 // IMPORTANT: This whole test fails on 32-bit x86.
 public class UT_math_fp16 extends UnitTest {

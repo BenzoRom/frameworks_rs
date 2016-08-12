@@ -17,7 +17,7 @@
 package com.android.rs.test;
 
 import android.content.Context;
-import android.renderscript.*;
+import android.renderscript.RenderScript;
 
 public class UT_math_conformance extends UnitTest {
 
