@@ -106,6 +106,7 @@ public class RSTestCore {
         unitTests.add(new UT_reduce(this, mCtx));
         unitTests.add(new UT_reduce_backward(this, mCtx));
         unitTests.add(new UT_small_struct(this, mCtx));
+        unitTests.add(new UT_struct_field(this, mCtx));
 
         /*
         unitTests.add(new UnitTest(null, "<Pass>", 1));
