@@ -381,7 +381,7 @@ def main():
             log.exception(str(error))
         else:
             print(error, file=sys.stderr)
-        _quit_test(util_constants.RC_TEST_ERROR, timer)
+        _quit_test(util_constants.RC_TEST_FAIL, timer)
 
     # use a global exception handler to be sure that we will
     # exit safely and correctly
