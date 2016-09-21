@@ -10,7 +10,7 @@ try:
 except ImportError:
     print('unable to import lldb')
     print('please run "lldb -P" and add to $PYTHONPATH')
-    quit(util_constants.RC_TEST_ERROR)
+    quit(util_constants.RC_TEST_FATAL)
 
 
 class UtilLLDB(object):
