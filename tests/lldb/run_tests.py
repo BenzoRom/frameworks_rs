@@ -256,7 +256,7 @@ class State(object):
         # each test case to avoid collisions.
         self.port_mod = 0
 
-        # total number of tests that will be executed
+        # total number of test files that have been executed
         self.test_count = 0
 
     def get_android(self):
@@ -276,14 +276,17 @@ class State(object):
         '''
         return self.bundle
 
-    def add_result(self, name, result):
+    def add_result(self, name, app_type, result):
         '''Add a test result to the collection.
 
         Args:
             name: String name of the test that has executed.
+            app_type: type of app i.e. java, jni, or cpp
             result: String result of the test, "pass", "fail", "error".
         '''
-        self.results[name] = result
+        key = (name, app_type)
+        assert key not in self.results
+        self.results[key] = result
 
     def get_single_test(self):
         '''Get the name of the single test to run.
@@ -503,45 +506,35 @@ def _run_test(state, name, bundle_type):
     ])
 
     return_code = subprocess.call(params)
-
+    state.test_count += 1
     state.android.remove_port_forwarding()
     log.seek_to_end()
 
     # report in sys.stdout the result
-    status_names = collections.defaultdict(lambda: 'FAIL', (
-            (util_constants.RC_TEST_OK, 'PASS'),
-            (util_constants.RC_TEST_IGNORED, 'IGNORED'),
+    success = return_code == util_constants.RC_TEST_OK
+    status_handlers = collections.defaultdict(lambda: ('error', log.error), (
+            (util_constants.RC_TEST_OK, ('pass', log.info)),
+            (util_constants.RC_TEST_TIMEOUT, ('timeout', log.error)),
+            (util_constants.RC_TEST_IGNORED, ('ignored', log.info)),
+            (util_constants.RC_TEST_FAIL, ('fail', log.critical))
         )
     )
-    log.info('Running %s: %s', name, status_names[return_code])
-    success = return_code == util_constants.RC_TEST_OK
+    status_name, status_logger = status_handlers[return_code]
+    log.info('Running %s: %s', name, status_name.upper())
+    status_logger("Test %r: %s", name, status_name)
+
+    # Special case for ignored tests - just return now
     if return_code == util_constants.RC_TEST_IGNORED:
-        log.info("%s was ignored", name)
         return
+
+    state.add_result(name, bundle_type, status_name)
 
     if state.fail_fast and not success:
         raise FailFastException(name)
 
-    if success:
-        state.add_result(name, 'pass')
-        log.info('Test {0} passed'.format(name))
-    elif return_code == util_constants.RC_TEST_TIMEOUT:
-        state.add_result(name, 'timeout')
-        log.error('Test {0} timed out'.format(name))
-    elif return_code == util_constants.RC_TEST_ERROR:
-        state.add_result(name, 'failure')
-        log.error('Test {0} failed'.format(name))
-    else: # unexpected result
-        state.add_result(name, 'error')
-        log.critical('Test {0} yielded an unexpected return code: {1}'
-                        .format(name, return_code))
-
     # print a running total pass rate
     passes = sum(1 for key, value in state.results.items() if value == 'pass')
-    log.info('Current pass rate: {0} of {1}.'.format(passes, len(state.results)))
-    if state.test_count:
-        percent = (len(state.results)*100) / state.test_count
-        log.info('Testing is {0}% complete.'.format(percent))
+    log.info('Current pass rate: %s of %s executed.', passes, len(state.results))
 
 
 def _check_lldbserver_exists(state):
@@ -666,19 +659,19 @@ def _suite_post_run(state):
 
         # test case name, followed by pass, failure or error elements
         testcase = ET.Element('testcase')
-        testcase.attrib['name'] = key
+        testcase.attrib['name'] = "%s:%s" % key
         result_element = ET.Element(value)
-        result_element.text = key
+        result_element.text = "%s:%s" % key
         testcase.append(result_element)
         results.append(testcase)
 
     assert passes + failures == total, 'Invalid test results status'
     if failures:
         log.log_and_print(
-            'The following failures occurred: \n{}'.format('\n'.join(
-                'failed: ' + name
-                for name, result in state.results.items() if result != 'pass'
-        )))
+            'The following failures occurred: %s\n' %
+            '\n'.join('failed: %s:%s' % test_spec
+                for test_spec, result in state.results.items() if result != 'pass'
+        ))
 
     log.log_and_print('{0} of {1} passed'.format(passes, total))
     if total:
@@ -722,7 +715,6 @@ def _discover_tests(state):
         else:
             tests.append(single_test + '.py')
 
-    state.test_count = len(tests)
     return tests
 
 
