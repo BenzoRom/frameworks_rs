@@ -2,6 +2,9 @@
 
 from __future__ import absolute_import
 
+import re
+import string
+
 from harness.test_base_remote import TestBaseRemote
 from harness import RS_funs
 from harness.decorators import (
@@ -11,8 +14,52 @@ from harness.decorators import (
 )
 
 
+class _APIFunsExprTestsMeta(type):
+    """
+    Generate unique, standalone test methods from a list of lldb expressions.
+    The lldb expression evaluation engine for calling RenderScript
+    builtins need to be tested thoroughly; rather than manually
+    write the 1000s of individual test cases, we automatically generate them
+    and their variants to add to the test class. This is done from a list
+    of expressions that are all tested in the same way.
+    """
+    def __new__(self, name, bases, class_dict):
+        func_name_sub = re.compile(r'[%s\s]+' % string.punctuation)
+
+        for count, line in enumerate(RS_funs.FUNC_LIST):
+            def make_test(line):
+                """
+                We use an extra level of indirection here to properly
+                close over the *value* of the loop variable, `line`
+                """
+                @ordered_test(count)
+                def test(self):
+                    # build the expression
+                    ret, expr = RS_funs.build_expr(line)
+                    try:
+                        # evaluate the expression with expected return value
+                        self.try_command(expr, [], [RS_funs.TYPE_MAP[ret]])
+                    except KeyError:
+                        # or just check the return type if no return value
+                        # specified
+                        self.try_command(expr, '(%s)' % ret)
+                return test
+
+            # Make a pretty python method that adheres to the testcase standard
+            # Use the `count` parameter to ensure the name is unique in the class
+            test_name = 'test_%s_%s' % (re.sub(func_name_sub, '_', line), count)
+            test = make_test(line)
+            test.func_name = test_name
+            # We mark every 10th test case as runnable in wimpy mode
+            class_dict[test_name] = wimpy(test) if count % 10 == 0 else test
+
+        return type(name, bases, class_dict)
+
+
 class TestCallApiFuns(TestBaseRemote):
     '''Tests calling of some RS API functions. This tests that JITing works.'''
+
+    __metaclass__ = _APIFunsExprTestsMeta
 
     bundle_target = {
         'java': "KernelVariables",
@@ -21,7 +68,7 @@ class TestCallApiFuns(TestBaseRemote):
     }
 
     @wimpy
-    @ordered_test(0)
+    @ordered_test(-2)
     def test_setup(self):
         self.try_command('language renderscript status',
                          ['Runtime Library discovered',
@@ -35,7 +82,7 @@ class TestCallApiFuns(TestBaseRemote):
                           'stop reason = breakpoint'])
 
     @wimpy
-    @ordered_test(1)
+    @ordered_test(-1)
     def test_call_api_funs_atomic(self):
         # Test the atomics separately because we want to check the output
         # AtomicAdd(1234, 2)
@@ -127,25 +174,6 @@ class TestCallApiFuns(TestBaseRemote):
         self.try_command('expr int_global',
                          ['(int)',
                           '402'])
-
-    @wimpy
-    @ordered_test(2)
-    def test_call_api_funs_general(self):
-        count = 0
-        for line in RS_funs.FUNC_LIST:
-            count += 1
-            if self.wimpy and not count % 10 == 0:
-                continue
-
-            # build the expression
-            ret, expr = RS_funs.build_expr(line)
-            # query return type table
-            if ret in RS_funs.TYPE_MAP:
-                # evaluate the expression
-                self.try_command(expr, [], [RS_funs.TYPE_MAP[ret]])
-            else:
-                # evaluate the expression
-                self.try_command(expr, '('+ret+')')
 
     @ordered_test('last')
     @cpp_only_test()
