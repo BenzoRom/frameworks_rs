@@ -26,6 +26,12 @@ import com.android.rs.imagejb.IPTestListJB.TestName;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.suitebuilder.annotation.MediumTest;
 
+import android.os.Environment;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 /**
  * ImageProcessing benchmark test.
  * To run the test, please use command
@@ -37,7 +43,6 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
     private final String TAG = "ImageProcessingTest";
     // Only run 1 iteration now to fit the MediumTest time requirement.
     // One iteration means running the tests continuous for 1s.
-    private int mIteration = 1;
     private ImageProcessingActivityJB mActivity;
 
     public ImageProcessingTest() {
@@ -60,23 +65,28 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
 
     @Override
     public void tearDown() throws Exception {
+        if (mActivity.mProcessor != null) {
+            mActivity.mProcessor.exit();
+            mActivity.mProcessor = null;
+        }
         super.tearDown();
     }
 
     class TestAction implements Runnable {
-        TestName mTestName;
-        float mResult;
+        private TestName mTestName;
+        private Result mResult;
         public TestAction(TestName testName) {
             mTestName = testName;
         }
         public void run() {
             mResult = mActivity.mProcessor.getInstrumentationResult(mTestName);
-            Log.v(TAG, "Benchmark for test \"" + mTestName.toString() + "\" is: " + mResult);
+            Log.v(TAG, "Benchmark for test \"" + mTestName.toString() + "\" is: " +
+                    mResult.getAvg() * 1000.f);
             synchronized(this) {
                 this.notify();
             }
         }
-        public float getBenchmark() {
+        public Result getBenchmark() {
             return mResult;
         }
     }
@@ -97,19 +107,43 @@ public class ImageProcessingTest extends ActivityInstrumentationTestCase2<ImageP
 
     // TODO: Report more info: mean, median, std, etc.
     public void runTest(TestAction ta, String testName) {
-        float sum = 0;
-        for (int i = 0; i < mIteration; i++) {
-            runOnUiThread(ta);
-            float bmValue = ta.getBenchmark();
-            Log.v(TAG, "results for iteration " + i + " is " + bmValue);
-            sum += bmValue;
-        }
-        float avgResult = sum/mIteration;
+        runOnUiThread(ta);
+        Result times = ta.getBenchmark();
 
         // post result to INSTRUMENTATION_STATUS
         Bundle results = new Bundle();
-        results.putFloat(testName + "_avg", avgResult);
+        results.putFloat(testName + "_avg", times.getAvg() * 1000.0f); // ms
+        results.putFloat(testName + "_stdevp", times.getStdevp() * 1000.0f); // ms
+        results.putFloat(testName + "_stdcoef", times.getStdCoef() * 100.0f); // %
         getInstrumentation().sendStatus(Activity.RESULT_OK, results);
+
+        // save the runtime distribution to a file on the sdcard so a script can plot it
+        writeResults("rsTimes/", testName + "_DATA.txt", times);
+    }
+
+    private void writeResults(String directory, String filename, Result times) {
+        // write result into a file
+        File externalStorage = Environment.getExternalStorageDirectory();
+        if (!externalStorage.canWrite()) {
+            Log.v(TAG, "sdcard is not writable");
+            return;
+        }
+        File resultDirectory = new File(externalStorage, directory);
+        resultDirectory.mkdirs();
+        File resultFile = new File(externalStorage, directory + filename);
+        resultFile.setWritable(true, false);
+        try {
+            BufferedWriter rsWriter = new BufferedWriter(new FileWriter(resultFile));
+            Log.v(TAG, "Saved results in: " + resultFile.getAbsolutePath());
+
+            float[] datapoints = times.getTimes();
+            for (int i = 0; i < times.getIterations(); i++) {
+                rsWriter.write(String.format("%d %f\n", i, datapoints[i] * 1000.0));
+            }
+            rsWriter.close();
+        } catch (IOException e) {
+            Log.v(TAG, "Unable to write result file " + e.getMessage());
+        }
     }
 
     // Test case 0: Levels Vec3 Relaxed
