@@ -33,6 +33,7 @@ import android.view.WindowManager;
 import android.util.Log;
 import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
+import android.support.test.InstrumentationRegistry;
 
 public class ImageProcessingActivityJB extends Activity
                                        implements SeekBar.OnSeekBarChangeListener,
@@ -68,6 +69,8 @@ public class ImageProcessingActivityJB extends Activity
     private int mBitmapWidth;
     private int mBitmapHeight;
     private boolean mDemoMode;
+    private float mMinTestRuntime;
+    private int mMinTestIterations;
 
     // Updates pending is a counter of how many kernels have been
     // sent to RS for processing
@@ -240,18 +243,13 @@ public class ImageProcessingActivityJB extends Activity
             start();
         }
 
-        class Result {
-            float totalTime;
-            int itterations;
-        }
-
         // Run one loop of kernels for at least the specified minimum time.
         // The function returns the average time in ms for the test run
-        private Result runBenchmarkLoop(float minTime) {
+        private Result runBenchmarkLoop(float minTime, int minIter) {
             mUpdatesPending = 0;
             Result r = new Result();
 
-            long t = java.lang.System.currentTimeMillis();
+            long t = java.lang.System.nanoTime();
             do {
                 synchronized(this) {
                     // Shows pending is used to track the number of kernels in the RS pipeline
@@ -269,12 +267,11 @@ public class ImageProcessingActivityJB extends Activity
 
                 // If animations are enabled update the test state.
                 if (mToggleAnimate) {
-                    mTest.animateBars(r.totalTime);
+                    mTest.animateBars(r.getTotalTime());
                 }
 
                 // Run the kernel
                 mTest.runTest();
-                r.itterations ++;
 
                 if (mToggleDisplay) {
                     // If we are not outputting directly to the TextureView we need to copy from
@@ -290,35 +287,30 @@ public class ImageProcessingActivityJB extends Activity
                 // Send our RS message handler a message so we know when this work has completed
                 mRS.sendMessage(0, null);
 
-                long t2 = java.lang.System.currentTimeMillis();
-                r.totalTime += (t2 - t) / 1000.f;
+                // Finish previous iteration before recording the time. Without this, the first
+                // few iterations finish very quickly and the later iterations take much longer
+                mRS.finish();
+
+                long t2 = java.lang.System.nanoTime();
+                r.add((t2 - t) / 1000000000.f);
                 t = t2;
-            } while (r.totalTime < minTime);
+            } while (r.getTotalTime() < minTime || r.getIterations() < minIter);
 
             // Wait for any stray operations to complete and update the final time
             mRS.finish();
-            long t2 = java.lang.System.currentTimeMillis();
-            r.totalTime += (t2 - t) / 1000.f;
-            t = t2;
             return r;
         }
 
         // Method to retreive benchmark results for instrumentation tests.
-        float getInstrumentationResult(IPTestListJB.TestName t) {
+        Result getInstrumentationResult(IPTestListJB.TestName t) {
             mTest = changeTest(t, false);
             return getBenchmark();
         }
 
         // Get a benchmark result for a specific test
-        private float getBenchmark() {
+        private Result getBenchmark() {
             mDoingBenchmark = true;
             mUpdatesPending = 0;
-
-            long result = 0;
-            float runtime = 1.f;
-            if (mToggleLong) {
-                runtime = 10.f;
-            }
 
             if (mToggleDVFS) {
                 mDvfsWar.go();
@@ -326,16 +318,16 @@ public class ImageProcessingActivityJB extends Activity
 
             // We run a short bit of work before starting the actual test
             // this is to let any power management do its job and respond
-            runBenchmarkLoop(0.3f);
+            runBenchmarkLoop(0.3f, 0);
 
             // Run the actual benchmark
-            Result r = runBenchmarkLoop(runtime);
+            Result r = runBenchmarkLoop(mMinTestRuntime, mMinTestIterations);
 
-            Log.v("rs", "Test: time=" + r.totalTime +"s,  frames=" + r.itterations +
-                  ", avg=" + r.totalTime / r.itterations * 1000.f);
+            Log.v("rs", "Test: time=" + r.getTotalTime() + "s,  frames=" + r.getIterations() +
+                  ", avg=" + r.getAvg() * 1000.f + ", stdcoef=" + r.getStdCoef() * 100.0f + "%");
 
             mDoingBenchmark = false;
-            return r.totalTime / r.itterations * 1000.f;
+            return r;
         }
 
         public void run() {
@@ -399,7 +391,7 @@ public class ImageProcessingActivityJB extends Activity
                         }
 
                         // Run the test
-                        mTestResults[ct] = getBenchmark();
+                        mTestResults[ct] = getBenchmark().getAvg() * 1000.0f;
                     }
                     onBenchmarkFinish(mRun);
                 } else {
@@ -660,6 +652,7 @@ public class ImageProcessingActivityJB extends Activity
         super.onPause();
         if (mProcessor != null) {
             mProcessor.exit();
+            mProcessor = null;
         }
     }
 
@@ -729,6 +722,33 @@ public class ImageProcessingActivityJB extends Activity
         mBitmapHeight = i.getIntExtra("resolution Y", 0);
         mDemoMode = i.getBooleanExtra("demo", false);
 
+        // Default values
+        mMinTestRuntime = 1.0f;
+        mMinTestIterations = 2;
+
+        // Pass in arguments from "am instrumentation ..." if present
+        // This is wrapped in a try..catch because there was an exception thrown whenever
+        // instrumentation was not used (ie. when the graphical interface was used)
+        try {
+            Bundle extras = InstrumentationRegistry.getArguments();
+            String passedInString = null;
+            if ( extras != null ) {
+                if ( extras.containsKey ("minimum_test_runtime") ) {
+                    mMinTestRuntime = Float.parseFloat(extras.getString("minimum_test_runtime"));
+                }
+                if ( extras.containsKey ("minimum_test_iterations") ) {
+                    mMinTestIterations = Integer.parseInt(
+                            extras.getString("minimum_test_iterations"));
+                }
+            }
+        } catch(Exception e) {
+        }
+
+        // User chose the longer pre-set runtime
+        if (mToggleLong) {
+            mMinTestRuntime = 10.f;
+        }
+
         // Hide the bars in demo mode.
         // Calling from onResume() to make sure the operation is on the UI thread.
         if (!mDemoMode) {
@@ -758,7 +778,9 @@ public class ImageProcessingActivityJB extends Activity
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        mProcessor.setSurface(null);
+        if (mProcessor != null) {
+            mProcessor.setSurface(null);
+        }
         return true;
     }
 
