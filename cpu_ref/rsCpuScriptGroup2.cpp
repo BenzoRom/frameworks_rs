@@ -331,9 +331,43 @@ void generateSourceSlot(RsdCpuReferenceImpl* ctxt,
 
 }  // anonymous namespace
 
+extern __attribute__((noinline))
+void debugHintScriptGroup2(const char* groupName,
+                           const uint32_t groupNameSize,
+                           const ExpandFuncTy* kernel,
+                           const uint32_t kernelCount) {
+    ALOGV("group name: %d:%s\n", groupNameSize, groupName);
+    for (uint32_t i=0; i < kernelCount; ++i) {
+        const char* f1 = (const char*)(kernel[i]);
+        ALOGV("  closure: %p\n", (const void*)f1);
+    }
+    // do nothing, this is just a hook point for the debugger.
+    return;
+}
+
 void CpuScriptGroup2Impl::compile(const char* cacheDir) {
 #ifndef RS_COMPATIBILITY_LIB
     if (mGroup->mClosures.size() < 2) {
+        return;
+    }
+
+    const int optLevel = getCpuRefImpl()->getContext()->getOptLevel();
+    if (optLevel == 0) {
+        std::vector<ExpandFuncTy> kernels;
+        for (const Batch* b : mBatches)
+            for (const CPUClosure* c : b->mClosures)
+                kernels.push_back(c->mFunc);
+
+        if (kernels.size()) {
+            // pass this information on to the debugger via a hint function.
+            debugHintScriptGroup2(mGroup->mName,
+                                  strlen(mGroup->mName),
+                                  kernels.data(),
+                                  kernels.size());
+        }
+
+        // skip script group compilation forcing the driver to use the fallback
+        // execution path which currently has better support for debugging.
         return;
     }
 
@@ -391,8 +425,6 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
     string coreLibRelaxedPath;
     const string& coreLibPath = getCoreLibPath(getCpuRefImpl()->getContext(),
                                                &coreLibRelaxedPath);
-
-    int optLevel = getCpuRefImpl()->getContext()->getOptLevel();
 
     vector<const char*> arguments;
     bool emitGlobalInfo = getCpuRefImpl()->getEmbedGlobalInfo();
