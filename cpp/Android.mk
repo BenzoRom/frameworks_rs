@@ -1,26 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_SRC_FILES:= \
-    rsDispatch.cpp
-
-LOCAL_C_INCLUDES += \
-	frameworks/rs
-
-LOCAL_CFLAGS += -Wno-unused-parameter -std=c++11
-
-LOCAL_MODULE:= libRSDispatch
-LOCAL_SDK_VERSION := 9
-LOCAL_MODULE_TAGS := optional
-LOCAL_LDFLAGS += -ldl
-# Used in librsjni, which is built as NDK code => no ASan.
-LOCAL_SANITIZE := never
-LOCAL_NDK_STL_VARIANT := none
-
-include $(BUILD_STATIC_LIBRARY)
-
-include $(CLEAR_VARS)
-
 rs_cpp_SRC_FILES := \
 	RenderScript.cpp \
 	BaseObj.cpp \
