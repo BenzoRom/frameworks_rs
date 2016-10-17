@@ -25,6 +25,8 @@
 #include <sys/wait.h>
 #endif
 
+#include <unistd.h>
+
 namespace android {
 namespace renderscript {
 
