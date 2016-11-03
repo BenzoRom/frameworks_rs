@@ -169,7 +169,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES += liblog libcutils libutils libEGL libGLESv1_CM libGLESv2
 LOCAL_SHARED_LIBRARIES += libgui libsync libdl libui
-LOCAL_SHARED_LIBRARIES += libft2 libpng libz
+LOCAL_SHARED_LIBRARIES += libft2 libpng libz libandroidfw
 
 LOCAL_SHARED_LIBRARIES += libbcinfo libLLVM
 
@@ -331,7 +331,7 @@ LOCAL_SRC_FILES:= \
 	rsThreadIO.cpp \
 	rsType.cpp
 
-LOCAL_STATIC_LIBRARIES := libcutils libutils liblog
+LOCAL_STATIC_LIBRARIES := libcutils libutils liblog libandroidfw
 
 LOCAL_CLANG := true
 
