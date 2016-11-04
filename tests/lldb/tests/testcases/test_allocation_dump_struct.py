@@ -38,7 +38,7 @@ class TestAllocationDumpStruct(TestBaseRemote):
         # Hit struct_kernel on last coordinate, so almost all elements have been initalised
         self.try_command(
             'language renderscript kernel breakpoint set struct_kernel -c 23',
-            ['Conditional kernel breakpoint on coordinate 23, 0, 0',
+            ['Conditional kernel breakpoint on coordinate (23, 0, 0)',
             'Breakpoint(s) created'])
 
         self.try_command('process continue',
