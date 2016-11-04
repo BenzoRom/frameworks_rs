@@ -17,9 +17,9 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
-
+using android::RSC::Allocation;
+using android::RSC::sp;
+using android::Surface;
 
 void * Allocation::getIDSafe() const {
     return getID();
@@ -496,7 +496,7 @@ void Allocation::ioGetInput() {
 #if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
 #include <gui/Surface.h>
 
-RSC::sp<Surface> Allocation::getSurface() {
+sp<Surface> Allocation::getSurface() {
     if ((mUsage & RS_ALLOCATION_USAGE_IO_INPUT) == 0) {
         mRS->throwError(RS_ERROR_INVALID_PARAMETER, "Can only get Surface if IO_INPUT usage specified.");
         return nullptr;
@@ -509,7 +509,7 @@ RSC::sp<Surface> Allocation::getSurface() {
     return new Surface(bp, true);;
 }
 
-void Allocation::setSurface(const RSC::sp<Surface>& s) {
+void Allocation::setSurface(const sp<Surface>& s) {
     if ((mUsage & RS_ALLOCATION_USAGE_IO_OUTPUT) == 0) {
         mRS->throwError(RS_ERROR_INVALID_PARAMETER, "Can only set Surface if IO_OUTPUT usage specified.");
         return;

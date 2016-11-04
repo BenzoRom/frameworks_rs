@@ -19,8 +19,7 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::Script;
 
 void Script::invoke(uint32_t slot, const void *v, size_t len) const {
     tryDispatch(mRS, RS::dispatch->ScriptInvokeV(mRS->getContext(), getID(), slot, v, len));

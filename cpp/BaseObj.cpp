@@ -17,8 +17,7 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::BaseObj;
 
 void * BaseObj::getID() const {
     if (mID == nullptr) {
