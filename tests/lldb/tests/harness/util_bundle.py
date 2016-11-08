@@ -22,7 +22,8 @@ class UtilBundle(object):
         'KernelVariables': 'com.android.rs.kernelvariables',
         'Allocations': 'com.android.rs.allocations',
         'MultipleRSFiles': 'com.android.rs.multiplersfiles',
-        'SingleSource': 'com.android.rs.singlesource'
+        'SingleSource': 'com.android.rs.singlesource',
+        'ScriptGroup': 'com.android.rs.scriptgroup'
     }
 
     _tests_jni = {
