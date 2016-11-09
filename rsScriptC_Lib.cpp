@@ -26,6 +26,7 @@
 #endif
 
 #include <time.h>
+#include <sstream>
 
 using namespace android;
 using namespace android::renderscript;
@@ -253,12 +254,80 @@ void rsrAllocationSyncAll(Context *rsc, Allocation *a, RsAllocationUsageType usa
     a->syncAll(rsc, usage);
 }
 
+// Helper for validateCopyArgs() - initialize the error message; only called on
+// infrequently executed paths
+static void initializeErrorMsg(std::stringstream &ss, int expectDim, bool isSrc) {
+    ss << (expectDim == 1 ? "rsAllocationCopy1DRange" : "rsAllocationCopy2DRange") << ": ";
+    ss << (isSrc? "source" : "destination") << " ";
+}
+
+// We are doing the check even in a non-debug context, which is permissible because in that case
+// a failed bound check results in unspecified behavior.
+static bool validateCopyArgs(Context *rsc, bool isSrc, uint32_t expectDim,
+                             const Allocation *alloc, uint32_t xoff, uint32_t yoff,
+                             uint32_t lod, uint32_t w, uint32_t h) {
+    std::stringstream ss;
+
+    if (lod >= alloc->mHal.drvState.lodCount) {
+        initializeErrorMsg(ss, expectDim, isSrc);
+        ss << "Mip level out of range: ";
+        ss << lod << " >= " << alloc->mHal.drvState.lodCount;
+        rsc->setError(RS_ERROR_FATAL_DEBUG, ss.str().c_str());
+        return false;
+    }
+
+    const uint32_t allocDimX = alloc->mHal.drvState.lod[lod].dimX;
+
+    // Check both in case xoff + w overflows
+    if (xoff >= allocDimX || (xoff + w) > allocDimX) {
+        initializeErrorMsg(ss, expectDim, isSrc);
+        ss << "X range: ";
+        ss << "[" << xoff << ", " << xoff + w << ") outside ";
+        ss << "[0, " << allocDimX << ")";
+        rsc->setError(RS_ERROR_FATAL_DEBUG, ss.str().c_str());
+        return false;
+    }
+
+    const uint32_t allocDimY = alloc->mHal.drvState.lod[lod].dimY;
+
+    if (expectDim > 1) {
+        if (allocDimY == 0) {  // Copy2D was given an allocation of 1D
+            initializeErrorMsg(ss, expectDim, isSrc);
+            ss << "dimensionality invalid: expected 2D; given 1D rs_allocation";
+            rsc->setError(RS_ERROR_FATAL_DEBUG, ss.str().c_str());
+            return false;
+        }
+        // Check both in case yoff + h overflows
+        if (yoff >= allocDimY || (yoff + h) > allocDimY) {
+            initializeErrorMsg(ss, expectDim, isSrc);
+            ss << "Y range: ";
+            ss << "[" << yoff << ", " << yoff + h << ") outside ";
+            ss << "[0, " << allocDimY << ")";
+            rsc->setError(RS_ERROR_FATAL_DEBUG, ss.str().c_str());
+            return false;
+        }
+    } else {
+        if (allocDimY != 0) {  // Copy1D was given an allocation of 2D
+            initializeErrorMsg(ss, expectDim, isSrc);
+            ss << "dimensionality invalid: expected 1D; given 2D rs_allocation";
+            rsc->setError(RS_ERROR_FATAL_DEBUG, ss.str().c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void rsrAllocationCopy1DRange(Context *rsc, Allocation *dstAlloc,
                               uint32_t dstOff,
                               uint32_t dstMip,
                               uint32_t count,
                               Allocation *srcAlloc,
                               uint32_t srcOff, uint32_t srcMip) {
+    if (!validateCopyArgs(rsc, false, 1, dstAlloc, dstOff, 0, dstMip, count, 1) ||
+        !validateCopyArgs(rsc, true, 1, srcAlloc, srcOff, 0, srcMip, count, 1)) {
+        return;
+    }
     rsi_AllocationCopy2DRange(rsc, dstAlloc, dstOff, 0,
                               dstMip, 0, count, 1,
                               srcAlloc, srcOff, 0, srcMip, 0);
@@ -271,6 +340,11 @@ void rsrAllocationCopy2DRange(Context *rsc, Allocation *dstAlloc,
                               Allocation *srcAlloc,
                               uint32_t srcXoff, uint32_t srcYoff,
                               uint32_t srcMip, uint32_t srcFace) {
+    if (!validateCopyArgs(rsc, false, 2, dstAlloc, dstXoff, dstYoff, dstMip, width, height) ||
+        !validateCopyArgs(rsc, true, 2, srcAlloc, srcXoff, srcYoff, srcMip, width, height)) {
+        return;
+    }
+
     rsi_AllocationCopy2DRange(rsc, dstAlloc, dstXoff, dstYoff,
                               dstMip, dstFace, width, height,
                               srcAlloc, srcXoff, srcYoff, srcMip, srcFace);
