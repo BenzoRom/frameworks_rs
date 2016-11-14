@@ -17,8 +17,8 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::Sampler;
+using android::RSC::sp;
 
 Sampler::Sampler(sp<RS> rs, void* id):
     BaseObj(id, rs)

@@ -20,8 +20,14 @@
 
 #define NELEM(m) (sizeof(m) / sizeof((m)[0]))
 
-using namespace android;
-using namespace RSC;
+using android::RSC::Allocation;
+using android::RSC::Element;
+using android::RSC::RS;
+using android::RSC::RS_ERROR_INVALID_ELEMENT;
+using android::RSC::RS_ERROR_INVALID_PARAMETER;
+using android::RSC::RS_SUCCESS;
+using android::RSC::ScriptIntrinsicBLAS;
+using android::RSC::sp;
 
 // ScriptIntrinsicBLAS APIS
 ScriptIntrinsicBLAS::ScriptIntrinsicBLAS(sp<RS> rs, sp<const Element> e)

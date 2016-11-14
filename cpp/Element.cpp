@@ -20,8 +20,7 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::Element;
 
 android::RSC::sp<const Element> Element::getSubElement(uint32_t index) {
     if (!mVisibleElementMapSize) {
