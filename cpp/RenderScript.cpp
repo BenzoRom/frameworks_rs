@@ -31,9 +31,8 @@
 #include "rsCompatibilityLib.h"
 #endif
 
-
-using namespace android;
-using namespace RSC;
+using android::RSC::RS;
+using android::RSC::RSError;
 
 bool RS::gInitialized = false;
 bool RS::usingNative = false;
