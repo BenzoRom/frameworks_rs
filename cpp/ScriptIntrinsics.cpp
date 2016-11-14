@@ -19,8 +19,18 @@
 #include "RenderScript.h"
 #include "rsCppInternal.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::ScriptIntrinsic;
+using android::RSC::ScriptIntrinsic3DLUT;
+using android::RSC::ScriptIntrinsicBlend;
+using android::RSC::ScriptIntrinsicBlur;
+using android::RSC::ScriptIntrinsicColorMatrix;
+using android::RSC::ScriptIntrinsicConvolve3x3;
+using android::RSC::ScriptIntrinsicConvolve5x5;
+using android::RSC::ScriptIntrinsicHistogram;
+using android::RSC::ScriptIntrinsicLUT;
+using android::RSC::ScriptIntrinsicResize;
+using android::RSC::ScriptIntrinsicYuvToRGB;
+using android::RSC::sp;
 
 ScriptIntrinsic::ScriptIntrinsic(sp<RS> rs, int id, sp<const Element> e)
     : Script(nullptr, rs) {
