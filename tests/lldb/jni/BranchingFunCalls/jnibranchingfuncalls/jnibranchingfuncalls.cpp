@@ -5,9 +5,6 @@
 
 #include "ScriptC_scalars.h"
 
-using namespace android;
-using namespace RSC;
-
 extern "C" void JNICALL
 Java_com_android_rs_jnibranchingfuncalls_MainActivity_nativeRS(
     JNIEnv * env,

@@ -5,9 +5,6 @@
 
 #include "ScriptC_infiniteloop.h"
 
-using namespace android;
-using namespace RSC;
-
 int main()
 {
     static const int size = 64;

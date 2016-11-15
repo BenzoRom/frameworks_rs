@@ -6,9 +6,6 @@
 #include "ScriptC_first.h"
 #include "ScriptC_second.h"
 
-using namespace android;
-using namespace RSC;
-
 extern "C" void JNICALL
 Java_com_android_rs_jnimultiplersfiles_MainActivity_nativeRS(
     JNIEnv * env,
