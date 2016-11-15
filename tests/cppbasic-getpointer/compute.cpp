@@ -5,9 +5,6 @@
 
 #include <stdlib.h>
 
-using namespace android;
-using namespace RSC;
-
 const uint32_t DIMX = 128;
 const uint32_t DIMY = 128;
 

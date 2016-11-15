@@ -3,9 +3,6 @@
 
 #include "ScriptC_multiply.h"
 
-using namespace android;
-using namespace RSC;
-
 int main(int argc, char** argv)
 {
 

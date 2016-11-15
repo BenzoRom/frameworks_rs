@@ -3,9 +3,6 @@
 #include "ScriptC_first.h"
 #include "ScriptC_second.h"
 
-using namespace android;
-using namespace RSC;
-
 int main()
 {
     static const int size = 64;
