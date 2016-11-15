@@ -17,9 +17,6 @@
 #include "RenderScript.h"
 #include "ScriptC_kernels.h"
 
-using namespace android;
-using namespace RSC;
-
 const static uint32_t x = 7;
 
 sp<Allocation> createAlloc(const sp<RS>& rs, const sp<const Element>& e) {

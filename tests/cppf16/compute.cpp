@@ -1,7 +1,10 @@
 #include "RenderScript.h"
 
-using namespace android;
-using namespace RSC;
+using android::RSC::Allocation;
+using android::RSC::Element;
+using android::RSC::RS;
+using android::RSC::Type;
+using android::RSC::sp;
 
 static const uint32_t dimX = 7, dimY = 5, dimZ = 3;
 

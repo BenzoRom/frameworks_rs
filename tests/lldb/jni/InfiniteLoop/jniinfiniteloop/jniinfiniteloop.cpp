@@ -6,9 +6,6 @@
 
 #include "ScriptC_infiniteloop.h"
 
-using namespace android;
-using namespace RSC;
-
 extern "C" void JNICALL
 Java_com_android_rs_jniinfiniteloop_MainActivity_nativeRS(
     JNIEnv * env,

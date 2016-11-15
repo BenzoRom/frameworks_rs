@@ -2,9 +2,6 @@
 
 #include "ScriptC_allocs.h"
 
-using namespace android;
-using namespace RSC;
-
 sp<RS> mRS;
 sp<Allocation> mBoolAllocation;  // boolean
 
