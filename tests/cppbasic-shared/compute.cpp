@@ -3,9 +3,6 @@
 
 #include "ScriptC_mono.h"
 
-using namespace android;
-using namespace RSC;
-
 int test_compute()
 {
     bool failed = false;

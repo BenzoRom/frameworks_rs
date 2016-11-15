@@ -5,9 +5,6 @@
 
 #include "ScriptC_simple.h"
 
-using namespace android;
-using namespace RSC;
-
 extern "C" void JNICALL
 Java_com_android_rs_jnikernelvariables_MainActivity_nativeRS(
     JNIEnv * env,
