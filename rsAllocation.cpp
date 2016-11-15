@@ -23,8 +23,8 @@
 #include "gui/GLConsumer.h"
 #endif
 
-using namespace android;
-using namespace android::renderscript;
+namespace android {
+namespace renderscript {
 
 Allocation::Allocation(Context *rsc, const Type *type, uint32_t usages,
                        RsAllocationMipmapControl mc, void * ptr)
@@ -697,9 +697,6 @@ bool Allocation::hasSameDims(const Allocation *other) const {
 /////////////////
 //
 
-namespace android {
-namespace renderscript {
-
 void rsi_AllocationSyncAll(Context *rsc, RsAllocation va, RsAllocationUsageType src) {
     Allocation *a = static_cast<Allocation *>(va);
     a->sendDirty(rsc);
@@ -977,5 +974,5 @@ void rsi_AllocationAdapterOffset(Context *rsc, RsAllocation va, const uint32_t *
 }
 
 
-}
-}
+}  // namespace renderscript
+}  // namespace android
