@@ -28,9 +28,6 @@
 #include <time.h>
 #include <sstream>
 
-using namespace android;
-using namespace android::renderscript;
-
 
 namespace android {
 namespace renderscript {
