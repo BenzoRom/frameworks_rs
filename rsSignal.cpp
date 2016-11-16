@@ -17,9 +17,8 @@
 #include "rsSignal.h"
 #include <errno.h>
 
-using namespace android;
-using namespace android::renderscript;
-
+namespace android {
+namespace renderscript {
 
 Signal::Signal() {
     mSet = true;
@@ -92,3 +91,5 @@ void Signal::wait() {
     }
 }
 
+} // namespace renderscript
+} // namespace android
