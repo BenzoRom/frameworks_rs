@@ -54,8 +54,8 @@ static pid_t gettid() {
 }
 #endif
 
-using namespace android;
-using namespace android::renderscript;
+namespace android {
+namespace renderscript {
 
 pthread_mutex_t Context::gInitMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t Context::gMessageMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -783,9 +783,6 @@ void Context::dumpDebug() const {
 ///////////////////////////////////////////////////////////////////////////////////////////
 //
 
-namespace android {
-namespace renderscript {
-
 void rsi_ContextFinish(Context *rsc) {
     rsc->finish();
 }
@@ -935,5 +932,5 @@ void LF_ObjDestroy_handcode(const Context *rsc, RsAsyncVoidPtr objPtr) {
 
 }
 
-}
-}
+} // namespace renderscript
+} // namespace android
