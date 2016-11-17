@@ -1,6 +1,27 @@
 
 LOCAL_PATH:=$(call my-dir)
 
+.PHONY: rs-prebuilts-full
+rs-prebuilts-full: \
+    bcc_compat \
+    llvm-rs-cc \
+    libRSSupport \
+    libRSSupportIO \
+    libRScpp_static \
+    libblasV8 \
+    libcompiler_rt \
+    librsrt_arm.bc \
+    librsrt_arm64.bc \
+    librsrt_mips.bc \
+    librsrt_x86.bc \
+    librsrt_x86_64.bc
+
+ifneq ($(HOST_OS),darwin)
+rs-prebuilts-full: \
+    host_cross_llvm-rs-cc \
+    host_cross_bcc_compat
+endif
+
 rs_base_CFLAGS := -Werror -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fno-exceptions -std=c++11
 ifeq ($(TARGET_BUILD_PDK), true)
   rs_base_CFLAGS += -D__RS_PDK__
