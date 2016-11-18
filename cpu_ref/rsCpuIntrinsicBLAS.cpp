@@ -20,9 +20,6 @@
 #include "rsCpuBLASDispatch.h"
 #include "eight_bit_int_gemm.h"
 
-using namespace android;
-using namespace android::renderscript;
-
 namespace android {
 namespace renderscript {
 
@@ -59,9 +56,6 @@ protected:
 
 
 };
-
-}
-}
 
 void RsdCpuScriptIntrinsicBLAS::populateScript(Script *s) {
     s->mHal.info.exportedVariableCount = 0;
@@ -739,12 +733,11 @@ RsdCpuScriptIntrinsicBLAS::RsdCpuScriptIntrinsicBLAS(RsdCpuReferenceImpl *ctx,
 RsdCpuScriptIntrinsicBLAS::~RsdCpuScriptIntrinsicBLAS() {
 }
 
-
-
-
-
 RsdCpuScriptImpl * rsdIntrinsic_BLAS(RsdCpuReferenceImpl *ctx,
                                     const Script *s, const Element *e) {
 
     return new RsdCpuScriptIntrinsicBLAS(ctx, s);
 }
+
+} // namespace renderscript
+} // namespace android
