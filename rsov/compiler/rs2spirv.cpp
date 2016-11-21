@@ -15,6 +15,7 @@
  */
 
 #include "RSSPIRVWriter.h"
+#include "unit_tests/TestRunner.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
@@ -27,7 +28,6 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
-#include "unit_tests/TestRunner.h"
 
 #include <fstream>
 #include <iterator>
