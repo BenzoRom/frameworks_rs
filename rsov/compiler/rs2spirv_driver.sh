@@ -34,11 +34,11 @@ eval llvm-rs-cc -o "$output_folder" -S -emit-llvm -Wall -Werror -target-api 24 \
   "$script_name"
 eval llvm-as "$output_folder/bc32/$script.ll" -o "$output_folder/$script.bc"
 eval rs2spirv "$output_folder/$script.bc" -o "$output_folder/$script.rs.spv" \
-              -wo "$output_folder/$script.w.spt" -debug
+              -wo "$output_folder/$script.w.spt"
 eval "$SPIRV_TOOLS_PATH/spirv-dis" "$output_folder/$script.rs.spv" \
               --no-color > "$output_folder/$script.rs.spt"
 eval rs2spirv -o "$output_folder/$script.spt" -lk "$output_folder/$script.rs.spt" \
-              -lw "$output_folder/$script.w.spt" -debug
+              -lw "$output_folder/$script.w.spt"
 eval "$SPIRV_TOOLS_PATH/spirv-as" "$output_folder/$script.spt" \
               -o "$output_folder/$script.spv"
 echo
