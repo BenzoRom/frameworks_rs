@@ -116,7 +116,7 @@ def download_file(host, build_number, android_branch, pkg_name, download_dir):
     path = 'builds/{build_branch}-{build_host}-{build_name}/{build_num}'.format(
         build_branch=android_branch,
         build_host=host_to_build_host(host),
-        build_name=build_name(host),
+        build_name='renderscript',
         build_num=build_number)
 
     url = '{}/{}/{}'.format(url_base, path, pkg_name)
@@ -151,22 +151,20 @@ def update_renderscript(host, build_number, android_branch, use_current_branch, 
 
     install_subdir = 'current'
     extract_package(package, prebuilt_dir)
-    shutil.copy(manifest, prebuilt_dir + '/' +  install_subdir)
+    shutil.rmtree(install_subdir)
+    shutil.move('renderscript-{}'.format(build_number), install_subdir)
+    shutil.copy(manifest, install_subdir)
 
     print('Adding files to index...')
     subprocess.check_call(['git', 'add', install_subdir])
-
-    version_file_path = os.path.join(install_subdir, 'AndroidVersion.txt')
-    with open(version_file_path) as version_file:
-        version = version_file.read().strip()
 
     print('Committing update...')
     message_lines = [
         'Update prebuilt RenderScript to build {}.'.format(build_number),
         '',
-        'Built from {build_branch}, version {build_version}.'.format(
+        'Built from {build_branch}, build {build_number}.'.format(
             build_branch=android_branch,
-            build_version=version),
+            build_number=build_number),
     ]
     if bug is not None:
         message_lines.append('')
