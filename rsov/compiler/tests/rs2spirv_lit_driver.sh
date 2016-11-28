@@ -29,17 +29,20 @@ script=${script_name%.*} # Remove extension.
 output_folder="driver_out"
 mkdir -p $output_folder
 
-eval llvm-as "$script_path" -o "$output_folder/$script.bc"
+eval llvm-as "$script_path" -o "$output_folder/$script.bc" &&
 eval rs2spirv "$output_folder/$script.bc" -o "$output_folder/$script.rs.spv" \
-              -wo "$output_folder/$script.w.spt"
+              -wo "$output_folder/$script.w.spt" &&
 eval spirv-dis "$output_folder/$script.rs.spv" \
-              --no-color > "$output_folder/$script.rs.spt"
+              --no-color > "$output_folder/$script.rs.spt" &&
 eval rs2spirv -o "$output_folder/$script.spt" -lk "$output_folder/$script.rs.spt" \
-              -lw "$output_folder/$script.w.spt"
+              -lw "$output_folder/$script.w.spt" &&
 eval spirv-as "$output_folder/$script.spt" \
-              -o "$output_folder/$script.spv"
-
-eval spirv-val "$output_folder/$script.spv"
+              -o "$output_folder/$script.spv" &&
+eval spirv-val "$output_folder/$script.spv" &&
 eval cat "$output_folder/$script.spt"
 
+RET=$?
+
 eval rm "$output_folder/$script.*"
+
+exit $RET

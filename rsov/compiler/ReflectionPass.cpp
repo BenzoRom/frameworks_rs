@@ -89,13 +89,21 @@ std::string TypeToString(const Type *Ty) {
     if (ET->isFloatTy())
       return "float4";
 
-    llvm_unreachable("Unknown vector type");
+    assert(false && "Unknown vector type");
   }
 
-  llvm_unreachable("Unknown type");
+  assert(false && "Unknown type");
+
+  std::string badNameString;
+  raw_string_ostream badNameStream(badNameString);
+  badNameStream << '[';
+  Ty->print(badNameStream);
+  badNameStream << ']';
+  return badNameStream.str();
 }
 
 enum class RSType {
+  rs_bad = -1,
   rs_void,
   rs_uchar,
   rs_int,
@@ -113,7 +121,8 @@ RSType StrToRsTy(StringRef S) {
                   .Case("float", RSType::rs_float)
                   .Case("uchar4", RSType::rs_uchar4)
                   .Case("int4", RSType::rs_int4)
-                  .Case("float4", RSType::rs_float4);
+                  .Case("float4", RSType::rs_float4)
+                  .Default(RSType::rs_bad);
   return Ty;
 }
 
