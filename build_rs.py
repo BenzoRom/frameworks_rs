@@ -220,10 +220,12 @@ def install_built_device_files(build_dir, install_dir, host):
         os.makedirs(lib_dir)
 
         # Copy librsrt_ARCH.bc.
+        lib_name = bc_lib + '_' + arch + '.bc'
         if not host.startswith('windows'):
-            lib_name = bc_lib + '_' + arch + '.bc'
             built_lib = os.path.join(build_dir, 'host', host, 'lib64', lib_name)
-            install_file(built_lib, os.path.join(lib_dir, bc_lib + '.bc'))
+        else:
+            built_lib = os.path.join(build_dir, 'host', 'linux-x86', 'lib64', lib_name)
+        install_file(built_lib, os.path.join(lib_dir, bc_lib + '.bc'))
 
         # Copy static libs and share libs.
         product_dir = os.path.join(build_dir, 'target/product', product)
