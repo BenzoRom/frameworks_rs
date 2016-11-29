@@ -118,7 +118,6 @@ def install_toolchain(build_dir, install_dir, host):
     install_clang_headers(build_dir, install_dir, host)
     install_built_device_files(build_dir, install_dir, host)
     install_license_files(install_dir)
-    install_repo_prop(install_dir)
 
 
 def install_built_host_files(build_dir, install_dir, host):
@@ -283,23 +282,6 @@ def install_license_files(install_dir):
             notices.append(notice_file.read())
     with open(os.path.join(install_dir, 'NOTICE'), 'w') as notice_file:
         notice_file.write('\n'.join(notices))
-
-
-def install_repo_prop(install_dir):
-    file_name = 'repo.prop'
-
-    dist_dir = os.environ.get('DIST_DIR')
-    if dist_dir is not None:
-        dist_repo_prop = os.path.join(dist_dir, file_name)
-        shutil.copy(dist_repo_prop, install_dir)
-    else:
-        out_file = os.path.join(install_dir, file_name)
-        with open(out_file, 'w') as prop_file:
-            cmd = [
-                'repo', 'forall', '-c',
-                'echo $REPO_PROJECT $(git rev-parse HEAD)',
-            ]
-            subprocess.check_call(cmd, stdout=prop_file)
 
 
 def parse_args():
