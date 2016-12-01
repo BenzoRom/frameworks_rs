@@ -269,6 +269,21 @@ LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
 
 LOCAL_MODULE_TAGS := optional
 
+# These runtime modules, including libcompiler_rt.so, are required for
+# RenderScript.
+LOCAL_REQUIRED_MODULES := \
+	libclcore.bc \
+	libclcore_debug.bc \
+	libclcore_g.bc \
+	libcompiler_rt
+
+LOCAL_REQUIRED_MODULES_x86 += libclcore_x86.bc
+LOCAL_REQUIRED_MODULES_x86_64 += libclcore_x86.bc
+
+ifeq ($(ARCH_ARM_HAVE_NEON),true)
+  LOCAL_REQUIRED_MODULES_arm += libclcore_neon.bc
+endif
+
 include $(BUILD_SHARED_LIBRARY)
 
 # Now build a host version for serialization
