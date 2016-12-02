@@ -71,8 +71,8 @@ std::string TypeToString(const Type *Ty) {
       return "int";
     else if (IT->getBitWidth() == 8)
       return "uchar";
-    assert(false && "Unknown integer type");
   }
+
   if (Ty->isFloatTy())
     return "float";
 
@@ -83,16 +83,10 @@ std::string TypeToString(const Type *Ty) {
         return "int4";
       else if (IT->getBitWidth() == 8)
         return "uchar4";
-
-      assert(false && "Unknown integer vector type");
     }
     if (ET->isFloatTy())
       return "float4";
-
-    assert(false && "Unknown vector type");
   }
-
-  assert(false && "Unknown type");
 
   std::string badNameString;
   raw_string_ostream badNameStream(badNameString);
