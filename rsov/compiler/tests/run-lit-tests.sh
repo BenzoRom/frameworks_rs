@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 current_dir=$(pwd)
+export PATH=$current_dir:$PATH
 LIT_PATH=$current_dir/llvm-lit
 LIBSPIRV_TESTS=$current_dir
 
