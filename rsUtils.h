@@ -17,7 +17,8 @@
 #ifndef ANDROID_RS_UTILS_H
 #define ANDROID_RS_UTILS_H
 
-#define LOG_NDEBUG 0
+// Uncomment the following line to enable verbose debugging.
+// #define LOG_NDEBUG 0
 #define LOG_TAG "RenderScript"
 
 #ifdef RS_SERVER
@@ -32,5 +33,3 @@
 #include "rsCppUtils.h"
 
 #endif //ANDROID_RS_UTILS_H
-
-
