@@ -216,19 +216,15 @@ uint32_t RSoVScript::getGlobalProperties(int i) const {
 void RSoVScript::InitDescriptorAndPipelineLayouts() {
   VkDescriptorSetLayoutBinding layout_bindings[] = {
       {
-          // In the current implementation, these are all STORAGE_IMAGEs
-          // TODO:
-          // 1) replace all images with buffers
-          // 2) based on usage, select either images or buffers
           .binding = 0,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
           .pImmutableSamplers = nullptr,
       },
       {
           .binding = 1,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
           .pImmutableSamplers = nullptr,
@@ -321,12 +317,11 @@ void RSoVScript::InitDescriptorPool() {
 
   VkResult res;
   VkDescriptorPoolSize type_count[] = {
-      // The current implementation uses STORAGE_IMAGE for all allocations
       {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 1,
+          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1,
       },
       {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, .descriptorCount = 1,
+          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1,
       },
 #ifdef SUPPORT_GLOBAL_VARIABLES
       {
@@ -372,8 +367,8 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
           .dstBinding = 0,
           .dstArrayElement = 0,
           .descriptorCount = 1,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-          .pImageInfo = inputAllocation->getImageInfo(),
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .pBufferInfo = inputAllocation->getBufferInfo(),
       },
       {
           .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -381,8 +376,8 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
           .dstBinding = 1,
           .dstArrayElement = 0,
           .descriptorCount = 1,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,
-          .pImageInfo = outputAllocation->getImageInfo(),
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .pBufferInfo = outputAllocation->getBufferInfo(),
       },
 #ifdef SUPPORT_GLOBAL_VARIABLES
       {
