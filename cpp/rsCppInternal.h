@@ -33,7 +33,8 @@
 
 #undef LOG_TAG
 #undef LOG_NDEBUG
-#define LOG_NDEBUG 0
+// Uncomment the following line to enable verbose debugging.
+// #define LOG_NDEBUG 0
 #define LOG_TAG "rsC++"
 
 #endif
