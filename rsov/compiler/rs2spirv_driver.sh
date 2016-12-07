@@ -59,7 +59,7 @@ AND_HOME=$ANDROID_BUILD_TOP
 SPIRV_TOOLS_PATH=$1
 
 script_name="$2"
-script=${2%.*} # Remove extension.
+script=`basename ${2%.*}` # Remove enclosing directories and extension.
 
 output_folder="$3"
 mkdir -p $output_folder
