@@ -59,12 +59,9 @@ LOCAL_C_INCLUDES := \
 LOCAL_MODULE := rs2spirv
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-# TODO: handle windows and darwin
-
-LOCAL_MODULE_HOST_OS := linux
 LOCAL_IS_HOST_MODULE := true
 
-LOCAL_SHARED_LIBRARIES_linux += libLLVM libbcinfo libSPIRV
+LOCAL_SHARED_LIBRARIES += libLLVM libbcinfo libSPIRV
 
 # TODO: fix the remaining warnings
 
@@ -130,6 +127,20 @@ include $(LLVM_DEVICE_BUILD_MK)
 include $(BUILD_EXECUTABLE)
 
 endif # Don't build in unbundled branches
+
+#=====================================================================
+# Device executable bcc_rsov
+#=====================================================================
+
+include $(CLEAR_VARS)
+include $(CLEAR_TBLGEN_VARS)
+
+LOCAL_MODULE:= bcc_rsov
+LOCAL_MULTILIB := first
+LOCAL_MODULE_CLASS := EXECUTABLES
+LOCAL_SRC_FILES := bcc_rsov.sh
+
+include $(BUILD_PREBUILT)
 
 #=====================================================================
 # Include Subdirectories

@@ -312,6 +312,7 @@ protected:
     int32_t mThreadPriority;
     bool mIsGraphicsContext;
 
+    bool mForceRSoV;
     bool mForceCpu;
 
     RsContextType mContextType;
@@ -349,7 +350,10 @@ private:
     uint32_t runRootScript();
 
     bool loadRuntime(const char* filename);
-    bool loadDriver(bool forceDefault);
+    // Loads the driver.
+    // forceDefault: If true, loads the default CPU driver.
+    // forceRSoV:  If true, overrides forceDefault and loads the RSoV driver.
+    bool loadDriver(bool forceDefault, bool forceRSoV);
     static void * threadProc(void *);
     static void * helperThreadProc(void *);
 
