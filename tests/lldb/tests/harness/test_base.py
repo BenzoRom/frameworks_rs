@@ -186,7 +186,7 @@ class TestBase(object):
 
         return output
 
-    def try_command(self, cmd, expected, expected_regex=None):
+    def try_command(self, cmd, expected=None, expected_regex=None):
         '''Run an lldb command and match the expected response.
 
         Args:
@@ -199,10 +199,12 @@ class TestBase(object):
         Raises:
             TestFail: One of the expected strings were not found in the lldb
             output.
+
+        Returns:
+            str: raw lldb command output.
         '''
         assert self._lldb
         assert self._ci
-
         log = util_log.get_logger()
         output = ''
         try:
@@ -212,7 +214,8 @@ class TestBase(object):
                 raise DisconnectedException('Lost connection to lldb-server.')
 
             # check the expected strings
-            self._match_literals(output, expected)
+            if expected:
+                self._match_literals(output, expected)
 
             # check the regexp patterns
             if expected_regex:
@@ -237,6 +240,8 @@ class TestBase(object):
             log.error('\n'.join(backtrace))
             log.error('[TEST ERROR] {0}'.format(exception.message))
             raise  # pass through
+
+        return output
 
     def _match_literals(self, text, literals):
         '''Checks the text against the array of literals.
