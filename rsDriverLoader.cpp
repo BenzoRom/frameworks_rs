@@ -230,16 +230,27 @@ error:
 
 
 
-bool Context::loadDriver(bool forceDefault) {
+bool Context::loadDriver(bool forceDefault, bool forceRSoV) {
     bool loadDefault = true;
 
     // Provide a mechanism for dropping in a different RS driver.
 #ifndef RS_COMPATIBILITY_LIB
+
+    if (forceRSoV) {
+        // If the debug property is set to use the RSoV driver, load it and fail
+        // if it does not load.
+        if (loadRuntime("libRSDriver_RSoV.so")) {
+            ALOGV("Successfully loaded the RSoV driver!");
+            return true;
+        }
+        ALOGE("Failed to load the RSoV driver!");
+        return false;
+    }
+
 #ifdef OVERRIDE_RS_DRIVER
 #define XSTR(S) #S
 #define STR(S) XSTR(S)
 #define OVERRIDE_RS_DRIVER_STRING STR(OVERRIDE_RS_DRIVER)
-
     if (!forceDefault) {
         if (loadRuntime(OVERRIDE_RS_DRIVER_STRING)) {
             ALOGV("Successfully loaded runtime: %s", OVERRIDE_RS_DRIVER_STRING);
