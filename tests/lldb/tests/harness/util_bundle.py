@@ -37,7 +37,8 @@ class UtilBundle(object):
         'Allocations': 'com.android.rs.allocations',
         'MultipleRSFiles': 'com.android.rs.multiplersfiles',
         'SingleSource': 'com.android.rs.singlesource',
-        'ScriptGroup': 'com.android.rs.scriptgroup'
+        'ScriptGroup': 'com.android.rs.scriptgroup',
+        'Reduction': 'com.android.rs.lldbreductiontest',
     }
 
     _tests_jni = {
