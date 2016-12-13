@@ -16,7 +16,7 @@ target triple = "armv7-none-linux-gnueabi"
 ; CHECK-NOT: %rs_linker__Z14convert_uchar4Dv4_j = OpFunction %v4uchar
 ; CHECK-NOT: %rs_linker__Z13convert_uint4Dv4_h = OpFunction %v4uint
 
-; CHECK: %main = OpFunction
+; CHECK: %__rsov_entry_setImageAlpha = OpFunction
 
 ; CHECK-NOT: OpFunctionCall
 
