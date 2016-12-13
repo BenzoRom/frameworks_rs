@@ -42,7 +42,6 @@ using namespace llvm;
 namespace {
 
 static const StringRef CoordsNames[] = {"x", "y", "z"};
-
 }
 
 namespace rs2spirv {
@@ -56,7 +55,7 @@ void KernelSignature::dump() const {
   dbgs() << ")\n";
 }
 
-const std::string KernelSignature::wrapperPrefix =  "%__rsov_entry_";
+const std::string KernelSignature::wrapperPrefix = "%__rsov_";
 
 namespace {
 
@@ -246,7 +245,6 @@ public:
 
     emitCommonTypes();
 
-
     if (!emitKernelTypes(Kernel)) {
       errs() << "Emitting kernel types failed\n";
       return false;
@@ -328,7 +326,8 @@ bool ReflectionPass::emitHeader(const Module &M,
   OS << "      OpEntryPoint GLCompute " << Kernel.getWrapperName() << " ";
   OS << "\"main\" %global_invocation_id\n"
         "      OpExecutionMode ";
-  OS << Kernel.getWrapperName() << " LocalSize 1 1 1\n"
+  OS << Kernel.getWrapperName()
+     << " LocalSize 1 1 1\n"
         "      OpSource GLSL 450\n"
         "      OpSourceExtension \"GL_ARB_separate_shader_objects\"\n"
         "      OpSourceExtension \"GL_ARB_shading_language_420pack\"\n"
@@ -937,63 +936,100 @@ bool ReflectionPass::emitMain(
   if (!RTMapping || !ArgTMapping)
     return false;
 
+  // Produce boilerplate code for the kernel with unique SPIR-V textual IDs
   OS << '\n';
-  OS << Kernel.getWrapperName();
-  OS << " = OpFunction %void None %fun_void\n";
-  OS << "%label_main  = OpLabel\n"
-        "%input_pixel = OpVariable %ptr_function_access_ty Function\n"
-        "        %res = OpVariable %ptr_function_ty Function\n"
-        " %image_load = OpLoad %input_image_ty %input_image\n"
-        "%coords_load = OpLoad %v3uint %global_invocation_id\n"
-        "   %coords_x = OpCompositeExtract %uint %coords_load 0\n"
-        "   %coords_y = OpCompositeExtract %uint %coords_load 1\n"
-        "   %coords_z = OpCompositeExtract %uint %coords_load 2\n"
-        "   %shuffled = OpVectorShuffle %v2uint %coords_load %coords_load 0 1\n"
-        "  %bitcasted = OpBitcast %v2int %shuffled\n";
+  OS << Kernel.getWrapperName() << " = OpFunction %void None %fun_void\n";
 
-  OS << " %image_read = OpImageRead " << ArgTMapping->SPIRVImageReadType
-     << " %image_load %bitcasted\n"
-        "               OpStore %input_pixel %image_read\n";
+  OS << Kernel.getTempName("_label") << " = OpLabel\n";
+
+  OS << Kernel.getTempName("_input_pixel")
+     << " = OpVariable %ptr_function_access_ty Function\n";
+
+  OS << Kernel.getTempName("_res")
+     << " = OpVariable %ptr_function_ty Function\n";
+
+  OS << Kernel.getTempName("_image_load")
+     << " = OpLoad %input_image_ty %input_image\n";
+
+  OS << Kernel.getTempName("_coords_load")
+     << " = OpLoad %v3uint %global_invocation_id\n";
+
+  OS << Kernel.getTempName("_coords_x") << " = OpCompositeExtract %uint "
+     << Kernel.getTempName("_coords_load") << " 0\n";
+
+  OS << Kernel.getTempName("_coords_y") << " = OpCompositeExtract %uint "
+     << Kernel.getTempName("_coords_load") << " 1\n";
+
+  OS << Kernel.getTempName("_coords_z") << " = OpCompositeExtract %uint "
+     << Kernel.getTempName("_coords_load") << " 2\n";
+
+  OS << Kernel.getTempName("_shuffled") << " = OpVectorShuffle %v2uint "
+     << Kernel.getTempName("_coords_load") << " "
+     << Kernel.getTempName("_coords_load") << " 0 1\n";
+
+  OS << Kernel.getTempName("_bitcasted") << " = OpBitcast %v2int "
+     << Kernel.getTempName("_shuffled") << "\n";
+
+  OS << Kernel.getTempName("_image_read") << " = OpImageRead "
+     << ArgTMapping->SPIRVImageReadType << " "
+     << Kernel.getTempName("_image_load") << " "
+     << Kernel.getTempName("_bitcasted") << "\n";
+
+  OS << "  OpStore " << Kernel.getTempName("_input_pixel") << " "
+     << Kernel.getTempName("_image_read") << "\n";
 
   // TODO: Handle vector types of width different than 4.
   if (RTMapping->isVectorTy) {
-    OS << " %input_load = OpLoad " << ArgTMapping->SPIRVTy << " %input_pixel\n";
+    OS << " " << Kernel.getTempName("_input_load") << " = OpLoad "
+       << ArgTMapping->SPIRVTy << " " << Kernel.getTempName("_input_pixel")
+       << "\n";
   } else {
-    OS << "%input_access_chain = OpAccessChain %ptr_function_ty "
-          "%input_pixel %uint_zero\n"
-       << " %input_load = OpLoad " << ArgTMapping->SPIRVTy
-       << " %input_access_chain\n";
+    OS << Kernel.getTempName("_input_access_chain")
+       << " = OpAccessChain %ptr_function_ty "
+       << Kernel.getTempName("_input_pixel") << " %uint_zero\n";
+
+    OS << Kernel.getTempName("_input_load") << " = OpLoad "
+       << ArgTMapping->SPIRVTy << " "
+       << Kernel.getTempName("_input_access_chain") << "\n";
   }
 
   for (const auto &A : RSAllocs)
     OS << A.VarName << "_load = OpLoad " << A.VarName << "_image_ty "
        << A.VarName << "_var\n";
 
-  OS << "%kernel_call = OpFunctionCall " << ArgTMapping->SPIRVTy
-     << " %RS_SPIRV_DUMMY_ %input_load";
+  OS << Kernel.getTempName("_kernel_call") << " = OpFunctionCall "
+     << ArgTMapping->SPIRVTy << " %RS_SPIRV_DUMMY_ "
+     << Kernel.getTempName("_input_load");
 
   const auto CoordsNum = size_t(Kernel.coordsKind);
   for (size_t i = 0; i != CoordsNum; ++i)
-    OS << " %coords_" << CoordsNames[i].str();
+    OS << " " << Kernel.getTempName("_coords_") << CoordsNames[i].str();
 
   OS << '\n';
 
-  OS << "               OpStore %res %kernel_call\n"
-        "%output_load = OpLoad %output_image_ty %output_image\n";
-  OS << "   %res_load = OpLoad " << RTMapping->SPIRVTy << " %res\n";
+  OS << " OpStore " << Kernel.getTempName("_res") << " "
+     << Kernel.getTempName("_kernel_call") << "\n";
+
+  OS << Kernel.getTempName("_output_load")
+     << " = OpLoad %input_image_ty %output_image\n";
+
+  OS << " " << Kernel.getTempName("_res_load") << " = OpLoad "
+     << RTMapping->SPIRVTy << " " << Kernel.getTempName("_res") << "\n";
 
   if (!RTMapping->isVectorTy) {
-    OS << "%composite_constructed = OpCompositeConstruct "
-       << RTMapping->SPIRVImageReadType;
+    OS << Kernel.getTempName("_composite_constructed")
+       << " = OpCompositeConstruct " << RTMapping->SPIRVImageReadType;
     for (size_t i = 0; i < RTMapping->vectorWidth; ++i)
-      OS << " %res_load";
+      OS << " " << Kernel.getTempName("_res_load");
 
-    OS << "\n"
-          "               OpImageWrite %output_load %bitcasted "
-          "%composite_constructed\n";
-
+    OS << "\n";
+    OS << " OpImageWrite " << Kernel.getTempName("_output_load") << " "
+       << Kernel.getTempName("_bitcasted") << " "
+       << Kernel.getTempName("_composite_constructed") << "\n";
   } else {
-    OS << "               OpImageWrite %output_load %bitcasted %res_load\n";
+    OS << " OpImageWrite " << Kernel.getTempName("_output_load") << " "
+       << Kernel.getTempName("_bitcasted") << " "
+       << Kernel.getTempName("_res_load") << "\n";
   }
 
   OS << "               OpReturn\n"
