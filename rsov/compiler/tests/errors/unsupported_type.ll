@@ -6,7 +6,7 @@ target triple = "armv7-none-linux-gnueabi"
 
 ; CHECK: LLVM to SPIRV type mapping for type:    [i16] not found
 ; CHECK: LLVM to SPIRV type mapping for type:    [i16] not found
-; CHECK: Emitting kernel types failed
+; CHECK: Emitting kernel types for tSet failed
 
 ; CHECK-NOT: OpFunctionEnd
 

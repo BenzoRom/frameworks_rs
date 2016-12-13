@@ -34,6 +34,7 @@ LOCAL_SRC_FILES := \
 LOCAL_SHARED_LIBRARIES := \
     libRS_internal \
     libRSCpuRef \
+    libbcinfo \
     libc++ \
     libcutils \
     libdl \
@@ -43,6 +44,7 @@ LOCAL_SHARED_LIBRARIES := \
     libvulkan
 
 LOCAL_C_INCLUDES := \
+    $(LIBBCC_ROOT_PATH)/include \
     frameworks/native/vulkan/include \
     frameworks/rs \
     frameworks/rs/cpu_ref \
