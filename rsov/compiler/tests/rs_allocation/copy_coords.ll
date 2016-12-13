@@ -2,7 +2,7 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: %main = OpFunction
+; CHECK: %__rsov_entry_copy_coords = OpFunction
 
 ; CHECK-NOT: OpFunctionCall
 

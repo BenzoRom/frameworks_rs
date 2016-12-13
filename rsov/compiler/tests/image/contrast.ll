@@ -12,7 +12,7 @@ target triple = "armv7-none-linux-gnueabi"
 ; CHECK-NOT: %rs_linker__Z14convert_uchar3Dv3_f = OpFunction %v3uchar
 ; CHECK-NOT: %rs_linker__Z5clampDv3_fff = OpFunction %v3float
 
-; CHECK: %main = OpFunction
+; CHECK: %__rsov_entry_contrast = OpFunction
 
 ; CHECK-NOT: OpFunctionCall
 

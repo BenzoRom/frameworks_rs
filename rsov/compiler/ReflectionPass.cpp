@@ -16,6 +16,8 @@
 
 #include "ReflectionPass.h"
 
+#include "KernelSignature.h"
+
 #include "RSAllocationUtils.h"
 #include "bcinfo/MetadataExtractor.h"
 #include "llvm/ADT/StringSwitch.h"
@@ -37,29 +39,26 @@
 
 using namespace llvm;
 
-namespace rs2spirv {
-
 namespace {
 
-// Numeric value corresponds to the number of components.
-enum class Coords : size_t { None = 0, X, XY, XYZ, Last = XYZ };
 static const StringRef CoordsNames[] = {"x", "y", "z"};
 
-struct KernelSignature {
-  std::string returnType;
-  std::string name;
-  std::string argumentType;
-  Coords coordsKind;
+}
 
-  void dump() const {
-    dbgs() << returnType << ' ' << name << '(' << argumentType;
-    const auto CoordsNum = size_t(coordsKind);
-    for (size_t i = 0; i != CoordsNum; ++i)
-      dbgs() << ", " << CoordsNames[i];
+namespace rs2spirv {
 
-    dbgs() << ")\n";
-  }
-};
+void KernelSignature::dump() const {
+  dbgs() << returnType << ' ' << name << '(' << argumentType;
+  const auto CoordsNum = size_t(coordsKind);
+  for (size_t i = 0; i != CoordsNum; ++i)
+    dbgs() << ", " << CoordsNames[i];
+
+  dbgs() << ")\n";
+}
+
+const std::string KernelSignature::wrapperPrefix =  "%__rsov_entry_";
+
+namespace {
 
 std::string TypeToString(const Type *Ty) {
   assert(Ty);
@@ -182,7 +181,7 @@ class ReflectionPass : public ModulePass {
     return TM;
   }
 
-  bool emitHeader(const Module &M);
+  bool emitHeader(const Module &M, const KernelSignature &Kernel);
   bool emitDecorations(const Module &M,
                        const SmallVectorImpl<RSAllocationInfo> &RSAllocs);
   void emitCommonTypes();
@@ -211,7 +210,19 @@ public:
   bool runOnModule(Module &M) override {
     DEBUG(dbgs() << "ReflectionPass\n");
 
-    if (!emitHeader(M)) {
+    SmallVector<KernelSignature, 4> Kernels;
+    if (!extractKernelSignatures(M, Kernels)) {
+      errs() << "Extraction of kernels failed\n";
+      return false;
+    }
+
+    if (Kernels.size() != 1) {
+      errs() << "Non single-kernel modules are not supported\n";
+      return false;
+    }
+    const auto &Kernel = Kernels.front();
+
+    if (!emitHeader(M, Kernel)) {
       errs() << "Emiting header failed\n";
       return false;
     }
@@ -235,17 +246,6 @@ public:
 
     emitCommonTypes();
 
-    SmallVector<KernelSignature, 4> Kernels;
-    if (!extractKernelSignatures(M, Kernels)) {
-      errs() << "Extraction of kernels failed\n";
-      return false;
-    }
-
-    if (Kernels.size() != 1) {
-      errs() << "Non single-kernel modules are not supported\n";
-      return false;
-    }
-    const auto &Kernel = Kernels.front();
 
     if (!emitKernelTypes(Kernel)) {
       errs() << "Emitting kernel types failed\n";
@@ -311,7 +311,8 @@ ModulePass *createReflectionPass(std::ostream &OS,
   return new ReflectionPass(OS, ME);
 }
 
-bool ReflectionPass::emitHeader(const Module &M) {
+bool ReflectionPass::emitHeader(const Module &M,
+                                const KernelSignature &Kernel) {
   DEBUG(dbgs() << "emitHeader\n");
 
   OS << "; SPIR-V\n"
@@ -323,9 +324,11 @@ bool ReflectionPass::emitHeader(const Module &M) {
         "      OpCapability StorageImageWriteWithoutFormat\n"
         "      OpCapability Addresses\n"
         " %glsl_ext_ins = OpExtInstImport \"GLSL.std.450\"\n"
-        "      OpMemoryModel Physical32 GLSL450\n"
-        "      OpEntryPoint GLCompute %main \"main\" %global_invocation_id\n"
-        "      OpExecutionMode %main LocalSize 1 1 1\n"
+        "      OpMemoryModel Physical32 GLSL450\n";
+  OS << "      OpEntryPoint GLCompute " << Kernel.getWrapperName() << " ";
+  OS << "\"main\" %global_invocation_id\n"
+        "      OpExecutionMode ";
+  OS << Kernel.getWrapperName() << " LocalSize 1 1 1\n"
         "      OpSource GLSL 450\n"
         "      OpSourceExtension \"GL_ARB_separate_shader_objects\"\n"
         "      OpSourceExtension \"GL_ARB_shading_language_420pack\"\n"
@@ -929,8 +932,9 @@ bool ReflectionPass::emitMain(
     return false;
 
   OS << '\n';
-  OS << "       %main = OpFunction %void None %fun_void\n"
-        "%lablel_main = OpLabel\n"
+  OS << Kernel.getWrapperName();
+  OS << " = OpFunction %void None %fun_void\n";
+  OS << "%label_main  = OpLabel\n"
         "%input_pixel = OpVariable %ptr_function_access_ty Function\n"
         "        %res = OpVariable %ptr_function_ty Function\n"
         " %image_load = OpLoad %input_image_ty %input_image\n"

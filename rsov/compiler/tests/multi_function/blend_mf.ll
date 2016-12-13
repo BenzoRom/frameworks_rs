@@ -8,7 +8,7 @@ target triple = "armv7-none-linux-gnueabi"
 ; CHECK-NOT: OpFunction %v4uchar
 ; CHECK-NOT: OpFunction %uchar
 
-; CHECK: %main = OpFunction
+; CHECK: %__rsov_entry_setImageAlpha = OpFunction
 
 ; CHECK: OpUConvert %v4uint
 ; CHECK: OpUConvert %v4uchar
