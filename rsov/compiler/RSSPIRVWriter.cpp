@@ -30,9 +30,9 @@
 #include "llvm/Transforms/IPO.h"
 
 #include "GlobalMergePass.h"
+#include "InlinePreparationPass.h"
 #include "LinkerModule.h"
 #include "ReflectionPass.h"
-#include "InlinePreparationPass.h"
 
 #include <fstream>
 #include <sstream>

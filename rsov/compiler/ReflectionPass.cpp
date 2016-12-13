@@ -21,8 +21,8 @@
 #include "RSAllocationUtils.h"
 #include "bcinfo/MetadataExtractor.h"
 #include "llvm/ADT/StringSwitch.h"
-#include "llvm/IR/Module.h"
 #include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
 #include "llvm/IR/PassManager.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
@@ -551,8 +551,9 @@ bool ReflectionPass::emitKernelTypes(const KernelSignature &Kernel) {
   if (!RTMapping || !ArgTMapping)
     return false;
 
-  OS << '\n' << "%kernel_function_ty = OpTypeFunction " << RTMapping->SPIRVTy
-     << ' ' << ArgTMapping->SPIRVTy;
+  OS << '\n'
+     << "%kernel_function_ty = OpTypeFunction " << RTMapping->SPIRVTy << ' '
+     << ArgTMapping->SPIRVTy;
 
   const auto CoordsNum = unsigned(Kernel.coordsKind);
   for (size_t i = 0; i != CoordsNum; ++i)
@@ -589,7 +590,8 @@ bool ReflectionPass::emitInputImage(const KernelSignature &Kernel) {
 void ReflectionPass::emitGLGlobalInput() {
   DEBUG(dbgs() << "emitGLGlobalInput\n");
 
-  OS << '\n' << "%global_input_ptr_ty = OpTypePointer Input %v3uint\n"
+  OS << '\n'
+     << "%global_input_ptr_ty = OpTypePointer Input %v3uint\n"
      << "%global_invocation_id = OpVariable %global_input_ptr_ty Input\n";
 }
 
@@ -625,9 +627,11 @@ bool ReflectionPass::emitRSAllocImages(
     if (!AMapping)
       return false;
 
-    OS << '\n' << A.VarName << "_image_ty"
+    OS << '\n'
+       << A.VarName << "_image_ty"
        << " = OpTypeImage " << AMapping->SPIRVScalarTy << " 2D 0 0 0 2 "
-       << AMapping->SPIRVImageFormat << '\n' << A.VarName << "_image_ptr_ty"
+       << AMapping->SPIRVImageFormat << '\n'
+       << A.VarName << "_image_ptr_ty"
        << " = OpTypePointer UniformConstant " << A.VarName << "_image_ty\n";
 
     OS << A.VarName << "_var = OpVariable " << A.VarName
@@ -671,8 +675,9 @@ static std::string GenerateEISFun(const char *Name, const char *FType,
                                   const char *InstName) {
   std::ostringstream OS;
 
-  OS << '\n' << "%rs_linker_" << Name << " = OpFunction " << RType << " Pure "
-     << FType << '\n';
+  OS << '\n'
+     << "%rs_linker_" << Name << " = OpFunction " << RType << " Pure " << FType
+     << '\n';
 
   for (size_t i = 0, e = ArgTypes.size(); i < e; ++i)
     OS << "%param" << Name << i << " = OpFunctionParameter " << ArgTypes[i]
@@ -685,7 +690,8 @@ static std::string GenerateEISFun(const char *Name, const char *FType,
   for (size_t i = 0, e = ArgTypes.size(); i < e; ++i)
     OS << " %param" << Name << i;
 
-  OS << '\n' << "      OpReturnValue %res" << Name << "\n"
+  OS << '\n'
+     << "      OpReturnValue %res" << Name << "\n"
      << "      OpFunctionEnd\n";
 
   return OS.str();
