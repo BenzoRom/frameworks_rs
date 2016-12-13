@@ -34,7 +34,13 @@ struct KernelSignature {
 
   inline void dump() const;
 
-  inline std::string getWrapperName(void) const { return wrapperPrefix + name; }
+  inline std::string getWrapperName(void) const {
+    return wrapperPrefix + "entry_" + name;
+  }
+
+  inline std::string getTempName(const std::string suffix) const {
+    return wrapperPrefix + name + suffix;
+  }
 
   static bool isWrapper(const llvm::StringRef &id) {
     return id.startswith(wrapperPrefix);
