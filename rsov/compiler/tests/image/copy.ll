@@ -3,7 +3,7 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: %main = OpFunction
+; CHECK: %__rsov_entry_copy = OpFunction
 
 ; Function Attrs: norecurse nounwind readnone
 define <4 x i8> @copy(<4 x i8> %v_in) #0 {

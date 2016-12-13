@@ -16,6 +16,8 @@
 
 #include "LinkerModule.h"
 
+#include "KernelSignature.h"
+
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 
@@ -368,8 +370,8 @@ LinkerModule::LinkerModule(std::istream &ModuleIn) {
     Optional<StringRef> Id = It->getLHSIdentifier();
     assert(Id && "Functions should start with OpFunction");
 
-    FunctionBlock &FunBlck =
-        *Id == "%main" ? addBlock<MainFunBlock>() : addBlock<FunctionBlock>();
+    FunctionBlock &FunBlck = KernelSignature::isWrapper(*Id) ?
+        addBlock<MainFunBlock>() : addBlock<FunctionBlock>();
     bool HasReturn = false;
 
     while (It != End) {
