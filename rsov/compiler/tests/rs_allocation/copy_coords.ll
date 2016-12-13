@@ -6,9 +6,9 @@ target triple = "armv7-none-linux-gnueabi"
 
 ; CHECK-NOT: OpFunctionCall
 
-; CHECK: %coords_load = OpLoad %v3uint %global_invocation_id
-; CHECK: %coords_x = OpCompositeExtract %uint %coords_load 0
-; CHECK: %coords_y = OpCompositeExtract %uint %coords_load 1
+; CHECK: %__rsov_copy_coords_coords_load = OpLoad %v3uint %global_invocation_id
+; CHECK: %__rsov_copy_coords_coords_x = OpCompositeExtract %uint %__rsov_copy_coords_coords_load 0
+; CHECK: %__rsov_copy_coords_coords_y = OpCompositeExtract %uint %__rsov_copy_coords_coords_load 1
 
 ; Function Attrs: norecurse nounwind readnone
 define <4 x i8> @copy_coords(<4 x i8> %in, i32 %x, i32 %y) #0 {
