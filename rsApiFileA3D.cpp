@@ -83,17 +83,8 @@ RsFile rsaFileA3DCreateFromMemory(RsContext con, const void *data, uint32_t len)
 }
 
 RsFile rsaFileA3DCreateFromAsset(RsContext con, void *_asset) {
-#if !defined(__RS_PDK__)
-    Context *rsc = static_cast<Context *>(con);
-    Asset *asset = static_cast<Asset *>(_asset);
-    FileA3D *fa3d = new FileA3D(rsc);
-    fa3d->incUserRef();
-
-    fa3d->load(asset);
-    return fa3d;
-#else
+    ALOGE("Calling deprecated %s API", __FUNCTION__);
     return nullptr;
-#endif
 }
 
 RsFile rsaFileA3DCreateFromFile(RsContext con, const char *path) {

@@ -23,9 +23,6 @@ rs-prebuilts-full: \
 endif
 
 rs_base_CFLAGS := -Werror -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fno-exceptions -std=c++11
-ifeq ($(TARGET_BUILD_PDK), true)
-  rs_base_CFLAGS += -D__RS_PDK__
-endif
 
 ifneq ($(OVERRIDE_RS_DRIVER),)
   rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER)
@@ -190,7 +187,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES += liblog libcutils libutils libEGL libGLESv1_CM libGLESv2
 LOCAL_SHARED_LIBRARIES += libgui libsync libdl libui
-LOCAL_SHARED_LIBRARIES += libft2 libpng libz libandroidfw
+LOCAL_SHARED_LIBRARIES += libft2 libpng libz
 
 LOCAL_SHARED_LIBRARIES += libbcinfo
 
@@ -367,7 +364,7 @@ LOCAL_SRC_FILES:= \
 	rsThreadIO.cpp \
 	rsType.cpp
 
-LOCAL_STATIC_LIBRARIES := libcutils libutils liblog libandroidfw
+LOCAL_STATIC_LIBRARIES := libcutils libutils liblog
 
 LOCAL_CLANG := true
 
