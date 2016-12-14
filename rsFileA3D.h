@@ -85,7 +85,6 @@ protected:
     const uint8_t * mData;
     void * mAlloc;
     uint64_t mDataSize;
-    Asset *mAsset;
 
     OStream *mWriteStream;
     Vector<A3DIndexEntry*> mWriteIndex;

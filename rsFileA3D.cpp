@@ -22,10 +22,6 @@
 #include "rsAnimation.h"
 #include "rs.h"
 
-#if !defined(__RS_PDK__)
-    #include <androidfw/Asset.h>
-#endif
-
 #include <inttypes.h>
 
 namespace android {
@@ -36,7 +32,6 @@ FileA3D::FileA3D(Context *rsc) : ObjectBase(rsc) {
     mData = nullptr;
     mWriteStream = nullptr;
     mReadStream = nullptr;
-    mAsset = nullptr;
 
     mMajorVersion = 0;
     mMinorVersion = 1;
@@ -58,11 +53,6 @@ FileA3D::~FileA3D() {
     }
     if (mAlloc) {
         free(mAlloc);
-    }
-    if (mAsset) {
-#if !defined(__RS_PDK__)
-        delete mAsset;
-#endif
     }
 }
 
@@ -92,12 +82,7 @@ void FileA3D::parseHeader(IStream *headerStream) {
 }
 
 bool FileA3D::load(Asset *asset) {
-#if !defined(__RS_PDK__)
-    mAsset = asset;
-    return load(asset->getBuffer(false), asset->getLength());
-#else
     return false;
-#endif
 }
 
 bool FileA3D::load(const void *data, size_t length) {
