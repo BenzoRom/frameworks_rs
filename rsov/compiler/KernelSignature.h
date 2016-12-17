@@ -39,17 +39,17 @@ struct KernelSignature {
   }
 
   inline std::string getTempName(const std::string suffix) const {
-    return wrapperPrefix + name + suffix;
+    return wrapperPrefix + name + "_" + suffix;
   }
 
   static bool isWrapper(const llvm::StringRef &id) {
     return id.startswith(wrapperPrefix);
   }
 
- private:
+private:
   static const std::string wrapperPrefix;
 };
 
-}  // namespace rs2spirv
+} // namespace rs2spirv
 
 #endif
