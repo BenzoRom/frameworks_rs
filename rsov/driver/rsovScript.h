@@ -21,6 +21,7 @@
 
 #include <vector>
 
+#include "bcinfo/MetadataExtractor.h"
 #include "rsDefines.h"
 #include "rs_hal.h"
 #include "rsd_cpu.h"
@@ -42,9 +43,10 @@ class RSoVContext;
 // TODO: CpuScript is a bad name for the base class. Fix with a refactoring.
 class RSoVScript : RsdCpuReference::CpuScript {
  public:
-  RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords);
-  RSoVScript(RSoVContext *context,
-             const std::vector<uint32_t> &spvWords) = delete;
+  RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
+             bcinfo::MetadataExtractor *ME);
+  RSoVScript(RSoVContext *context, const std::vector<uint32_t> &spvWords,
+             bcinfo::MetadataExtractor *ME) = delete;
 
   virtual ~RSoVScript();
 
@@ -94,13 +96,14 @@ class RSoVScript : RsdCpuReference::CpuScript {
 
  private:
   void InitDescriptorAndPipelineLayouts();
-  void InitShader();
+  void InitShader(uint32_t slot);
   void InitDescriptorPool();
   void InitDescriptorSet(const RSoVAllocation *inputAllocation,
                          RSoVAllocation *outputAllocation);
   void InitPipelineCache();
   void InitPipeline();
-  void runForEach(const RSoVAllocation *input, RSoVAllocation *output);
+  void runForEach(uint32_t slot, const RSoVAllocation *input,
+                  RSoVAllocation *output);
 
   RSoVContext *mRSoV;
   VkDevice mDevice;
@@ -115,6 +118,8 @@ class RSoVScript : RsdCpuReference::CpuScript {
   VkPipelineShaderStageCreateInfo mShaderStage;
   VkDescriptorPool mDescPool;
   std::vector<VkDescriptorSet> mDescSet;
+  // For kernel names
+  const bcinfo::MetadataExtractor *mME;
 };
 
 }  // namespace rsov

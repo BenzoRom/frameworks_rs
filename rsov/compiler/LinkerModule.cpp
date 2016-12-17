@@ -197,7 +197,7 @@ void Block::removeNonCodeLines() {
               Lines.end());
 }
 
-bool HeaderBlock::getRSKernelNames(SmallVectorImpl<StringRef> &Out) const {
+bool HeaderBlock::getRSKernelNames(SmallVectorImpl<std::string> &Out) const {
   for (const auto &L : Lines)
     if (L.contains("OpString")) {
       const Optional<StringRef> Name = L.getLHSIdentifier();
@@ -205,7 +205,16 @@ bool HeaderBlock::getRSKernelNames(SmallVectorImpl<StringRef> &Out) const {
         auto LStr = L.str();
         LStr.erase(std::remove(LStr.begin(), LStr.end(), '"'), LStr.end());
 
-        SPIRVLine(LStr).getRHSIdentifiers(Out);
+        llvm::SmallVector<llvm::StringRef, 2> KernelNames;
+        SPIRVLine(LStr).getRHSIdentifiers(KernelNames);
+
+        Out.clear();
+        // Returning StringRef to a destructed string is bad.
+        // Need to duplicate the contents before returning.
+        for (auto n : KernelNames) {
+          Out.push_back(n);
+        }
+
         return true;
       }
     }

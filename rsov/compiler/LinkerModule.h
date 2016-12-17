@@ -119,7 +119,7 @@ public:
   HeaderBlock &operator=(const HeaderBlock &) = default;
   static bool classof(const Block *B) { return B->getKind() == BK_Header; }
 
-  bool getRSKernelNames(llvm::SmallVectorImpl<llvm::StringRef> &Out) const;
+  bool getRSKernelNames(llvm::SmallVectorImpl<std::string> &Out) const;
 };
 
 class DecorBlock : public Block {
