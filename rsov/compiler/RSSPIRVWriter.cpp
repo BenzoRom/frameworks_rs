@@ -159,7 +159,7 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   DEBUG(KernelM.dump());
   DEBUG(dbgs() << "\n======================\n\n");
 
-  const char *const Prefix = "%rs_linker_";
+  const char Prefix[] = "%rs_linker_";
 
   for (auto *LPtr : KernelM.lines()) {
     assert(LPtr);
@@ -191,7 +191,7 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   if (!HeaderB || !isa<HeaderBlock>(KIt->get()))
     return false;
 
-  SmallVector<StringRef, 2> KernelNames;
+  SmallVector<std::string, 2> KernelNames;
   const bool KernelsFound = HeaderB->getRSKernelNames(KernelNames);
 
   if (!KernelsFound) {
@@ -199,17 +199,7 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
     return false;
   }
 
-  // TODO: Support more than one kernel.
-  if (KernelNames.size() != 1) {
-    errs() << "Unsupported number of kernels: " << KernelNames.size() << '\n';
-    return false;
-  }
-
-  const std::string KernelName =
-      Prefix + KernelNames.front().drop_front().str();
-  DEBUG(dbgs() << "Kernel name: " << KernelName << '\n');
-
-  // Kernel's HeaderBlock is skipped - it has OpenCL-specific code that
+  // KernelM module's HeaderBlock is skipped - it has OpenCL-specific code that
   // is replaced here with compute shader code.
 
   OutM.addBlock<HeaderBlock>(*HeaderB);
@@ -221,8 +211,8 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   if (!DecorBW || !isa<DecorBlock>(KIt->get()))
     return false;
 
-  // Kernel's DecorBlock is skipped, because it contains OpenCL-specific code
-  // that is not needed (eg. linkage type information).
+  // KernelM module's DecorBlock is skipped, because it contains OpenCL-specific
+  // code that is not needed (eg. linkage type information).
 
   OutM.addBlock<DecorBlock>(*DecorBW);
 
@@ -252,7 +242,7 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   else
     --KIt;
 
-  MainFunBlock *MainB = nullptr;
+  SmallVector<MainFunBlock *, 2> MainBs;
 
   while (++WIt != WEnd) {
     auto *FunB = dyn_cast<FunctionBlock>(WIt->get());
@@ -260,18 +250,13 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
       return false;
 
     if (auto *MB = dyn_cast<MainFunBlock>(WIt->get())) {
-      if (MainB) {
-        errs() << "More than one main function found in wrapper module\n";
-        return false;
-      }
-
-      MainB = &OutM.addBlock<MainFunBlock>(*MB);
+      MainBs.push_back(&OutM.addBlock<MainFunBlock>(*MB));
     } else {
       OutM.addBlock<FunctionBlock>(*FunB);
     }
   }
 
-  if (!MainB) {
+  if (!MainBs.size()) {
     errs() << "Wrapper module has no main function\n";
     return false;
   }
@@ -296,11 +281,26 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   }
 
   OutM.fixBlockOrder();
-  if (!FixMain(OutM, *MainB, KernelName))
-    return false;
 
-  if (!FixVectorShuffles(*MainB))
+  auto KernelName = KernelNames.begin();
+  const auto KE = KernelNames.end();
+  auto MainB = MainBs.begin();
+  const auto ME = MainBs.end();
+
+  for (; KernelName != KE && MainB != ME; ++KernelName, ++MainB) {
+    // Remove the leading "%" character in kernel names
+    const std::string KernelNameStr = Prefix + KernelName->substr(1);
+    DEBUG(dbgs() << "Kernel name: " << KernelNameStr << '\n');
+    if (!FixMain(OutM, **MainB, KernelNameStr))
+      return false;
+    if (!FixVectorShuffles(**MainB))
+      return false;
+  }
+
+  if (KernelName != KE || MainB != ME) {
+    errs() << "Inconsistent kernel metadata and definitions\n";
     return false;
+  }
 
   OutM.removeUnusedFunctions();
 

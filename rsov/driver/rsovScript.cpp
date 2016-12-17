@@ -16,14 +16,15 @@
 
 #include "rsovScript.h"
 
-#include <fstream>
-
+#include "bcinfo/MetadataExtractor.h"
 #include "rsContext.h"
 #include "rsType.h"
 #include "rsUtils.h"
 #include "rsovAllocation.h"
 #include "rsovContext.h"
 #include "rsovCore.h"
+
+#include <fstream>
 
 namespace android {
 namespace renderscript {
@@ -102,13 +103,16 @@ std::vector<uint32_t> compileBitcode(const char *resName, const char *cacheDir,
 
 }  // anonymous namespace
 
-RSoVScript::RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords)
+RSoVScript::RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
+                       bcinfo::MetadataExtractor *ME)
     : mRSoV(context),
       mDevice(context->getDevice()),
-      mSPIRVWords(std::move(spvWords)) {}
+      mSPIRVWords(std::move(spvWords)),
+      mME(ME) {}
 
 RSoVScript::~RSoVScript() {
   delete mCpuScript;
+  delete mME;
   // TODO: destroy shader
 }
 
@@ -138,7 +142,7 @@ void RSoVScript::invokeForEach(uint32_t slot, const Allocation **ains,
       static_cast<RSoVAllocation *>(ains[0]->mHal.drv);
   RSoVAllocation *outputAllocation =
       static_cast<RSoVAllocation *>(aout->mHal.drv);
-  runForEach(inputAllocation, outputAllocation);
+  runForEach(slot, inputAllocation, outputAllocation);
 }
 
 void RSoVScript::invokeReduce(uint32_t slot, const Allocation **ains,
@@ -282,7 +286,7 @@ void RSoVScript::InitDescriptorAndPipelineLayouts() {
   ALOGV("%s succeeded.", __FUNCTION__);
 }
 
-void RSoVScript::InitShader() {
+void RSoVScript::InitShader(uint32_t slot) {
   VkResult res;
 
   mShaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -290,7 +294,13 @@ void RSoVScript::InitShader() {
   mShaderStage.pSpecializationInfo = nullptr;
   mShaderStage.flags = 0;
   mShaderStage.stage = VK_SHADER_STAGE_COMPUTE_BIT;
-  mShaderStage.pName = "main";
+  const char **RSKernelNames = mME->getExportForEachNameList();
+  size_t RSKernelNum = mME->getExportForEachSignatureCount();
+  rsAssert(slot < RSKernelNum);
+  rsAssert(RSKernelNames);
+  rsAssert(RSKernelNames[slot]);
+  ALOGV("slot = %d kernel name = %s", slot, RSKernelNames[slot]);
+  mShaderStage.pName = RSKernelNames[slot];
 
   VkShaderModuleCreateInfo moduleCreateInfo = {
       .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -413,12 +423,13 @@ void RSoVScript::InitPipeline() {
   ALOGV("%s succeeded.", __FUNCTION__);
 }
 
-void RSoVScript::runForEach(const RSoVAllocation *inputAllocation,
+void RSoVScript::runForEach(uint32_t slot,
+                            const RSoVAllocation *inputAllocation,
                             RSoVAllocation *outputAllocation) {
   VkResult res;
 
   InitDescriptorAndPipelineLayouts();
-  InitShader();
+  InitShader(slot);
   InitDescriptorPool();
   InitDescriptorSet(inputAllocation, outputAllocation);
   // InitPipelineCache();
@@ -538,7 +549,15 @@ bool rsovScriptInit(const Context *rsc, ScriptC *script, char const *resName,
   }
   cs->populateScript(script);
 
-  RSoVScript *rsovScript = new RSoVScript(rsov, std::move(spvWords));
+  bcinfo::MetadataExtractor *bitcodeMetadata =
+      new bcinfo::MetadataExtractor((const char *)bitcode, bitcodeSize);
+  if (!bitcodeMetadata->extract()) {
+    ALOGE("Could not extract metadata from bitcode");
+    return false;
+  }
+
+  RSoVScript *rsovScript =
+      new RSoVScript(rsov, std::move(spvWords), bitcodeMetadata);
 
   if (!rsovScript) {
     ALOGV("Failed creating a RSoV script");
