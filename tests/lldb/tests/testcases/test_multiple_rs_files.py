@@ -51,13 +51,13 @@ class TestMultipleRSFiles(TestBaseRemote):
                           'Runtime Driver discovered',
                           'Runtime functions hooked'])
 
-        self.try_command('breakpoint set --file first.rs --line 12',
+        self.try_command('breakpoint set --file first.rs --line 28',
                          ['(pending)'])
 
         self.try_command('process continue',
                          ['stopped',
                           'librs.first.so`first_kernel',
-                          'at first.rs:12',
+                          'at first.rs:28',
                           "name = '%s'" % self._binary_name(),
                           'stop reason = breakpoint 1'])
 
