@@ -44,7 +44,7 @@ class TestInvokeFun(TestBaseRemote):
         self.try_command('process continue',
                          ['stopped',
                           'stop reason = breakpoint'],
-                         [r'scalars\.rs:5[789]'])
+                         [r'scalars\.rs:7[345]'])
 
         self.try_command('language renderscript kernel breakpoint set simple_kernel',
                          ['Breakpoint 2', 'Breakpoint(s) created'])
@@ -53,7 +53,7 @@ class TestInvokeFun(TestBaseRemote):
                          ['stopped',
                           'stop reason = breakpoint',
                           'simple_kernel'],
-                         [r'scalars\.rs:4[567]'])
+                         [r'scalars\.rs:6[123]'])
 
         self.try_command('expr glob',
                          ['(int)',

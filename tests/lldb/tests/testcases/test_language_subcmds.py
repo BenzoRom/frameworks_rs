@@ -64,7 +64,7 @@ class TestLanguageSubcmds(TestBaseRemote):
                           'rsdScriptInvokeForEachMulti',
                           'rsdScriptSetGlobalVar'])
 
-        self.try_command('breakpoint set --file simple.rs --line 12',
+        self.try_command('breakpoint set --file simple.rs --line 28',
                          ['(pending)'])
 
         self.try_command('process continue',

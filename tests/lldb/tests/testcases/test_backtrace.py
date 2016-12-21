@@ -54,7 +54,7 @@ class TestBacktrace(TestBaseRemote):
                           'frame #2:',
                           'librs.scalars.so',
                           'simple_kernel'],
-                         [r'scalars\.rs:4[567]'])
+                         [r'scalars\.rs:6[123]'])
 
         self.try_command('breakpoint delete 1',
                          ['1 breakpoints deleted'])
@@ -62,7 +62,7 @@ class TestBacktrace(TestBaseRemote):
         self.try_command('b set_i',
                          ['Breakpoint 2',
                           'set_i'],
-                         [r'scalars\.rs:2[012]'])
+                         [r'scalars\.rs:3[678]'])
 
         self.try_command('breakpoint list',
                          ['set_i', 'resolved'])
@@ -80,7 +80,7 @@ class TestBacktrace(TestBaseRemote):
                           'librs.scalars.so',
                           'modify_i',
                           'set_i'],
-                         [r'scalars\.rs:2[012]'])
+                         [r'scalars\.rs:3[678]'])
 
     @ordered_test('last')
     @cpp_only_test()
