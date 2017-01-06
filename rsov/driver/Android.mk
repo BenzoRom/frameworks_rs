@@ -36,11 +36,7 @@ LOCAL_SHARED_LIBRARIES := \
     libRSCpuRef \
     libbcinfo \
     libc++ \
-    libcutils \
-    libdl \
     liblog \
-    libsync \
-    libutils \
     libvulkan
 
 LOCAL_C_INCLUDES := \
