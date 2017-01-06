@@ -13,8 +13,6 @@ target triple = "armv7-none-linux-gnueabi"
 ; CHECK-NOT: OpFunctionCall
 
 ; CHECK: OpImageRead %v4uchar
-; CHECK: OpImageRead %v4uchar %[[RS_ALLOC:.*]] %{{.*}}
-; CHECK: OpImageWrite %{{.*}}[[RS_ALLOC]] %{{.*}} %{{.*}}
 ; CHECK: OpImageWrite
 
 

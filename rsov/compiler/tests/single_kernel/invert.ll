@@ -1,5 +1,4 @@
-; RUN: llvm-as < %s | rs2spirv -spirv-text -o %t
-; RUN: FileCheck < %t %s
+; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
 
 ; TODO: Complete the test.
 
@@ -7,7 +6,14 @@ target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
 ; Function Attrs: norecurse nounwind readnone
-; CHECK: Name [[FooIdx:[0-9]+]] "invert"
+; CHECK:OpDecorate %[[BUF_S:.*]] BufferBlock
+; CHECK:OpDecorate %[[BUF_VAR:.*]] DescriptorSet {{[0-9]}}
+; CHECK:OpDecorate %[[BUF_VAR]] Binding {{[0-9]}}
+; CHECK:%[[BUF_PTR_TY:.*]] = OpTypePointer Uniform %[[BUF_S]]
+; CHECK:%[[BUF_VAR]] = OpVariable %[[BUF_PTR_TY]] Uniform
+; CHECK:%[[ADDR:.*]] = OpAccessChain {{.*}} %[[BUF_VAR]]
+; CHECK:OpLoad {{.*}} %[[ADDR]]
+
 define <4 x float> @invert(<4 x float> %in) #0 {
 entry:
   %0 = extractelement <4 x float> %in, i64 0
