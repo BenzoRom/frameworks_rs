@@ -493,7 +493,9 @@ bool FuseTypesAndConstants(LinkerModule &LM) {
       assert(LHS);
       assert(RHS);
 
-      if (TypesAndConstDefs.count(*RHS) != 0) {
+      if (!RHS->startswith("OpTypeStruct") &&
+          !RHS->startswith("OpTypeRuntimeArray") &&
+          TypesAndConstDefs.count(*RHS) != 0) {
         NameReps.insert(
             std::make_pair(LHS->str(), TypesAndConstDefs[RHS->str()]));
         DEBUG(dbgs() << "New mapping: [" << LHS->str() << ", "

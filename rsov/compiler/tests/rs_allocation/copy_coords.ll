@@ -6,7 +6,7 @@ target triple = "armv7-none-linux-gnueabi"
 
 ; CHECK-NOT: OpFunctionCall
 
-; CHECK: %__rsov_copy_coords_coords_load = OpLoad %v3uint %global_invocation_id
+; CHECK: %__rsov_copy_coords_coords_load = OpLoad %v3uint %gl_GlobalInvocationID
 ; CHECK: %__rsov_copy_coords_coords_x = OpCompositeExtract %uint %__rsov_copy_coords_coords_load 0
 ; CHECK: %__rsov_copy_coords_coords_y = OpCompositeExtract %uint %__rsov_copy_coords_coords_load 1
 
