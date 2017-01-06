@@ -262,13 +262,74 @@ RSoVAllocation::RSoVAllocation(RSoVContext *context, const Type *type)
       mWidth(type->getDimX()),
       mHeight(type->getDimY()),
       mDepth(type->getDimZ()) {
-  InitImage();
+  InitBuffer();
 }
 
 RSoVAllocation::~RSoVAllocation() {
   vkDestroyImageView(mDevice, mImageView, nullptr);
   vkDestroyImage(mDevice, mImage, nullptr);
   vkFreeMemory(mDevice, mMem, nullptr);
+}
+
+void RSoVAllocation::InitBuffer() {
+  VkResult res;
+
+  uint32_t bufferSize = mWidth;
+
+  if (mHeight > 0) {
+    bufferSize *= mHeight;
+  }
+
+  if (mDepth > 0) {
+    bufferSize *= mDepth;
+  }
+
+  bufferSize *= mType->getElement()->getSizeBytes();
+
+  VkBufferCreateInfo buf_info = {
+    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+    .pNext = nullptr,
+    .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+    .size = bufferSize,
+    .queueFamilyIndexCount = 0,
+    .pQueueFamilyIndices = nullptr,
+    .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+    .flags = 0,
+  };
+  res = vkCreateBuffer(mDevice, &buf_info, nullptr, &mBuf);
+  rsAssert(res == VK_SUCCESS);
+
+  VkMemoryRequirements mem_reqs;
+  vkGetBufferMemoryRequirements(mDevice, mBuf, &mem_reqs);
+
+  VkMemoryAllocateInfo allocateInfo = {
+    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+    .pNext = nullptr,
+    .memoryTypeIndex = 0,
+    .allocationSize = mem_reqs.size,
+  };
+
+  bool pass;
+  pass = mRSoV->MemoryTypeFromProperties(
+      mem_reqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+      &allocateInfo.memoryTypeIndex);
+  ALOGV("TypeBits = 0x%08X", mem_reqs.memoryTypeBits);
+  rsAssert(pass);
+
+  // TODO: Make this aligned
+  res = vkAllocateMemory(mDevice, &allocateInfo, nullptr, &mMem);
+  rsAssert(res == VK_SUCCESS);
+
+  res = vkBindBufferMemory(mDevice, mBuf, mMem, 0);
+  rsAssert(res == VK_SUCCESS);
+
+  mBufferInfo.buffer = mBuf;
+  mBufferInfo.offset = 0;
+  mBufferInfo.range = bufferSize;
+
+  res = vkMapMemory(mDevice, mMem, 0, mem_reqs.size, 0, (void **)&mPtr);
+  rsAssert(res == VK_SUCCESS);
 }
 
 void RSoVAllocation::InitImage() {
