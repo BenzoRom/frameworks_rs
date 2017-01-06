@@ -12,8 +12,6 @@ target triple = "armv7-none-linux-gnueabi"
 
 ; CHECK-NOT: OpFunctionCall
 
-; CHECK: OpImageRead %v4uchar
-; CHECK: OpImageWrite
 ; CHECK: OpImageWrite
 
 %struct.rs_allocation = type { i32* }
