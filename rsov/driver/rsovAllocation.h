@@ -42,10 +42,12 @@ class RSoVAllocation {
   uint32_t getWidth() const { return mWidth; }
   uint32_t getHeight() const { return mHeight; }
   uint32_t getDepth() const { return mDepth; }
+  const VkDescriptorBufferInfo *getBufferInfo() const { return &mBufferInfo; }
   const VkDescriptorImageInfo *getImageInfo() const { return &mImageInfo; }
   char *getHostPtr() const { return mPtr; }
 
  private:
+  void InitBuffer();
   void InitImage();
 
   char *mPtr;  // Host pointer to mmapped device memory for the Allocation
@@ -57,13 +59,13 @@ class RSoVAllocation {
   const uint32_t mDepth;
 
   VkFormat mFormat;
-  VkDescriptorImageInfo mImageInfo;
   VkDeviceMemory mMem;
   VkImage mImage;
+  VkDescriptorImageInfo mImageInfo;
   VkImageView mImageView;
   VkImageLayout mImageLayout;
-
-  // TODO: add an underneath buffer too
+  VkBuffer mBuf;
+  VkDescriptorBufferInfo mBufferInfo;
 };
 
 }  // namespace rsov
