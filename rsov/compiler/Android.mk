@@ -26,6 +26,7 @@ RS2SPIRV_SOURCES := \
   rs2spirv.cpp \
   GlobalMergePass.cpp \
   InlinePreparationPass.cpp \
+  KernelSignature.cpp \
   LinkerModule.cpp \
   ReflectionPass.cpp \
   RSAllocationUtils.cpp \
