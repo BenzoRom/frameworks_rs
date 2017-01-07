@@ -18,21 +18,29 @@
 #define RS_KERNEL_SIGNATURE_H
 
 #include "llvm/ADT/StringRef.h"
+#include "llvm/IR/DerivedTypes.h"
 
 #include <string>
+#include <vector>
 
 namespace rs2spirv {
+
+static const llvm::StringRef CoordsNames[] = {"x", "y", "z"};
 
 // Numeric value corresponds to the number of components.
 enum class Coords : size_t { None = 0, X, XY, XYZ, Last = XYZ };
 
 struct KernelSignature {
+  typedef std::vector<std::string> ArgumentTypes;
   std::string returnType;
   std::string name;
-  std::string argumentType;
+  ArgumentTypes argumentTypes;
   Coords coordsKind;
 
-  inline void dump() const;
+  KernelSignature(const llvm::FunctionType *FT, const std::string Fname,
+                  Coords CK);
+
+  void dump() const;
 
   inline std::string getWrapperName(void) const {
     return wrapperPrefix + "entry_" + name;

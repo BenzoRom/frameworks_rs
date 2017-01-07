@@ -39,60 +39,9 @@
 
 using namespace llvm;
 
-namespace {
-
-static const StringRef CoordsNames[] = {"x", "y", "z"};
-}
-
 namespace rs2spirv {
 
-void KernelSignature::dump() const {
-  dbgs() << returnType << ' ' << name << '(' << argumentType;
-  const auto CoordsNum = size_t(coordsKind);
-  for (size_t i = 0; i != CoordsNum; ++i)
-    dbgs() << ", " << CoordsNames[i];
-
-  dbgs() << ")\n";
-}
-
-const std::string KernelSignature::wrapperPrefix = "%__rsov_";
-
 namespace {
-
-std::string TypeToString(const Type *Ty) {
-  assert(Ty);
-  if (Ty->isVoidTy())
-    return "void";
-
-  if (auto *IT = dyn_cast<IntegerType>(Ty)) {
-    if (IT->getBitWidth() == 32)
-      return "int";
-    else if (IT->getBitWidth() == 8)
-      return "uchar";
-  }
-
-  if (Ty->isFloatTy())
-    return "float";
-
-  if (auto *VT = dyn_cast<VectorType>(Ty)) {
-    auto *ET = VT->getElementType();
-    if (auto *IT = dyn_cast<IntegerType>(ET)) {
-      if (IT->getBitWidth() == 32)
-        return "int4";
-      else if (IT->getBitWidth() == 8)
-        return "uchar4";
-    }
-    if (ET->isFloatTy())
-      return "float4";
-  }
-
-  std::string badNameString;
-  raw_string_ostream badNameStream(badNameString);
-  badNameStream << '[';
-  Ty->print(badNameStream);
-  badNameStream << ']';
-  return badNameStream.str();
-}
 
 enum class RSType {
   rs_bad = -1,
@@ -576,10 +525,7 @@ bool ReflectionPass::extractKernelSignatures(
     }
 
     const auto *FT = F.getFunctionType();
-    const auto *RT = FT->getReturnType();
-    const auto *ArgT = FT->params()[0];
-    Out.push_back(
-        {TypeToString(RT), F.getName(), TypeToString(ArgT), GetCoordsKind(F)});
+    Out.push_back(KernelSignature(FT, F.getName(), CoordsKind));
     DEBUG(Out.back().dump());
   }
 
@@ -590,7 +536,7 @@ bool ReflectionPass::emitKernelTypes(const KernelSignature &Kernel) {
   DEBUG(dbgs() << "emitKernelTypes\n");
 
   const auto *RTMapping = getMappingOrPrintError(Kernel.returnType);
-  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentType);
+  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentTypes[0]);
 
   if (!RTMapping || !ArgTMapping)
     return false;
@@ -658,7 +604,7 @@ std::string ReflectionPass::emitInputBuffer(const KernelSignature &Kernel,
                                             const std::string &idBufVar,
                                             const std::string &idArrTy) {
   DEBUG(dbgs() << __FUNCTION__ << "\n");
-  return emitBufferUsingRSType(Kernel.argumentType,
+  return emitBufferUsingRSType(Kernel.argumentTypes[0],
                                Kernel.getTempName(idBufVar),
                                Kernel.getTempName(idArrTy));
 }
@@ -1014,7 +960,7 @@ bool ReflectionPass::emitMainUsingBuffersForInputOutput(
   }
   const auto &RetTy = RTMapping->SPIRVTy;
 
-  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentType);
+  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentTypes[0]);
   if (!ArgTMapping) {
     return false;
   }
