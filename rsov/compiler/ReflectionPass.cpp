@@ -359,7 +359,8 @@ bool ReflectionPass::emitDecorations(
     OS << "OpDecorate " << K.getTempName(inputBuffer) << " DescriptorSet 0\n";
     OS << "OpDecorate " << K.getTempName(inputBuffer) << " Binding 0\n";
     OS << "OpDecorate " << K.getTempName(outputMemTy) << " ArrayStride 16\n";
-    OS << "OpMemberDecorate " << K.getTempName(outputBufferS) << " 0 Offset 0\n";
+    OS << "OpMemberDecorate " << K.getTempName(outputBufferS)
+       << " 0 Offset 0\n";
     OS << "OpDecorate " << K.getTempName(outputBufferS) << " BufferBlock\n";
     OS << "OpDecorate " << K.getTempName(outputBuffer) << " DescriptorSet 0\n";
     OS << "OpDecorate " << K.getTempName(outputBuffer) << " Binding 1\n";
@@ -987,7 +988,8 @@ bool ReflectionPass::emitMainUsingBuffersForInputOutput(
   OS << TMP(tmp2)
      << " = OpAccessChain %_ptr_Input_uint %gl_NumWorkGroups %uint_zero\n";
   OS << TMP(tmp3) << " = OpLoad %uint " << TMP(tmp2) << "\n";
-  OS << TMP(tmp4) << " = OpIMul %uint " << TMP(tmp1) << " " << TMP(tmp3) << "\n";
+  OS << TMP(tmp4) << " = OpIMul %uint " << TMP(tmp1) << " " << TMP(tmp3)
+     << "\n";
   OS << TMP(tmp5) << " = OpIAdd %uint " << TMP(tmp4) << " " << TMP(coords_x)
      << "\n";
   OS << TMP(tmp6) << " = OpAccessChain " << TMP(ptr_function_ty) << " "
