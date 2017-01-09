@@ -66,7 +66,7 @@ build_rs_libs() {
   # Build the RS runtime libraries.
   cd $MY_ANDROID_DIR/frameworks/rs/driver/runtime && mma -j$NUM_CORES && cd - || exit 1
   # Build libRSSupport.so
-  cd $MY_ANDROID_DIR/frameworks/support/v8/renderscript && mma -j$NUM_CORES && cd - || exit 2
+  cd $MY_ANDROID_DIR/frameworks/rs/support && mma -j$NUM_CORES && cd - || exit 2
   # Build android-support-v8-renderscript.jar
   # We need to explicitly do so, since JACK won't generate a jar by default.
   cd $MY_ANDROID_DIR && make $RENDERSCRIPT_V8_JAR -j$NUM_CORES && cd - || exit 3
