@@ -29,7 +29,7 @@ LOCAL_SDK_VERSION := 14
 LOCAL_RENDERSCRIPT_TARGET_API := 18
 LOCAL_RENDERSCRIPT_COMPATIBILITY := 18
 LOCAL_RENDERSCRIPT_INCLUDES_OVERRIDE := $(TOPDIR)external/clang/lib/Headers \
-                                        $(TOPDIR)frameworks/rs/scriptc
+                                        $(TOPDIR)frameworks/rs/script_api/include
 
 LOCAL_RENDERSCRIPT_FLAGS := -rs-package-name=android.support.v8.renderscript
 LOCAL_JNI_SHARED_LIBRARIES := librsjni

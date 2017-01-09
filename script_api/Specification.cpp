@@ -930,7 +930,7 @@ unsigned int SystemSpecification::getMaximumApiLevel() {
 }
 
 bool SystemSpecification::generateFiles(bool forVerification, unsigned int maxApiLevel) const {
-    bool success = generateHeaderFiles("scriptc") &&
+    bool success = generateHeaderFiles("include") &&
                    generateDocumentation("docs", forVerification) &&
                    generateTestFiles("test", maxApiLevel) &&
                    generateStubsWhiteList("slangtest", maxApiLevel);
