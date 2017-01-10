@@ -69,6 +69,9 @@ KernelSignature::KernelSignature(const FunctionType *FT,
   for (const auto *ArgT : FT->params()) {
     argumentTypes.push_back(TypeToString(ArgT));
   }
+  // Drop special arguments
+  // TODO: handle all special argument cases.
+  argumentTypes.resize(argumentTypes.size()-size_t(CK));
 }
 
 void KernelSignature::dump() const {
