@@ -249,7 +249,7 @@ def install_built_device_files(build_dir, install_dir, host):
     # Copy RS runtime headers.
     headers_dst_base = os.path.join(install_dir, 'platform', 'rs')
 
-    headers_src = android_path('frameworks/rs/scriptc')
+    headers_src = android_path('frameworks/rs/script_api/include')
     headers_dst = os.path.join(headers_dst_base, 'scriptc')
     install_directory(headers_src, headers_dst)
 

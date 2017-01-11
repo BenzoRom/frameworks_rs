@@ -29,7 +29,7 @@ public class UT_single_source_alloc extends UnitTest {
     private int dimZ = 5;
     private int start = 23;
 
-    // Mimicking enum rs_data_type in frameworks/rs/scriptc/rs_object_types.rsh
+    // Mimicking enum rs_data_type in frameworks/rs/script_api/include/rs_object_types.rsh
     private enum rsDataType {
         RS_TYPE_FLOAT_32    (2),
         RS_TYPE_FLOAT_64    (3),

@@ -215,7 +215,7 @@ fi
 
 # Copy header files for compilers
 cp $MY_ANDROID_DIR/external/clang/lib/Headers/*.h renderscript/clang-include
-cp $MY_ANDROID_DIR/frameworks/rs/scriptc/* renderscript/include
+cp $MY_ANDROID_DIR/frameworks/rs/script_api/include/* renderscript/include
 
 
 # Host-specific tools (bin/ and lib/)
