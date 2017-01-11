@@ -216,7 +216,7 @@ uint32_t RSoVScript::getGlobalProperties(int i) const {
 void RSoVScript::InitDescriptorAndPipelineLayouts() {
   VkDescriptorSetLayoutBinding layout_bindings[] = {
       {
-          .binding = 0,
+          .binding = 2,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -231,7 +231,7 @@ void RSoVScript::InitDescriptorAndPipelineLayouts() {
       },
 #ifdef SUPPORT_GLOBAL_VARIABLES
       {
-          .binding = 2,
+          .binding = 0,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
@@ -364,7 +364,7 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
       {
           .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
           .dstSet = mDescSet[0],
-          .dstBinding = 0,
+          .dstBinding = 2,
           .dstArrayElement = 0,
           .descriptorCount = 1,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -383,7 +383,7 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
       {
           .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
           .dstSet = mDescSet[0],
-          .dstBinding = 2,
+          .dstBinding = 0,
           .dstArrayElement = 0,
           .descriptorCount = 1,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
