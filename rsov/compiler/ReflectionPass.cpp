@@ -139,9 +139,9 @@ class ReflectionPass : public ModulePass {
   std::string emitBufferUsingRSType(const std::string &,
                                     const std::string &idBufVar = std::string(),
                                     const std::string &idArrTy = std::string());
-  std::string emitInputBuffer(const KernelSignature &Kernel,
-                              const std::string &idBufVar = std::string(),
-                              const std::string &idArrTy = std::string());
+  bool emitInputBuffers(const KernelSignature &Kernel,
+                        const std::string &idBufVar = std::string(),
+                        const std::string &idArrTy = std::string());
   std::string emitOutputBuffer(const KernelSignature &Kernel,
                                const std::string &idBufVar = std::string(),
                                const std::string &idArrTy = std::string());
@@ -220,9 +220,9 @@ public:
     emitGLGlobalInput();
 
     for (const auto &Kernel : Kernels) {
-      std::string inputBuffer =
-          emitInputBuffer(Kernel, "inputBuffer", "inputMemTy");
-      if (inputBuffer.empty()) {
+      bool inputBufferOK =
+          emitInputBuffers(Kernel, "inputBuffer", "inputMemTy");
+      if (!inputBufferOK) {
         errs() << "Emitting input buffer failed\n";
         return false;
       }
@@ -337,12 +337,11 @@ bool ReflectionPass::emitHeader(const Module &M,
 
 bool ReflectionPass::emitDecorations(
     const Module &M, const SmallVectorImpl<RSAllocationInfo> &RSAllocs,
-    const KernelSignatures &Kernels, const std::string &inputBuffer,
-    const std::string &outputBuffer, const std::string &inputMemTy,
+    const KernelSignatures &Kernels, const std::string &inputBufferPrefix,
+    const std::string &outputBuffer, const std::string &inputMemTyPrefix,
     const std::string &outputMemTy) {
   DEBUG(dbgs() << "emitDecorations\n");
 
-  const std::string &inputBufferS = bufferNameToStructName(inputBuffer);
   const std::string &outputBufferS = bufferNameToStructName(outputBuffer);
 
   // TODO: adjust stride based on type
@@ -353,11 +352,26 @@ bool ReflectionPass::emitDecorations(
 )";
 
   for (const auto &K : Kernels) {
-    OS << "OpDecorate " << K.getTempName(inputMemTy) << " ArrayStride 16\n";
-    OS << "OpMemberDecorate " << K.getTempName(inputBufferS) << " 0 Offset 0\n";
-    OS << "OpDecorate " << K.getTempName(inputBufferS) << " BufferBlock\n";
-    OS << "OpDecorate " << K.getTempName(inputBuffer) << " DescriptorSet 0\n";
-    OS << "OpDecorate " << K.getTempName(inputBuffer) << " Binding 0\n";
+
+    for (size_t argNo = 0; argNo < K.argumentTypes.size(); ++argNo) {
+      std::ostringstream OSS;
+      OSS << std::dec << argNo;
+      const std::string &inputBufferS =
+          bufferNameToStructName(inputBufferPrefix + OSS.str());
+      const std::string inputMemTy = inputMemTyPrefix + OSS.str();
+      const std::string inputBuffer = inputBufferPrefix + OSS.str();
+
+      OS << "OpDecorate " << K.getTempName(inputMemTy) << " ArrayStride 16\n";
+      OS << "OpMemberDecorate " << K.getTempName(inputBufferS)
+         << " 0 Offset 0\n";
+      OS << "OpDecorate " << K.getTempName(inputBufferS) << " BufferBlock\n";
+      OS << "OpDecorate " << K.getTempName(inputBuffer) << " DescriptorSet 0\n";
+      // Binding 0 is for (non-allocation) globals, 1 is for the output
+      // allocation
+      OS << "OpDecorate " << K.getTempName(inputBuffer) << " Binding "
+         << (2 + argNo) << "\n";
+    }
+
     OS << "OpDecorate " << K.getTempName(outputMemTy) << " ArrayStride 16\n";
     OS << "OpMemberDecorate " << K.getTempName(outputBufferS)
        << " 0 Offset 0\n";
@@ -518,12 +532,6 @@ bool ReflectionPass::extractKernelSignatures(
       continue;
 
     const auto CoordsKind = GetCoordsKind(F);
-    const auto CoordsNum = unsigned(CoordsKind);
-    if (F.arg_size() != CoordsNum + 1) {
-      // TODO: Handle different arrities (and lack of return value).
-      errs() << "Unsupported kernel signature.\n";
-      return false;
-    }
 
     const auto *FT = F.getFunctionType();
     Out.push_back(KernelSignature(FT, F.getName(), CoordsKind));
@@ -537,14 +545,19 @@ bool ReflectionPass::emitKernelTypes(const KernelSignature &Kernel) {
   DEBUG(dbgs() << "emitKernelTypes\n");
 
   const auto *RTMapping = getMappingOrPrintError(Kernel.returnType);
-  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentTypes[0]);
 
-  if (!RTMapping || !ArgTMapping)
+  if (!RTMapping)
     return false;
 
   OS << '\n'
      << Kernel.getTempName("kernel_function_ty") << " = OpTypeFunction "
-     << RTMapping->SPIRVTy << ' ' << ArgTMapping->SPIRVTy;
+     << RTMapping->SPIRVTy;
+  for (const auto &ArgT : Kernel.argumentTypes) {
+    const auto *ArgTMapping = getMappingOrPrintError(ArgT);
+    if (!ArgTMapping)
+      return false;
+    OS << ' ' << ArgTMapping->SPIRVTy;
+  }
 
   const auto CoordsNum = unsigned(Kernel.coordsKind);
   for (size_t i = 0; i != CoordsNum; ++i)
@@ -601,13 +614,22 @@ std::string ReflectionPass::emitBufferUsingRSType(const std::string &type,
   return bufferID;
 }
 
-std::string ReflectionPass::emitInputBuffer(const KernelSignature &Kernel,
-                                            const std::string &idBufVar,
-                                            const std::string &idArrTy) {
+bool ReflectionPass::emitInputBuffers(const KernelSignature &Kernel,
+                                      const std::string &idBufVar,
+                                      const std::string &idArrTy) {
+  unsigned bufNo = 0;
   DEBUG(dbgs() << __FUNCTION__ << "\n");
-  return emitBufferUsingRSType(Kernel.argumentTypes[0],
-                               Kernel.getTempName(idBufVar),
-                               Kernel.getTempName(idArrTy));
+  for (const auto &AT : Kernel.argumentTypes) {
+    std::ostringstream OS;
+    OS << bufNo++;
+    std::string bufVar = idBufVar + OS.str();
+    std::string bufTy = idArrTy + OS.str();
+    std::string bufStr = emitBufferUsingRSType(AT, Kernel.getTempName(bufVar),
+                                               Kernel.getTempName(bufTy));
+    if (bufStr.empty())
+      return false;
+  }
+  return true;
 }
 
 std::string ReflectionPass::emitOutputBuffer(const KernelSignature &Kernel,
@@ -954,18 +976,12 @@ bool ReflectionPass::emitRSAllocFunctions(
 bool ReflectionPass::emitMainUsingBuffersForInputOutput(
     const KernelSignature &Kernel,
     const SmallVectorImpl<RSAllocationInfo> &RSAllocs,
-    const std::string &inputBuffer, const std::string &outputBuffer) {
+    const std::string &inputBufferPrefix, const std::string &outputBuffer) {
   const auto *RTMapping = getMappingOrPrintError(Kernel.returnType);
   if (!RTMapping) {
     return false;
   }
   const auto &RetTy = RTMapping->SPIRVTy;
-
-  const auto *ArgTMapping = getMappingOrPrintError(Kernel.argumentTypes[0]);
-  if (!ArgTMapping) {
-    return false;
-  }
-  const auto &ArgTy = ArgTMapping->SPIRVTy;
 
 #define TMP(X) (Kernel.getTempName(#X))
 
@@ -992,12 +1008,31 @@ bool ReflectionPass::emitMainUsingBuffersForInputOutput(
      << "\n";
   OS << TMP(tmp5) << " = OpIAdd %uint " << TMP(tmp4) << " " << TMP(coords_x)
      << "\n";
-  OS << TMP(tmp6) << " = OpAccessChain " << TMP(ptr_function_ty) << " "
-     << inputBuffer << " %uint_zero " << TMP(tmp5) << "\n";
-  OS << TMP(inputPixel) << " = OpLoad " << ArgTy << " " << TMP(tmp6) << "\n";
 
-  OS << TMP(tmp7) << " = OpFunctionCall " << RetTy << " %RS_SPIRV_DUMMY_ "
-     << TMP(inputPixel);
+  size_t argNo = 0;
+  std::ostringstream inputPixels;
+  for (const auto &AT : Kernel.argumentTypes) {
+    std::ostringstream OSS;
+    OSS << argNo++;
+
+    const std::string tmp6 = Kernel.getTempName("tmp6" + OSS.str());
+    const std::string inputBuffer = inputBufferPrefix + OSS.str();
+
+    OS << tmp6 << " = OpAccessChain " << TMP(ptr_function_ty) << " "
+       << inputBuffer << " %uint_zero " << TMP(tmp5) << "\n";
+
+    const auto *ArgTMapping = getMappingOrPrintError(AT);
+    if (!ArgTMapping)
+      return false;
+    const auto &ArgTy = ArgTMapping->SPIRVTy;
+
+    const std::string inputPixel = Kernel.getTempName("inputPixel" + OSS.str());
+    OS << inputPixel << " = OpLoad " << ArgTy << " " << tmp6 << "\n";
+    inputPixels << ' ' << inputPixel;
+  }
+
+  OS << TMP(tmp7) << " = OpFunctionCall " << RetTy << " %RS_SPIRV_DUMMY_"
+     << inputPixels.str();
   const auto CoordsNum = size_t(Kernel.coordsKind);
   for (size_t i = 0; i != CoordsNum; ++i)
     OS << " " << TMP(coords_) << CoordsNames[i].str();
