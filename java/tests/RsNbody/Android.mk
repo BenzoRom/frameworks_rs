@@ -30,6 +30,6 @@ LOCAL_RENDERSCRIPT_TARGET_API := 23
 LOCAL_RENDERSCRIPT_CC := $(LLVM_RS_CC)
 LOCAL_RENDERSCRIPT_INCLUDES_OVERRIDE := \
     $(TOPDIR)external/clang/lib/Headers \
-    $(TOPDIR)frameworks/rs/scriptc
+    $(TOPDIR)frameworks/rs/script_api/include
 
 include $(BUILD_PACKAGE)
