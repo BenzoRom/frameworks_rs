@@ -69,7 +69,7 @@ ll_bc_files := $(patsubst %.ll,%.bc, \
     $(addprefix $(intermediates)/, $(ll_sources)))
 
 $(c_bc_files): PRIVATE_INCLUDES := \
-    frameworks/rs/scriptc \
+    frameworks/rs/script_api/include \
     external/clang/lib/Headers
 $(c_bc_files): PRIVATE_CFLAGS := $(bc_cflags)
 
