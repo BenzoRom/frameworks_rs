@@ -15,13 +15,13 @@
 # limitations under the License.
 #
 
-CLANG=$ANDROID_BUILD_TOP/prebuilts/clang/linux-x86/host/3.6/bin/clang++
+CLANG=$ANDROID_BUILD_TOP/prebuilts/clang/host/linux-x86/clang-stable/bin/clang++
 
 set -e
 $CLANG Generator.cpp Specification.cpp GenerateDocumentation.cpp GenerateHeaderFiles.cpp GenerateTestFiles.cpp Scanner.cpp Utilities.cpp GenerateStubsWhiteList.cpp -g -std=c++11 -Wall -o generator
 
 mkdir -p test
-mkdir -p scriptc
+mkdir -p include
 mkdir -p docs
 mkdir -p slangtest
 
@@ -38,10 +38,6 @@ rm generator
 rm -f ../../../cts/tests/tests/renderscript/src/android/renderscript/cts/generated/*
 mv test/* ../../../cts/tests/tests/renderscript/src/android/renderscript/cts/generated/
 rmdir test
-
-rm -f ../scriptc/*.rsh
-mv scriptc/*.rsh ../scriptc
-rmdir scriptc
 
 rm -f ../../base/docs/html/guide/topics/renderscript/reference/*.jd
 mv docs/*.jd ../../base/docs/html/guide/topics/renderscript/reference/

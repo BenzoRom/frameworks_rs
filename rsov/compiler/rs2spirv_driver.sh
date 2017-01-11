@@ -65,7 +65,7 @@ output_folder="$3"
 mkdir -p $output_folder
 
 eval llvm-rs-cc -o "$output_folder" -S -emit-llvm -Wall -Werror -target-api 24 \
-  -I "$AND_HOME/external/clang/lib/Headers" -I "$AND_HOME/frameworks/rs/scriptc" \
+  -I "$AND_HOME/external/clang/lib/Headers" -I "$AND_HOME/frameworks/rs/script_api/include" \
   "$script_name" &&
 eval llvm-as "$output_folder/bc32/$script.ll" -o "$output_folder/$script.bc" &&
 eval rs2spirv "$output_folder/$script.bc" -o "$output_folder/$script.rs.spv" \
