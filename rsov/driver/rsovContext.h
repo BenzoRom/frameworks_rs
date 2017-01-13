@@ -23,8 +23,6 @@
 namespace android {
 namespace renderscript {
 
-class RsdCpuReference;
-
 namespace rsov {
 
 class RSoVContext {

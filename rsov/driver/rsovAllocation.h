@@ -36,7 +36,7 @@ class RSoVContext;
 
 class RSoVAllocation {
  public:
-  RSoVAllocation(RSoVContext *context, const Type *type);
+  RSoVAllocation(RSoVContext *context, const Type *type, size_t bufferSize);
   ~RSoVAllocation();
 
   uint32_t getWidth() const { return mWidth; }
@@ -47,7 +47,7 @@ class RSoVAllocation {
   char *getHostPtr() const { return mPtr; }
 
  private:
-  void InitBuffer();
+  void InitBuffer(size_t);
   void InitImage();
 
   char *mPtr;  // Host pointer to mmapped device memory for the Allocation
