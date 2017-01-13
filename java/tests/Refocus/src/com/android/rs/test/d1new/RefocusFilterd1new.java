@@ -65,9 +65,13 @@ public class RefocusFilterd1new extends
     startnow = System.nanoTime();
     scriptC.forEach_PackOutputImage(buffers.outAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "PackOutputImage: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "PackOutputImage", endnow - startnow);
 
+    startnow = System.nanoTime();
     buffers.outAllocation.copyTo(buffers.outputImage);
+    endnow = System.nanoTime();
+    logTiming(myTAG, "CopyOutputImage", endnow - startnow);
+
     return buffers.outputImage;
   }
 
@@ -133,16 +137,16 @@ public class RefocusFilterd1new extends
     startnow = System.nanoTime();
     //scriptC.forEach_MarkLayerMask(buffers.inAllocation);
     // Pass sharp meta allocation directly into the kernel
-    scriptC.forEach_MarkLayerMaskPassInput(buffers.sharpActualDepthAllocation, buffers.sharpDilatedDepthAllocation);
+    scriptC.forEach_MarkLayerMaskPassInput(buffers.sharpActualDepthAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "MarkLayerMask: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "MarkLayerMask", endnow - startnow);
 
     startnow = System.nanoTime();
     //scriptC.forEach_ComputeLayerMatteBehindFocalDepth(buffers.inAllocation);
     // Pass g_sharp_meta into kernel and get updated g_sharp_meta
     scriptC.forEach_ComputeLayerMatteBehindFocalDepthPassInput(buffers.sharpDilatedDepthAllocation, buffers.sharpDilatedDepthAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "ComputeLayerMatteBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "ComputeLayerMatteBehindFocalDepth", endnow - startnow);
   }
 
   @Override
@@ -162,7 +166,7 @@ public class RefocusFilterd1new extends
       scriptC.forEach_ComputeIntegralImageForLayerBehindFocalDepth(
           buffers.inAllocation, launchOptions);
       endnow = System.nanoTime();
-      Log.d(myTAG, "ComputeIntegralImageForLayerBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+      logTiming(myTAG, "ComputeIntegralImageForLayerBehindFocalDepth", endnow - startnow);
     } else {
       scriptC.invoke_SetUseIntegralImage(0);
     }
@@ -172,7 +176,8 @@ public class RefocusFilterd1new extends
     // Pass g_fuzzy_RGBA into kernel and get g_fuzzy_RGBA as output
     scriptC.forEach_FilterLayerBehindFocalDepthPassInput(buffers.fuzzyRGBAAllocation, buffers.fuzzyRGBAAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "FilterLayerBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FilterLayerBehindFocalDepth", endnow - startnow);
+
     //extractFuzzyImage("fuzzy_behind");
     //extractSharpImage("sharp_behind");
   }
@@ -186,10 +191,10 @@ public class RefocusFilterd1new extends
 
     //scriptC.forEach_UpdateSharpImageUsingFuzzyImage(buffers.inAllocation);
     // Pass input and output version of UpdateSharpImageUsingFuzzyImage
-		scriptC.forEach_UpdateSharpUsingFuzzyPassInput(buffers.sharpDilatedDepthAllocation, buffers.sharpDilatedDepthAllocation);
+    scriptC.forEach_UpdateSharpUsingFuzzyPassInput(buffers.sharpDilatedDepthAllocation, buffers.sharpDilatedDepthAllocation);
+    endnow = System.nanoTime();
+    logTiming(myTAG, "UpdateSharpImageUsingFuzzyImage", endnow - startnow);
 
-		endnow = System.nanoTime();
-		Log.d(myTAG, "updateSharpImageUsingFuzzyImage: "+(endnow - startnow)+ " ns" );
     //extractSharpImage("sharp_update");
   }
 
@@ -204,16 +209,16 @@ public class RefocusFilterd1new extends
     startnow = System.nanoTime();
     //scriptC.forEach_MarkLayerMask(buffers.inAllocation);
     // Pass sharp meta allocation directly into the kernel
-    scriptC.forEach_MarkLayerMaskPassInput(buffers.sharpActualDepthAllocation, buffers.sharpDilatedDepthAllocation);
+    scriptC.forEach_MarkLayerMaskPassInput(buffers.sharpActualDepthAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "MarkLayerMask: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "MarkLayerMask", endnow - startnow);
 
     startnow = System.nanoTime();
     //scriptC.forEach_ComputeLayerMatteInFrontOfFocalDepth(buffers.inAllocation);
     // Pass g_sharp_meta and g_fuzzy_RGBA directly into the kernel
     scriptC.forEach_ComputeLayerMatteInFrontOfFocalDepthPassInput(buffers.sharpDilatedDepthAllocation, buffers.sharpDilatedDepthAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "ComputeLayerMatteInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "ComputeLayerMatteInFrontOfFocalDepth", endnow - startnow);
   }
 
   @Override
@@ -232,7 +237,7 @@ public class RefocusFilterd1new extends
       scriptC.forEach_ComputeIntegralImageForLayerInFrontOfFocalDepth(
           buffers.inAllocation, launchOptions);
       endnow = System.nanoTime();
-      Log.d(myTAG, "ComputeIntegralImageForLayerInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+      logTiming(myTAG, "ComputeIntegralImageForLayerInFrontOfFocalDepth", endnow - startnow);
     } else {
       scriptC.invoke_SetUseIntegralImage(0);
     }
@@ -241,7 +246,7 @@ public class RefocusFilterd1new extends
     // Pass g_sharp_dilated_depth into kernel and get g_fuzzy_RGBA as output
     scriptC.forEach_FilterLayerInFrontOfFocalDepthPassInput(buffers.sharpDilatedDepthAllocation, buffers.sharpDilatedDepthAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "FilterLayerInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FilterLayerInFrontOfFocalDepth", endnow - startnow);
 
     //extractFuzzyImage("fuzzy_front");
     //extractSharpImage("sharp_front");
@@ -257,6 +262,6 @@ public class RefocusFilterd1new extends
     scriptC.forEach_FinalizeFuzzyImageUsingSharpImage(buffers.inAllocation);
     //scriptC.forEach_FinalizeFuzzyImageUsingSharpImagePassInput(buffers.sharpActualDepthAllocation, buffers.fuzzyRGBAAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "finalizeFuzzyImageUsingSharpImage: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FinalizeFuzzyImageUsingSharpImage", endnow - startnow);
   }
 }

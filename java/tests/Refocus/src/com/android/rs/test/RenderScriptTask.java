@@ -6,7 +6,8 @@ import com.android.rs.refocus.f32.RefocusFilterF32;
 import android.graphics.Bitmap;
 import android.support.v8.renderscript.RenderScript;
 import android.util.Log;
-
+import android.util.Pair;
+import java.util.ArrayList;
 
 /**
  * An wrapper class that calls the refocus filtering function in
@@ -62,6 +63,8 @@ public class RenderScriptTask {
    */
   private RenderScript renderScript;
 
+  public ArrayList<Pair<String,Long>> timings;
+
   /**
    * A constructor of render script context.
    *
@@ -81,29 +84,28 @@ public class RenderScriptTask {
    * @return the refocus filtering result
    */
   public Bitmap applyRefocusFilter(DepthOfFieldOptions options) {
-    long startTime = System.currentTimeMillis();
-
     // Generates {@code rgbdImage} and {@code blurStack}.
     prepareRefocusFilter(options);
-    Bitmap outputImage = null;
+
     // Check which version of RenderScript code is used.
+    RefocusFilter filter;
     switch (mScript) {
       case f32:
-        RefocusFilterF32 rfFilterF32 = new RefocusFilterF32(renderScript);
-        outputImage =
-                rfFilterF32.compute(rgbdImage, blurStack);
+        filter = new RefocusFilterF32(renderScript);
         break;
       case d1new:
-        RefocusFilterd1new rfFilterd1new = new RefocusFilterd1new(renderScript);
-        outputImage =
-                rfFilterd1new.compute(rgbdImage, blurStack);
+        filter = new RefocusFilterd1new(renderScript);
         break;
+      default:
+        filter = null;
     }
 
+    long startTime = System.currentTimeMillis();
+    Bitmap outputImage = filter.compute(rgbdImage, blurStack);
     long endTime = System.currentTimeMillis();
-    float duration = (endTime - startTime);
-    Log.d(TAG, "applyRefocusFilter is finished in " + (duration / 1000.0f)
-        + " seconds");
+    filter.logTiming(TAG, "TOTAL", endTime - startTime, "ms");
+
+    timings = filter.timings;
 
     return outputImage;
   }
