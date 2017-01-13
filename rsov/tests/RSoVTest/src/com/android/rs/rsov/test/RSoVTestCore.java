@@ -56,7 +56,8 @@ public class RSoVTestCore {
 
         unitTests.add(new UT_invert(this, mCtx));
         unitTests.add(new UT_modulo(this, mCtx));
-        unitTests.add(new UT_multi(this, mCtx));
+        unitTests.add(new UT_multi_kernel(this, mCtx));
+        unitTests.add(new UT_multi_input(this, mCtx));
 
         UnitTest[] uta = new UnitTest[unitTests.size()];
         uta = unitTests.toArray(uta);

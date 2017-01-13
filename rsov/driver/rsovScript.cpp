@@ -148,14 +148,14 @@ void RSoVScript::invokeForEach(uint32_t slot, const Allocation **ains,
                                const void *usr, uint32_t usrLen,
                                const RsScriptCall *sc) {
   // TODO: Handle kernel without input Allocation
-  // TODO: Handle multi-input kernel
-  rsAssert(ains && inLen == 1);
-
-  RSoVAllocation *inputAllocation =
-      static_cast<RSoVAllocation *>(ains[0]->mHal.drv);
+  rsAssert(ains);
+  std::vector<RSoVAllocation *> inputAllocations(inLen);
+  for (uint32_t i = 0; i < inLen; ++i) {
+    inputAllocations[i] = static_cast<RSoVAllocation *>(ains[i]->mHal.drv);
+  }
   RSoVAllocation *outputAllocation =
       static_cast<RSoVAllocation *>(aout->mHal.drv);
-  runForEach(slot, inputAllocation, outputAllocation);
+  runForEach(slot, inLen, inputAllocations, outputAllocation);
 }
 
 void RSoVScript::invokeReduce(uint32_t slot, const Allocation **ains,
@@ -226,39 +226,37 @@ uint32_t RSoVScript::getGlobalProperties(int i) const {
   return 0;
 }
 
-void RSoVScript::InitDescriptorAndPipelineLayouts() {
-  VkDescriptorSetLayoutBinding layout_bindings[] = {
+void RSoVScript::InitDescriptorAndPipelineLayouts(uint32_t inLen) {
+  // TODO: global variables
+  // TODO: kernels with zero output allocations
+  std::vector<VkDescriptorSetLayoutBinding> layout_bindings{
       {
-          .binding = 2,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-          .descriptorCount = 1,
-          .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-          .pImmutableSamplers = nullptr,
-      },
-      {
+          // for the output allocation
           .binding = 1,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .descriptorCount = 1,
           .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
           .pImmutableSamplers = nullptr,
       },
-#ifdef SUPPORT_GLOBAL_VARIABLES
-      {
-          .binding = 0,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-          .descriptorCount = 1,
-          .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-          .pImmutableSamplers = nullptr,
-      }
-#endif
   };
+
+  // initialize descriptors for input allocations
+  for (uint32_t i = 0; i < inLen; ++i) {
+    layout_bindings.push_back({
+        .binding = i + 2,  // input allocations start from bining #2
+        .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        .descriptorCount = 1,
+        .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+        .pImmutableSamplers = nullptr,
+    });
+  }
 
   VkDescriptorSetLayoutCreateInfo descriptor_layout = {
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
       .pNext = nullptr,
       .flags = 0,
-      .bindingCount = NELEM(layout_bindings),
-      .pBindings = layout_bindings,
+      .bindingCount = static_cast<uint32_t>(layout_bindings.size()),
+      .pBindings = layout_bindings.data(),
   };
 
   VkResult res;
@@ -271,13 +269,7 @@ void RSoVScript::InitDescriptorAndPipelineLayouts() {
                         "vkCreateDescriptorSetLayout() returns %d", res);
   }
   rsAssert(res == VK_SUCCESS);
-  /*
-    VkPushConstantRange pushConstantRange[] = { {
-    .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
-    .offset = 0,
-    .size = 16
-    } };
-  */
+
   /* Now use the descriptor layout to create a pipeline layout */
   VkPipelineLayoutCreateInfo pPipelineLayoutCreateInfo = {
       .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -357,8 +349,9 @@ void RSoVScript::InitDescriptorPool() {
   ALOGV("%s succeeded.", __FUNCTION__);
 }
 
-void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
-                                   RSoVAllocation *outputAllocation) {
+void RSoVScript::InitDescriptorSet(
+    const std::vector<RSoVAllocation *> &inputAllocations,
+    RSoVAllocation *outputAllocation) {
   VkResult res;
 
   VkDescriptorSetAllocateInfo alloc_info = {
@@ -373,16 +366,9 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
   res = vkAllocateDescriptorSets(mDevice, &alloc_info, mDescSet.data());
   rsAssert(res == VK_SUCCESS);
 
-  const VkWriteDescriptorSet writes[] = {
-      {
-          .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-          .dstSet = mDescSet[0],
-          .dstBinding = 2,
-          .dstArrayElement = 0,
-          .descriptorCount = 1,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-          .pBufferInfo = inputAllocation->getBufferInfo(),
-      },
+  // TODO: support for set up the binding(s) of global variables
+  uint32_t nBindings = inputAllocations.size() + 1;  // input + output.
+  std::vector<VkWriteDescriptorSet> writes{
       {
           .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
           .dstSet = mDescSet[0],
@@ -392,20 +378,20 @@ void RSoVScript::InitDescriptorSet(const RSoVAllocation *inputAllocation,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
           .pBufferInfo = outputAllocation->getBufferInfo(),
       },
-#ifdef SUPPORT_GLOBAL_VARIABLES
-      {
-          .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-          .dstSet = mDescSet[0],
-          .dstBinding = 0,
-          .dstArrayElement = 0,
-          .descriptorCount = 1,
-          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-          .pBufferInfo = somebuffer_info,
-      },
-#endif
   };
+  for (uint32_t i = 0; i < inputAllocations.size(); ++i) {
+    writes.push_back({
+        .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+        .dstSet = mDescSet[0],
+        .dstBinding = 2 + i,  // input allocations start from binding #2
+        .dstArrayElement = 0,
+        .descriptorCount = 1,
+        .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+        .pBufferInfo = inputAllocations[i]->getBufferInfo(),
+    });
+  }
 
-  vkUpdateDescriptorSets(mDevice, NELEM(writes), writes, 0, NULL);
+  vkUpdateDescriptorSets(mDevice, writes.size(), writes.data(), 0, NULL);
 
   ALOGV("%s succeeded.", __FUNCTION__);
 }
@@ -431,15 +417,16 @@ void RSoVScript::InitPipeline() {
   ALOGV("%s succeeded.", __FUNCTION__);
 }
 
-void RSoVScript::runForEach(uint32_t slot,
-                            const RSoVAllocation *inputAllocation,
-                            RSoVAllocation *outputAllocation) {
+void RSoVScript::runForEach(
+    uint32_t slot, uint32_t inLen,
+    const std::vector<RSoVAllocation *> &inputAllocations,
+    RSoVAllocation *outputAllocation) {
   VkResult res;
 
-  InitDescriptorAndPipelineLayouts();
+  InitDescriptorAndPipelineLayouts(inLen);
   InitShader(slot);
   InitDescriptorPool();
-  InitDescriptorSet(inputAllocation, outputAllocation);
+  InitDescriptorSet(inputAllocations, outputAllocation);
   // InitPipelineCache();
   InitPipeline();
 
@@ -470,10 +457,10 @@ void RSoVScript::runForEach(uint32_t slot,
 
   vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_COMPUTE, mPipelineLayout,
                           0, mDescSet.size(), mDescSet.data(), 0, nullptr);
-
-  const uint32_t width = inputAllocation->getWidth();
-  const uint32_t height = rsMax(inputAllocation->getHeight(), 1U);
-  const uint32_t depth = rsMax(inputAllocation->getDepth(), 1U);
+  // Assuming all input allocations are of the same dimensionality
+  const uint32_t width = inputAllocations[0]->getWidth();
+  const uint32_t height = rsMax(inputAllocations[0]->getHeight(), 1U);
+  const uint32_t depth = rsMax(inputAllocations[0]->getDepth(), 1U);
   vkCmdDispatch(cmd, width, height, depth);
 
   res = vkEndCommandBuffer(cmd);
