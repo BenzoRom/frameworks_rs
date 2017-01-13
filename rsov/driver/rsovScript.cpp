@@ -103,6 +103,22 @@ std::vector<uint32_t> compileBitcode(const char *resName, const char *cacheDir,
 
 }  // anonymous namespace
 
+bool RSoVScript::isScriptCpuBacked(const Script *s) {
+  return s->mHal.info.mVersionMinor == CPU_SCRIPT_MAGIC_NUMBER;
+}
+
+void RSoVScript::initScriptOnCpu(Script *s, RsdCpuReference::CpuScript *cs) {
+  s->mHal.drv = cs;
+  s->mHal.info.mVersionMajor = 0;  // Unused. Don't care.
+  s->mHal.info.mVersionMinor = CPU_SCRIPT_MAGIC_NUMBER;
+}
+
+void RSoVScript::initScriptOnRSoV(Script *s, RSoVScript *rsovScript) {
+  s->mHal.drv = rsovScript;
+  s->mHal.info.mVersionMajor = 0;  // Unused. Don't care.
+  s->mHal.info.mVersionMinor = 0;
+}
+
 RSoVScript::RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
                        bcinfo::MetadataExtractor *ME)
     : mRSoV(context),
@@ -122,13 +138,10 @@ void RSoVScript::populateScript(Script *) {
 
 void RSoVScript::invokeFunction(uint32_t slot, const void *params,
                                 size_t paramLength) {
-  // TODO: implement this
+  getCpuScript()->invokeFunction(slot, params, paramLength);
 }
 
-int RSoVScript::invokeRoot() {
-  // TODO: implement this
-  return 0;
-}
+int RSoVScript::invokeRoot() { return getCpuScript()->invokeRoot(); }
 
 void RSoVScript::invokeForEach(uint32_t slot, const Allocation **ains,
                                uint32_t inLen, Allocation *aout,
@@ -148,7 +161,7 @@ void RSoVScript::invokeForEach(uint32_t slot, const Allocation **ains,
 void RSoVScript::invokeReduce(uint32_t slot, const Allocation **ains,
                               uint32_t inLen, Allocation *aout,
                               const RsScriptCall *sc) {
-  // TODO: implement this
+  getCpuScript()->invokeReduce(slot, ains, inLen, aout, sc);
 }
 
 void RSoVScript::invokeInit() {
@@ -526,43 +539,39 @@ using android::renderscript::rsov::compileBitcode;
 bool rsovScriptInit(const Context *rsc, ScriptC *script, char const *resName,
                     char const *cacheDir, uint8_t const *bitcode,
                     size_t bitcodeSize, uint32_t flags) {
-  std::vector<uint32_t> &&spvWords =
-      compileBitcode(resName, cacheDir, (const char *)bitcode, bitcodeSize);
-
-  if (spvWords.empty()) {
-    ALOGE("compilation failed for script %s", resName);
-    return false;
-  }
-
   RSoVHal *hal = static_cast<RSoVHal *>(rsc->mHal.drv);
-  RSoVContext *rsov = hal->mRSoV;
 
   std::unique_ptr<RsdCpuReference::CpuScript> cs(hal->mCpuRef->createScript(
       script, resName, cacheDir, bitcode, bitcodeSize, flags));
   if (cs == nullptr) {
+    ALOGE("Failed creating a CPU script %p for %s (%p)", cs.get(), resName,
+          script);
     return false;
   }
   cs->populateScript(script);
 
-  bcinfo::MetadataExtractor *bitcodeMetadata =
-      new bcinfo::MetadataExtractor((const char *)bitcode, bitcodeSize);
-  if (!bitcodeMetadata->extract()) {
-    ALOGE("Could not extract metadata from bitcode");
+  std::unique_ptr<bcinfo::MetadataExtractor> bitcodeMetadata(
+      new bcinfo::MetadataExtractor((const char *)bitcode, bitcodeSize));
+  if (!bitcodeMetadata || !bitcodeMetadata->extract()) {
+    ALOGE("Could not extract metadata from bitcode from %s", resName);
     return false;
   }
 
-  RSoVScript *rsovScript =
-      new RSoVScript(rsov, std::move(spvWords), bitcodeMetadata);
-
-  if (!rsovScript) {
-    ALOGV("Failed creating a RSoV script");
-    // Uncomment below to choose CPU driver instead
-    // script->mHal.drv = cs;
-    return false;
+  auto spvWords =
+      compileBitcode(resName, cacheDir, (const char *)bitcode, bitcodeSize);
+  if (!spvWords.empty()) {
+    RSoVScript *rsovScript = new RSoVScript(hal->mRSoV, std::move(spvWords),
+                                            bitcodeMetadata.release());
+    if (rsovScript) {
+      rsovScript->setCpuScript(cs.release());
+      RSoVScript::initScriptOnRSoV(script, rsovScript);
+      return true;
+    }
   }
 
-  rsovScript->setCpuScript(cs.release());
-  script->mHal.drv = rsovScript;
+  ALOGD("Failed creating an RSoV script for %s", resName);
+  // Fall back to CPU driver instead
+  RSoVScript::initScriptOnCpu(script, cs.release());
 
   return true;
 }
