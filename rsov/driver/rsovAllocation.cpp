@@ -255,46 +255,34 @@ void mip8(const Allocation *alloc, int lod, RsAllocationCubemapFace face) {
 
 }  // anonymous namespace
 
-RSoVAllocation::RSoVAllocation(RSoVContext *context, const Type *type)
+RSoVAllocation::RSoVAllocation(RSoVContext *context, const Type *type,
+                               size_t size)
     : mRSoV(context),
       mDevice(context->getDevice()),
       mType(type),
       mWidth(type->getDimX()),
       mHeight(type->getDimY()),
       mDepth(type->getDimZ()) {
-  InitBuffer();
+  InitBuffer(size);
 }
 
 RSoVAllocation::~RSoVAllocation() {
-  vkDestroyImageView(mDevice, mImageView, nullptr);
-  vkDestroyImage(mDevice, mImage, nullptr);
+  vkDestroyBuffer(mDevice, mBuf, nullptr);
   vkFreeMemory(mDevice, mMem, nullptr);
 }
 
-void RSoVAllocation::InitBuffer() {
+void RSoVAllocation::InitBuffer(size_t bufferSize) {
   VkResult res;
 
-  uint32_t bufferSize = mWidth;
-
-  if (mHeight > 0) {
-    bufferSize *= mHeight;
-  }
-
-  if (mDepth > 0) {
-    bufferSize *= mDepth;
-  }
-
-  bufferSize *= mType->getElement()->getSizeBytes();
-
   VkBufferCreateInfo buf_info = {
-    .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
-    .pNext = nullptr,
-    .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
-    .size = bufferSize,
-    .queueFamilyIndexCount = 0,
-    .pQueueFamilyIndices = nullptr,
-    .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-    .flags = 0,
+      .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
+      .pNext = nullptr,
+      .usage = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT,
+      .size = bufferSize,
+      .queueFamilyIndexCount = 0,
+      .pQueueFamilyIndices = nullptr,
+      .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+      .flags = 0,
   };
   res = vkCreateBuffer(mDevice, &buf_info, nullptr, &mBuf);
   rsAssert(res == VK_SUCCESS);
@@ -303,10 +291,10 @@ void RSoVAllocation::InitBuffer() {
   vkGetBufferMemoryRequirements(mDevice, mBuf, &mem_reqs);
 
   VkMemoryAllocateInfo allocateInfo = {
-    .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-    .pNext = nullptr,
-    .memoryTypeIndex = 0,
-    .allocationSize = mem_reqs.size,
+      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
+      .pNext = nullptr,
+      .memoryTypeIndex = 0,
+      .allocationSize = mem_reqs.size,
   };
 
   bool pass;
@@ -450,7 +438,9 @@ bool rsovAllocationInit(const Context *rsc, Allocation *alloc, bool forceZero) {
   RSoVContext *rsov = hal->mRSoV;
   const Type *type = alloc->getType();
 
-  RSoVAllocation *rsovAlloc = new RSoVAllocation(rsov, type);
+  // Calculate the object size.
+  size_t allocSize = AllocationBuildPointerTable(rsc, alloc, type, nullptr);
+  RSoVAllocation *rsovAlloc = new RSoVAllocation(rsov, type, allocSize);
   alloc->mHal.drv = rsovAlloc;
   AllocationBuildPointerTable(rsc, alloc, type,
                               (uint8_t *)rsovAlloc->getHostPtr());
