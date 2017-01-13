@@ -63,9 +63,13 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_PackOutputImage(buffers.outAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "PackOutputImage: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "PackOutputImage", endnow - startnow);
 
+    startnow = System.nanoTime();
     buffers.outAllocation.copyTo(buffers.outputImage);
+    endnow = System.nanoTime();
+    logTiming(myTAG, "CopyOutputImage", endnow - startnow);
+
     return buffers.outputImage;
   }
 
@@ -131,12 +135,12 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_MarkLayerMask(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "MarkLayerMask: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "MarkLayerMask", endnow - startnow);
 
     startnow = System.nanoTime();
     scriptC.forEach_ComputeLayerMatteBehindFocalDepth(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "ComputeLayerMatteBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "ComputeLayerMatteBehindFocalDepth", endnow - startnow);
   }
 
   @Override
@@ -155,7 +159,7 @@ public class RefocusFilterF32 extends
       scriptC.forEach_ComputeIntegralImageForLayerBehindFocalDepth(
           buffers.inAllocation, launchOptions);
       endnow = System.nanoTime();
-      Log.d(myTAG, "ComputeIntegralImageForLayerBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+      logTiming(myTAG, "ComputeIntegralImageForLayerBehindFocalDepth", endnow - startnow);
     } else {
       scriptC.invoke_SetUseIntegralImage(0);
     }
@@ -163,7 +167,7 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_FilterLayerBehindFocalDepth(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "FilterLayerBehindFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FilterLayerBehindFocalDepth", endnow - startnow);
 
     //extractFuzzyImage("fuzzy_behind");
     //extractSharpImage("sharp_behind");
@@ -177,7 +181,7 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_UpdateSharpImageUsingFuzzyImage(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "UpdateSharpImageUsingFuzzyImage: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "UpdateSharpImageUsingFuzzyImage", endnow - startnow);
 
     //extractSharpImage("sharp_update");
   }
@@ -191,12 +195,12 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_MarkLayerMask(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "MarkLayerMask: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "MarkLayerMask", endnow - startnow);
 
     startnow = System.nanoTime();
     scriptC.forEach_ComputeLayerMatteInFrontOfFocalDepth(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "ComputeLayerMatteInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "ComputeLayerMatteInFrontOfFocalDepth", endnow - startnow);
   }
 
   @Override
@@ -215,14 +219,14 @@ public class RefocusFilterF32 extends
       scriptC.forEach_ComputeIntegralImageForLayerInFrontOfFocalDepth(
           buffers.inAllocation, launchOptions);
       endnow = System.nanoTime();
-      Log.d(myTAG, "ComputeIntegralImageForLayerInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+      logTiming(myTAG, "ComputeIntegralImageForLayerInFrontOfFocalDepth", endnow - startnow);
     } else {
       scriptC.invoke_SetUseIntegralImage(0);
     }
     startnow = System.nanoTime();
     scriptC.forEach_FilterLayerInFrontOfFocalDepth(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "FilterLayerInFrontOfFocalDepth: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FilterLayerInFrontOfFocalDepth", endnow - startnow);
 
     //extractFuzzyImage("fuzzy_front");
     //extractSharpImage("sharp_front");
@@ -237,6 +241,6 @@ public class RefocusFilterF32 extends
     startnow = System.nanoTime();
     scriptC.forEach_FinalizeFuzzyImageUsingSharpImage(buffers.inAllocation);
     endnow = System.nanoTime();
-    Log.d(myTAG, "FinalizeFuzzyImageUsingSharpImage: "+(endnow - startnow)+ " ns" );
+    logTiming(myTAG, "FinalizeFuzzyImageUsingSharpImage", endnow - startnow);
   }
 }
