@@ -30,7 +30,7 @@
 // UnpackInputImage, ComputeLayerMatteBehindFocalDepth, ComputeIntegralImageForLayerBehindFocalDepth,
 // FilterLayerBehindFocalDepth, updateSharpImageUsingFuzzyImage, ComputeLayerMatteInFrontOfFocalDepth,
 // FilterLayerInFrontOfFocalDepth
-double cpuDummy;
+// double cpuDummy;
 
 // Image size of padded images: g_sharp_image and g_fuzzy_image.
 // Float4 that stores the image size info: 1. width, 2. height, 3. margin
@@ -179,8 +179,8 @@ void __attribute__((kernel)) MarkLayerMask(uchar4 in, uint32_t x, uint32_t y) {
 // Another version of MarkLayerMask kernel that directly passes input allocation to kernels
 // Input: g_sharp_actual_depth
 // Output: g_sharp_dilated_depth
-uchar __attribute__((kernel)) MarkLayerMaskPassInput(uchar in_sharp_actual_depth, uint32_t x) {
-  if (!OnTheLayer(in_sharp_actual_depth, g_target_layer_i2)) return rsGetElementAt_uchar(g_sharp_dilated_depth, x);
+void __attribute__((kernel)) MarkLayerMaskPassInput(uchar in_sharp_actual_depth, uint32_t x) {
+  if (!OnTheLayer(in_sharp_actual_depth, g_target_layer_i2)) return;
 
   // Marks this pixel as active.
   rsSetElementAt_uchar(g_sharp_active, 1, x);
@@ -207,7 +207,8 @@ uchar __attribute__((kernel)) MarkLayerMaskPassInput(uchar in_sharp_actual_depth
     ValidDepthNotOnTheLayer(sharp_actual_depth, g_target_layer_i2);
 
   if (!is_this_pixel_on_boundary) {
-    return in_sharp_actual_depth;
+    rsSetElementAt_uchar(g_sharp_dilated_depth, in_sharp_actual_depth, x);
+    return;
   }
 
   // Marks pixels near the boundary of active pixels to compute matte later.
@@ -233,8 +234,6 @@ uchar __attribute__((kernel)) MarkLayerMaskPassInput(uchar in_sharp_actual_depth
     }
     current_meta_index += jump_to_next_row;
   }
-
-  return in_sharp_actual_depth;
 }
 // Distance transform in processing layers in pass one from the back-most to
 // the sharp depth.

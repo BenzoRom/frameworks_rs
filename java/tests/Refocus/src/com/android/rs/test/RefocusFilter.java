@@ -3,6 +3,8 @@ package com.android.rs.refocus;
 import android.graphics.Bitmap;
 import android.support.v8.renderscript.RenderScript;
 import android.util.Log;
+import android.util.Pair;
+import java.util.ArrayList;
 
 /**
  * An abstract class that implements refocus filtering using Render Script. The
@@ -22,6 +24,18 @@ public abstract class RefocusFilter<ScriptType> {
 
   // Script functions in .rs file.
   protected ScriptType scriptC;
+
+  // Timing info for each phase and total computation
+  public ArrayList<Pair<String,Long>> timings = new ArrayList<Pair<String,Long>>();
+
+  public void logTiming(String implementation, String phase, long time) {
+      logTiming(implementation, phase, time, "ns");
+  }
+
+  public void logTiming(String implementation, String phase, long time, String unit) {
+      timings.add(Pair.create(phase + " (" + unit + ")", Long.valueOf(time)));
+      Log.d(implementation, phase + ":" + time + " " + unit);
+  }
 
   /*
    * A constructor that initializes the class.

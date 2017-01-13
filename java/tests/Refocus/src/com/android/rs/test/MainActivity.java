@@ -11,32 +11,28 @@ import android.os.Environment;
 import android.os.Bundle;
 import android.support.v8.renderscript.RenderScript;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
     private static final int RS_API = 19;
     private static final String TAG = "MainActivity";
 
-    ImageView mImgView;
-
-    ImageView mNewImgView;
-    TextView mCompareTextView;
-    TextView mPointerLabelTextView;
-    TextView mAllocLabelTextView;
+    private LinearLayout mLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mImgView = (ImageView) findViewById(R.id.image_view);
-        mNewImgView = (ImageView) findViewById(R.id.image_view_new);
-        mCompareTextView = (TextView) findViewById(R.id.compareTextView);
-        mPointerLabelTextView = (TextView) findViewById(R.id.orignialImageLabel);
-        mAllocLabelTextView = (TextView) findViewById(R.id.newImageLabel);
+        mLayout = (LinearLayout) findViewById(R.id.layoutTopMost);
 
         Intent intent = getIntent();
         if (intent != null) {
@@ -58,7 +54,7 @@ public class MainActivity extends Activity {
                       current_depth_options.setFocusPoint(0.7f, 0.5f);
                       current_depth_options.setBokeh(2f);
 
-                      RsTaskParams rsTaskParam = new RsTaskParams(renderScript, current_depth_options);
+                      RsTaskParams rsTaskParam = new RsTaskParams(this, renderScript, current_depth_options);
                       new RsAsyncTaskRunner().execute(rsTaskParam);
                       return;
                     } catch (IOException e) {
@@ -71,25 +67,80 @@ public class MainActivity extends Activity {
 
 
         try {
-            //Uri data = getLocalRef();
-            Uri data = getResourceRef();
-            if (data == null) {
-                return;
-            }
-
             RenderScript renderScript = RenderScript.create(getApplicationContext(), RS_API);
             renderScript.setPriority(RenderScript.Priority.NORMAL);
 
-            // Get input uri to RGBZ
-            RGBZ current_rgbz = new RGBZ(data, getContentResolver(), this);
-            DepthOfFieldOptions current_depth_options = new DepthOfFieldOptions(current_rgbz);
+            RGBZ rgbz;
+            DepthOfFieldOptions options;
+            RsTaskParams task;
+/*
+            rgbz = new RGBZ(getResourceRef(R.drawable.flower2), getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
+            options.setFocusPoint(0.5f, 0.5f);
+            options.setBokeh(0.25f);
 
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+
+            rgbz = new RGBZ(getResourceRef(R.drawable.cup), getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
+            options.setFocusPoint(0.5f, 0.5f);
+            options.setBokeh(0.25f);
+
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+
+            rgbz = new RGBZ(getResourceRef(R.drawable.apple), getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
+            options.setFocusPoint(0.5f, 0.5f);
+            options.setBokeh(0.25f);
+
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+*/
+/*
+            RGBZ current_rgbz = new RGBZ(getResourceRef(R.drawable.refocusimage),
+                                         getContentResolver(), this);
+*/
+            rgbz = new RGBZ(getResourceRef(R.drawable.flower),
+                            getResourceRef(R.drawable.flower_depthmap),
+                            getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
+            options.setFocusPoint(0.5f, 0.5f);
+            options.setBokeh(0.025f);
+
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+
+/*
+            RGBZ current_rgbz =
+                    RGBZ.createFromBitmapDepthmap(getResourceRef(R.drawable.balls),
+                                                  getResourceRef(R.drawable.balls_depthmap1),
+                                                  getContentResolver(), this);
+*/
+            rgbz = RGBZ.createFromPFMDepthmap(getResourceRef(R.drawable.balls),
+                                              getResourceRef(R.drawable.balls_depthmap),
+                                              getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
+            options.setFocusPoint(0.2f, 0.167f);
+            options.setBokeh(2.0f);
+            options.setDepthOfField(0.005f);
+
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+
+            rgbz = RGBZ.createFromPFMDepthmap(getResourceRef(R.drawable.sculpture),
+                                              getResourceRef(R.drawable.sculpture_depthmap),
+                                              getContentResolver(), this);
+            options = new DepthOfFieldOptions(rgbz);
             // Set image focus settings
-            current_depth_options.setFocusPoint(0.7f, 0.5f);
-            current_depth_options.setBokeh(2f);
+            options.setFocusPoint(0.33f, 0.66f);
+            options.setBokeh(0.1f);
+            options.setDepthOfField(0.2f);
 
-            RsTaskParams rsTaskParam = new RsTaskParams(renderScript, current_depth_options);
-            new RsAsyncTaskRunner().execute(rsTaskParam);
+            task = new RsTaskParams(this, renderScript, options);
+            new RsAsyncTaskRunner().execute(task);
+
             return;
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,68 +148,102 @@ public class MainActivity extends Activity {
     }
 
     private static class RsTaskParams {
+        MainActivity mContext;
       RenderScript mRenderScript;
       DepthOfFieldOptions mOptions;
 
-      RsTaskParams(RenderScript renderScript,
+        public ImageView mImageView1;
+        public ImageView mImageView2;
+        public TextView  mTextView;
+
+      RsTaskParams(MainActivity context,
+                   RenderScript renderScript,
                    DepthOfFieldOptions options) {
+          mContext = context;
         mRenderScript = renderScript;
         mOptions = options;
+
+        LayoutParams lparams = new LayoutParams(LayoutParams.WRAP_CONTENT,
+                                                LayoutParams.WRAP_CONTENT);
+        mImageView1 = new ImageView(context);
+        mImageView1.setLayoutParams(lparams);
+        context.mLayout.addView(mImageView1);
+
+        mImageView2 = new ImageView(context);
+        mImageView2.setLayoutParams(lparams);
+        context.mLayout.addView(mImageView2);
+
+        mTextView = new TextView(context);
+        mTextView.setLayoutParams(lparams);
+        context.mLayout.addView(mTextView);
       }
+
     }
 
-    private class RsAsyncTaskRunner extends AsyncTask<RsTaskParams, Integer, Bitmap> {
+    private class Result {
+        public ArrayList<Pair<String,Long>> timingsOld;
+        public ArrayList<Pair<String,Long>> timingsNew;
+        public double psnr;
 
+        public Result(ArrayList<Pair<String,Long>> timingsOld,
+                      ArrayList<Pair<String,Long>> timingsNew,
+                      double psnr) {
+            this.timingsOld = timingsOld;
+            this.timingsNew = timingsNew;
+            this.psnr = psnr;
+        }
+    }
+
+    private class RsAsyncTaskRunner extends AsyncTask<RsTaskParams, ImageView, Result> {
+      Bitmap outputImageOld;
       Bitmap outputImage;
       Bitmap outputImageNew;
-      ImageCompare.CompareValue result;
+      TextView textView;
 
       @Override
-      protected Bitmap doInBackground(RsTaskParams... params) {
-
-        publishProgress(0);
+      protected Result doInBackground(RsTaskParams... params) {
 
         RenderScriptTask renderScriptTask = new RenderScriptTask(params[0].mRenderScript, RenderScriptTask.script.f32);
-        outputImage = renderScriptTask.applyRefocusFilter(params[0].mOptions);
-        publishProgress(1);
+        outputImageOld = outputImage = renderScriptTask.applyRefocusFilter(params[0].mOptions);
+        final ImageView v = params[0].mImageView1;
+        publishProgress(v);
 
         RenderScriptTask renderScriptTaskNew = new RenderScriptTask(params[0].mRenderScript, RenderScriptTask.script.d1new);
-        outputImageNew = renderScriptTaskNew.applyRefocusFilter(params[0].mOptions);
-        publishProgress(2);
+        outputImageNew = outputImage = renderScriptTaskNew.applyRefocusFilter(params[0].mOptions);
+        final ImageView v2 = params[0].mImageView2;
+        publishProgress(v2);
 
-        result = new ImageCompare.CompareValue();
-        ImageCompare.compareBitmap(outputImage, outputImageNew, result);
-        publishProgress(3);
+        double psnr = ImageCompare.psnr(outputImageOld, outputImage);
+        textView = params[0].mTextView;
 
-        return outputImage;
+        return new Result(renderScriptTask.timings, renderScriptTaskNew.timings, psnr);
       }
 
-      protected  void onPostExecute(Bitmap result) {
+      protected  void onPostExecute(Result result) {
+          StringBuffer buffer = new StringBuffer();
+          DecimalFormat formatter = new DecimalFormat("#,###");
 
+          buffer.append("PSNR: " + String.format("%.02f", result.psnr) + "\n");
+          long sum1 = 0, sum2 = 0;
+          for (int i = 0; i < result.timingsOld.size(); i++) {
+              String tag = result.timingsOld.get(i).first;
+              long t1 = result.timingsOld.get(i).second.longValue();
+              long t2 = result.timingsNew.get(i).second.longValue();
+              buffer.append(tag + ":" + formatter.format(t1) + ":" +
+                            formatter.format(t2) + ":"  +
+                            String.format("%.02f", (double) t1 / t2) + "\n");
+              sum1 += t1;
+              sum2 += t2;
+          }
+          buffer.append("Sum (ms):" +
+                        String.format("%.02f", (double)sum1 / 1000000) + ":" +
+                        String.format("%.02f", (double)sum2 / 1000000) + ":" +
+                        String.format("%.02f", (double) sum1 / sum2) + "\n");
+          textView.setText(buffer.toString());
       }
 
-      protected void onProgressUpdate(Integer... progress) {
-        switch (progress[0]){
-          case 0:
-              mAllocLabelTextView.setText("Global Allocation Version...");
-              mPointerLabelTextView.setText("Processing...");
-              mCompareTextView.setText("Image Difference");
-          case 1:
-              mImgView.setImageBitmap(outputImage);
-              mImgView.invalidate();
-              mPointerLabelTextView.setText("Pointer Result");
-              mAllocLabelTextView.setText("Processing...");
-            break;
-          case 2:
-              mNewImgView.setImageBitmap(outputImageNew);
-              mNewImgView.invalidate();
-              mAllocLabelTextView.setText("Global Allocation Version");
-              mCompareTextView.setText("Calculating...");
-            break;
-          case 3:
-              mCompareTextView.setText("Percentage Different: " + result.diffPercent + " Average Difference: " + result.aveDiff);
-            break;
-        }
+      protected void onProgressUpdate(ImageView... progress) {
+          progress[0].setImageBitmap(outputImage);
       }
     }
 
@@ -177,9 +262,8 @@ public class MainActivity extends Activity {
         return null;
     }
 
-    Uri getResourceRef() {
+    Uri getResourceRef(int resID) {
         Context context = getApplicationContext();
-        int resID = R.drawable.refocusimage;
         Uri path = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" +
             context.getResources().getResourcePackageName(resID) + '/' +
             context.getResources().getResourceTypeName(resID) + '/' +
