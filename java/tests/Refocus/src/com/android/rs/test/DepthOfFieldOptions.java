@@ -23,7 +23,7 @@ public class DepthOfFieldOptions {
   public DepthOfFieldOptions(RGBZ rgbz) {
     this.focalDepth = (float)rgbz.getFocusDepth();
     this.depthOfField = (float)rgbz.getDepthOfField();
-    this.blurInfinity = (float)rgbz.getBlurInfinity() * Math.max(rgbz.getHeight(), rgbz.getWidth());
+    this.blurInfinity = (float)rgbz.getBlurInfinity();
     this.rgbz = rgbz;
   }
 
@@ -35,5 +35,9 @@ public class DepthOfFieldOptions {
 
   public void setBokeh(float bokeh) {
     this.blurInfinity = bokeh * 200;
+  }
+
+  public void setDepthOfField(float depthOfField) {
+    this.depthOfField = depthOfField;
   }
 }
