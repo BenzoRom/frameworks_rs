@@ -80,7 +80,7 @@ build_rstest_compatlib() {
   echo Building for target $1
   lunch $1
   # Build a sample support application to ensure that all the pieces are up to date.
-  cd $MY_ANDROID_DIR/frameworks/rs/java/tests/RSTest_CompatLib/ && mma -j$NUM_CORES FORCE_BUILD_RS_COMPAT=true && cd - || exit 6
+  cd $MY_ANDROID_DIR/frameworks/rs/tests/java_api/RSTest_CompatLib/ && mma -j$NUM_CORES FORCE_BUILD_RS_COMPAT=true && cd - || exit 6
 }
 
 build_rs_host_tools() {
