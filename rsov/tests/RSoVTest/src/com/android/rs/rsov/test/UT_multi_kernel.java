@@ -23,14 +23,14 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 import android.util.Log;
 
-public class UT_multi extends UnitTest {
-    protected UT_multi(RSoVTestCore rstc, Context ctx) {
-        super(rstc, "multi", ctx);
+public class UT_multi_kernel extends UnitTest {
+    protected UT_multi_kernel(RSoVTestCore rstc, Context ctx) {
+        super(rstc, "multi_kernel", ctx);
     }
 
     private boolean Test(int width, int height, int depth) {
         RenderScript pRS = RenderScript.create(mCtx);
-        ScriptC_multi s = new ScriptC_multi(pRS);
+        ScriptC_multi_kernel s = new ScriptC_multi_kernel(pRS);
 
         Type.Builder typeBuilder = new Type.Builder(pRS, Element.F32_4(pRS));
         typeBuilder.setX(width);
