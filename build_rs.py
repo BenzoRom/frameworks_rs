@@ -118,6 +118,25 @@ def install_toolchain(build_dir, install_dir, host):
     install_clang_headers(build_dir, install_dir, host)
     install_built_device_files(build_dir, install_dir, host)
     install_license_files(install_dir)
+    # We need to package libwinpthread-1.dll for Windows. This is explicitly
+    # linked whenever pthreads is used, and the build system doesn't allow
+    # us to link just that library statically (ldflags are stripped out
+    # of ldlibs and vice-versa).
+    # Bug: http://b/34273721
+    if host.startswith('windows'):
+        install_winpthreads(install_dir)
+
+
+def install_winpthreads(install_dir):
+      """Installs the winpthreads runtime to the Windows bin directory."""
+      lib_name = 'libwinpthread-1.dll'
+      mingw_dir = android_path(
+          'prebuilts/gcc/linux-x86/host/x86_64-w64-mingw32-4.8')
+      # RenderScript NDK toolchains for Windows only contains 32-bit binaries.
+      lib_path = os.path.join(mingw_dir, 'x86_64-w64-mingw32/lib32', lib_name)
+
+      lib_install = os.path.join(install_dir, 'bin', lib_name)
+      install_file(lib_path, lib_install)
 
 
 def install_built_host_files(build_dir, install_dir, host):
@@ -155,6 +174,10 @@ def install_built_host_files(build_dir, install_dir, host):
 
     for built_file in built_files:
         dirname = os.path.dirname(built_file)
+        # Put dlls and exes into bin/ for windows.
+        # Bug: http://b/34273721
+        if is_windows:
+            dirname = 'bin'
         install_path = os.path.join(install_dir, dirname)
         if not os.path.exists(install_path):
             os.makedirs(install_path)
