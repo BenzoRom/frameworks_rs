@@ -41,8 +41,13 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_C_INCLUDES += frameworks/rs
 LOCAL_C_INCLUDES += $(intermediates)
 
+# We need to export not just rs/cpp but also rs.  This is because
+# RenderScript.h includes rsCppStructs.h, which includes rs/rsDefines.h.
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH) $(LOCAL_PATH)/..
+
 include $(BUILD_SHARED_LIBRARY)
 
+####################################################################
 
 include $(CLEAR_VARS)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
@@ -73,5 +78,7 @@ LOCAL_C_INCLUDES += $(intermediates)
 
 LOCAL_LDFLAGS := -llog -lz -ldl -Wl,--exclude-libs,libc++_static.a
 LOCAL_NDK_STL_VARIANT := c++_static
+
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH) $(LOCAL_PATH)/..
 
 include $(BUILD_STATIC_LIBRARY)
