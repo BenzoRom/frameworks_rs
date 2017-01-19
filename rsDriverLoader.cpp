@@ -237,14 +237,13 @@ bool Context::loadDriver(bool forceDefault, bool forceRSoV) {
 #ifndef RS_COMPATIBILITY_LIB
 
     if (forceRSoV) {
-        // If the debug property is set to use the RSoV driver, load it and fail
-        // if it does not load.
+        // If the property is set to use the RSoV driver, load it and fall back
+        // to the vendor driver or the CPU reference driver if it does not load.
         if (loadRuntime("libRSDriver_RSoV.so")) {
             ALOGV("Successfully loaded the RSoV driver!");
             return true;
         }
         ALOGE("Failed to load the RSoV driver!");
-        return false;
     }
 
 #ifdef OVERRIDE_RS_DRIVER
