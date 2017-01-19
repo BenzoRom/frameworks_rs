@@ -40,7 +40,7 @@ class RSoVContext {
  private:
   RSoVContext();
 
-  void Initialize(char const* const name);
+  bool Initialize(char const* const name);
 
   static RSoVContext* mContext;
   static std::once_flag mInitFlag;

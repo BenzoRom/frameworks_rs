@@ -27,7 +27,7 @@ namespace rsov {
 RSoVContext* RSoVContext::mContext = nullptr;
 std::once_flag RSoVContext::mInitFlag;
 
-void RSoVContext::Initialize(char const* const name) {
+bool RSoVContext::Initialize(char const* const name) {
   // Initialize instance
   VkApplicationInfo appInfo = {
       .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
@@ -47,18 +47,24 @@ void RSoVContext::Initialize(char const* const name) {
 
   VkResult res;
   res = vkCreateInstance(&instInfo, nullptr, &mInstance);
-  rsAssert(res == VK_SUCCESS);
+  if (res != VK_SUCCESS) {
+    return false;
+  }
 
   // Enumerate devices
   uint32_t gpu_count;
 
   res = vkEnumeratePhysicalDevices(mInstance, &gpu_count, nullptr);
-  rsAssert(gpu_count > 0);
+  if (gpu_count == 0) {
+    return false;
+  }
 
   std::vector<VkPhysicalDevice> GPUs(gpu_count);
 
   res = vkEnumeratePhysicalDevices(mInstance, &gpu_count, GPUs.data());
-  rsAssert(res == VK_SUCCESS && gpu_count > 0);
+  if (!(res == VK_SUCCESS && gpu_count > 0)) {
+    return false;
+  }
 
   mGPU = GPUs[0];
 
@@ -85,19 +91,25 @@ void RSoVContext::Initialize(char const* const name) {
   };
 
   res = vkCreateDevice(mGPU, &deviceInfo, nullptr, &mDevice);
-  rsAssert(res == VK_SUCCESS);
+  if (res != VK_SUCCESS) {
+    return false;
+  }
 
   // Initialize queue family index
   uint32_t queueCount;
 
   vkGetPhysicalDeviceQueueFamilyProperties(mGPU, &queueCount, nullptr);
-  rsAssert(queueCount > 0);
+  if (queueCount == 0) {
+    return false;
+  }
 
   std::vector<VkQueueFamilyProperties> queueProps(queueCount);
 
   vkGetPhysicalDeviceQueueFamilyProperties(mGPU, &queueCount,
                                            queueProps.data());
-  rsAssert(queueCount > 0);
+  if (queueCount == 0) {
+    return false;
+  }
 
   uint32_t queueFamilyIndex = UINT_MAX;
   bool found = false;
@@ -109,7 +121,9 @@ void RSoVContext::Initialize(char const* const name) {
     }
   }
 
-  rsAssert(found);
+  if (!found) {
+    return false;
+  }
 
   // Create a device queue
 
@@ -125,7 +139,11 @@ void RSoVContext::Initialize(char const* const name) {
   };
 
   res = vkCreateCommandPool(mDevice, &cmd_pool_info, nullptr, &mCmdPool);
-  rsAssert(res == VK_SUCCESS);
+  if (res != VK_SUCCESS) {
+    return false;
+  }
+
+  return true;
 }
 
 bool RSoVContext::MemoryTypeFromProperties(uint32_t typeBits,
@@ -145,20 +163,19 @@ bool RSoVContext::MemoryTypeFromProperties(uint32_t typeBits,
   return false;
 }
 
-RSoVContext::RSoVContext() {
-  char engineName[] = "RSoV";
+RSoVContext::RSoVContext() {}
 
-  Initialize(engineName);
-}
-
-RSoVContext::~RSoVContext() {
-  vkDestroyCommandPool(mDevice, mCmdPool, nullptr);
-  vkDestroyDevice(mDevice, nullptr);
-  vkDestroyInstance(mInstance, nullptr);
-}
+RSoVContext::~RSoVContext() {}
 
 RSoVContext* RSoVContext::create() {
-  std::call_once(mInitFlag, []() { mContext = new RSoVContext(); });
+  std::call_once(mInitFlag, []() {
+    std::unique_ptr<RSoVContext> context(new RSoVContext());
+    char engineName[] = "RSoV";
+
+    if (context && context->Initialize(engineName)) {
+      mContext = context.release();
+    }
+  });
   return mContext;
 }
 
