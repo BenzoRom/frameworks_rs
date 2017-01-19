@@ -308,28 +308,29 @@ extern "C" bool rsdHalInit(RsContext c, uint32_t version_major,
                            uint32_t version_minor) {
   Context *rsc = (Context *)c;
 
-  RSoVHal *hal = new RSoVHal();
+  std::unique_ptr<RSoVHal> hal(new RSoVHal());
   if (!hal) {
     ALOGE("Failed creating RSoV driver hal.");
     return false;
   }
-  rsc->mHal.drv = hal;
 
-  hal->mCpuRef = RsdCpuReference::create(rsc, version_major, version_minor,
-                                         &lookupRuntimeStubs,
-                                         &rsov::lookupCpuScript);
-  if (!hal->mCpuRef) {
-    ALOGE("RsdCpuReference::create for driver hal failed.");
-    rsc->mHal.drv = nullptr;
-    return false;
-  }
-
-  hal->mRSoV = rsov::RSoVContext::create();
-  if (!hal->mRSoV) {
+  std::unique_ptr<rsov::RSoVContext> rsov(rsov::RSoVContext::create());
+  if (!rsov) {
     ALOGE("RSoVContext::create for driver hal failed.");
-    rsc->mHal.drv = nullptr;
     return false;
   }
+
+  std::unique_ptr<RsdCpuReference> cpuref(RsdCpuReference::create(rsc, version_major, version_minor,
+                                                                  &lookupRuntimeStubs,
+                                                                  &rsov::lookupCpuScript));
+  if (!cpuref) {
+    ALOGE("RsdCpuReference::create for driver hal failed.");
+    return false;
+  }
+
+  hal->mRSoV = rsov.release();
+  hal->mCpuRef = cpuref.release();
+  rsc->mHal.drv = hal.release();
 
   return true;
 }
