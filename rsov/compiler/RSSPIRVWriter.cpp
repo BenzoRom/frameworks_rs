@@ -33,6 +33,7 @@
 #include "InlinePreparationPass.h"
 #include "LinkerModule.h"
 #include "ReflectionPass.h"
+#include "RemoveNonkernelsPass.h"
 
 #include <fstream>
 #include <sstream>
@@ -83,7 +84,17 @@ static void HandleTargetTriple(Module &M) {
   M.setTargetTriple(NewTriple);
 }
 
-void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr) {
+void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
+                          bcinfo::MetadataExtractor &Extractor) {
+  PassMgr.add(createInlinePreparationPass(Extractor));
+  PassMgr.add(createAlwaysInlinerPass());
+  PassMgr.add(createRemoveNonkernelsPass(Extractor));
+  // Delete unreachable globals.
+  PassMgr.add(createGlobalDCEPass());
+  // Remove dead debug info.
+  PassMgr.add(createStripDeadDebugInfoPass());
+  // Remove dead func decls.
+  PassMgr.add(createStripDeadPrototypesPass());
   PassMgr.add(createGlobalMergePass());
   PassMgr.add(createPromoteMemoryToRegisterPass());
   PassMgr.add(createTransOCLMD());
@@ -92,7 +103,6 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr) {
   PassMgr.add(createSPIRVRegularizeLLVM());
   PassMgr.add(createSPIRVLowerConstExpr());
   PassMgr.add(createSPIRVLowerBool());
-  PassMgr.add(createAlwaysInlinerPass());
 }
 
 bool WriteSPIRV(Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
@@ -108,8 +118,7 @@ bool WriteSPIRV(Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
   DEBUG(dbgs() << "Metadata extracted\n");
 
   llvm::legacy::PassManager PassMgr;
-  PassMgr.add(createInlinePreparationPass(ME));
-  addPassesForRS2SPIRV(PassMgr);
+  addPassesForRS2SPIRV(PassMgr, ME);
 
   std::ofstream WrapperF;
   if (!WrapperOutputFile.empty()) {
