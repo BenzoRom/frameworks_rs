@@ -1,7 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_CLANG := true
 LOCAL_SDK_VERSION := 14
 
 LOCAL_SRC_FILES:= \
@@ -14,11 +13,12 @@ LOCAL_C_INCLUDES += \
 	frameworks/rs/cpp \
 	frameworks/rs/driver
 
-LOCAL_CFLAGS += -Wno-unused-parameter -Werror
-LOCAL_CFLAGS += -DRS_COMPATIBILITY_LIB -std=c++11
+LOCAL_CFLAGS += -Werror -Wall -Wextra \
+		-Wno-unused-parameter \
+		-DRS_COMPATIBILITY_LIB \
+		-std=c++11
 
 LOCAL_MODULE:= libRSSupportIO
-LOCAL_MODULE_TAGS := optional
 
 LOCAL_LDLIBS += -landroid
 LOCAL_LDFLAGS += -ldl -Wl,--exclude-libs,libc++_static.a
@@ -27,7 +27,6 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 
-LOCAL_CLANG := true
 LOCAL_SDK_VERSION := 9
 
 LOCAL_SRC_FILES:= \
@@ -44,10 +43,9 @@ LOCAL_C_INCLUDES += \
 	frameworks/rs \
 	frameworks/rs/cpp
 
-LOCAL_CFLAGS += -Wno-unused-parameter -Werror -std=c++11
+LOCAL_CFLAGS += -Werror -Wall -Wextra -Wno-unused-parameter -std=c++11
 
 LOCAL_MODULE:= librsjni
-LOCAL_MODULE_TAGS := optional
 LOCAL_REQUIRED_MODULES := libRSSupport
 
 LOCAL_LDFLAGS += -ldl -llog -Wl,--exclude-libs,libc++_static.a

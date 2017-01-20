@@ -54,7 +54,10 @@ int main(int argc, char** argv)
     if (forceCpu) flags |= RS_INIT_LOW_LATENCY;
     if (synchronous) flags |= RS_INIT_SYNCHRONOUS;
 
-    bool r = rs->init("/system/bin", flags);
+    if (!rs->init("/system/bin", flags)) {
+        printf("Could not initialize RenderScript\n");
+        return 1;
+    }
 
     sp<const Element> e = Element::U32(rs);
 
