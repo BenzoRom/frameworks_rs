@@ -1,8 +1,6 @@
 LOCAL_MODULE_TAGS := tests
 
 LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)
-LOCAL_C_INCLUDES += frameworks/rs/cpp
-LOCAL_C_INCLUDES += frameworks/rs
 
 LOCAL_CPP_FEATURES += exceptions
 
