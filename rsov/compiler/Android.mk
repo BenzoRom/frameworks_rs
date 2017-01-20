@@ -29,6 +29,7 @@ RS2SPIRV_SOURCES := \
   KernelSignature.cpp \
   LinkerModule.cpp \
   ReflectionPass.cpp \
+  RemoveNonkernelsPass.cpp \
   RSAllocationUtils.cpp \
   RSSPIRVWriter.cpp \
   unit_tests/LinkerModuleTests.cpp
