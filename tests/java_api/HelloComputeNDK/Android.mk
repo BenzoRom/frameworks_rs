@@ -24,6 +24,8 @@ LOCAL_MODULE_TAGS := tests
 LOCAL_SRC_FILES := $(call all-java-files-under, src) \
                    $(call all-renderscript-files-under, src)
 
+LOCAL_CFLAGS := -Werror -Wall -Wextra
+
 LOCAL_PACKAGE_NAME := HelloComputeNDK
 LOCAL_SDK_VERSION := 14
 

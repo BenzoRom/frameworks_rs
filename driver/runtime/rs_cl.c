@@ -1,6 +1,8 @@
 #include "rs_core.rsh"
 #include "rs_f16_util.h"
 
+#include <string.h>
+
 extern float2 __attribute__((overloadable)) convert_float2(int2 c);
 extern float3 __attribute__((overloadable)) convert_float3(int3 c);
 extern float4 __attribute__((overloadable)) convert_float4(int4 c);
@@ -297,37 +299,37 @@ extern float4 __attribute__((overloadable)) \
     return r;                                   \
 }
 
-static const int iposinf = 0x7f800000;
-static const int ineginf = 0xff800000;
+static const unsigned int iposinf = 0x7f800000;
+static const unsigned int ineginf = 0xff800000;
 
-static const float posinf() {
+static float posinf() {
     float f = *((float*)&iposinf);
     return f;
 }
 
-static const float neginf() {
-    float f = *((float*)&ineginf);
-    return f;
+static unsigned int float_bits(float f) {
+    unsigned int result;
+    // Get the bits while following the strict aliasing rules.
+    memcpy(&result, &f, sizeof(f));
+    return result;
 }
 
 static bool isinf(float f) {
-    int i = *((int*)(void*)&f);
+    unsigned int i = float_bits(f);
     return (i == iposinf) || (i == ineginf);
 }
 
 static bool isnan(float f) {
-    int i = *((int*)(void*)&f);
+    unsigned int i = float_bits(f);
     return (((i & 0x7f800000) == 0x7f800000) && (i & 0x007fffff));
 }
 
 static bool isposzero(float f) {
-    int i = *((int*)(void*)&f);
-    return (i == 0x00000000);
+    return (float_bits(f) == 0x00000000);
 }
 
 static bool isnegzero(float f) {
-    int i = *((int*)(void*)&f);
-    return (i == 0x80000000);
+    return (float_bits(f) == 0x80000000);
 }
 
 static bool iszero(float f) {

@@ -15,12 +15,13 @@ rs_cpp_SRC_FILES := \
 
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 include frameworks/compile/slang/rs_version.mk
-local_cflags_for_rs_cpp += $(RS_VERSION_DEFINE)
-local_cflags_for_rs_cpp += -Werror -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fno-exceptions -std=c++11
+local_cflags_for_rs_cpp += $(RS_VERSION_DEFINE) \
+	-Werror -Wall -Wextra \
+	-Wno-unused-parameter -Wno-unused-variable
+	-std=c++11
 
 LOCAL_SRC_FILES := $(rs_cpp_SRC_FILES)
 
-LOCAL_CLANG := true
 LOCAL_CFLAGS += $(local_cflags_for_rs_cpp)
 
 LOCAL_SHARED_LIBRARIES := \
@@ -36,8 +37,6 @@ LOCAL_STATIC_LIBRARIES := \
 
 LOCAL_MODULE:= libRScpp
 
-LOCAL_MODULE_TAGS := optional
-
 LOCAL_C_INCLUDES += frameworks/rs
 LOCAL_C_INCLUDES += $(intermediates)
 
@@ -52,7 +51,6 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 
-LOCAL_CLANG := true
 LOCAL_CFLAGS += $(local_cflags_for_rs_cpp)
 
 ifeq ($(my_32_64_bit_suffix),32)
@@ -70,8 +68,6 @@ LOCAL_WHOLE_STATIC_LIBRARIES := \
 	libRSDispatch
 
 LOCAL_MODULE:= libRScpp_static
-
-LOCAL_MODULE_TAGS := optional
 
 LOCAL_C_INCLUDES += frameworks/rs
 LOCAL_C_INCLUDES += $(intermediates)
