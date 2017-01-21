@@ -20,7 +20,10 @@ int main(int argc, char** argv)
 
     sp<RS> rs = new RS();
 
-    bool r = rs->init("/system/bin");
+    if (!rs->init("/system/bin")) {
+        printf("Could not initialize RenderScript\n");
+        return 1;
+    }
 
     sp<const Element> e = Element::U32(rs);
 

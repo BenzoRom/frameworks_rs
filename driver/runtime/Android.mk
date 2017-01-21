@@ -31,7 +31,8 @@ clcore_base_files := \
     rs_convert.c \
     rs_quaternion.c
 
-clcore_cflags := -Iframeworks/rs/cpu_ref -DRS_DECLARE_EXPIRED_APIS
+clcore_cflags := -Werror -Wall -Wextra \
+	         -Iframeworks/rs/cpu_ref -DRS_DECLARE_EXPIRED_APIS
 
 clcore_base_files_32 := \
     ll32/allocation.ll
