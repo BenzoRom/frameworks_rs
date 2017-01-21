@@ -1,7 +1,8 @@
 LOCAL_PATH:=$(call my-dir)
 
-rs_base_CFLAGS := -Werror -Wall -Wextra -Wno-unused-parameter \
-                  -Wno-unused-variable -fno-exceptions -std=c++11
+rs_base_CFLAGS := -Werror -Wall -Wextra \
+				  -Wno-unused-parameter -Wno-unused-variable \
+				  -std=c++11
 ifeq ($(TARGET_BUILD_PDK), true)
   rs_base_CFLAGS += -D__RS_PDK__
 endif
@@ -16,7 +17,6 @@ endif
 
 include $(CLEAR_VARS)
 ifneq ($(HOST_OS),windows)
-LOCAL_CLANG := true
 endif
 LOCAL_MODULE := libRSCpuRef
 LOCAL_MODULE_TARGET_ARCH := arm mips mips64 x86 x86_64 arm64
@@ -96,7 +96,5 @@ LOCAL_C_INCLUDES += external/zlib
 include frameworks/compile/libbcc/libbcc-targets.mk
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
-
-LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)

@@ -61,8 +61,6 @@ LOCAL_C_INCLUDES := \
 LOCAL_MODULE := rs2spirv
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-LOCAL_IS_HOST_MODULE := true
-
 LOCAL_SHARED_LIBRARIES += libLLVM libbcinfo libSPIRV
 
 # TODO: fix the remaining warnings
@@ -82,9 +80,9 @@ ifeq (true, $(FORCE_RS2SPIRV_DEBUG_BUILD))
 endif
 
 include $(LLVM_ROOT_PATH)/llvm.mk
+include $(LLVM_HOST_BUILD_MK)
 include $(LLVM_GEN_INTRINSICS_MK)
 include $(LLVM_GEN_ATTRIBUTES_MK)
-include $(LLVM_HOST_BUILD_MK)
 include $(BUILD_HOST_EXECUTABLE)
 
 endif # Don't build in unbundled branches
@@ -149,4 +147,3 @@ include $(BUILD_PREBUILT)
 #=====================================================================
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
-

@@ -47,7 +47,7 @@ LOCAL_C_INCLUDES := \
 
 LOCAL_C_INCLUDES += \
 
-LOCAL_CFLAGS := -Werror -Wall -Wextra -fno-exceptions
+LOCAL_CFLAGS := -Werror -Wall -Wextra
 # TODO: remove warnings on unused variables and parameters
 LOCAL_CFLAGS += -Wno-unused-variable -Wno-unused-parameter
 

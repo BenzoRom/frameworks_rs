@@ -1,7 +1,10 @@
 
 LOCAL_PATH:=frameworks/rs
-rs_base_CFLAGS := -Werror -Wall -Wno-unused-parameter -Wno-unused-variable \
-		  -Wno-overloaded-virtual -DRS_COMPATIBILITY_LIB -std=c++11
+rs_base_CFLAGS := -Werror -Wall -Wextra \
+		  -Wno-unused-parameter \
+		  -Wno-unused-variable \
+		  -Wno-overloaded-virtual -DRS_COMPATIBILITY_LIB \
+		  -std=c++11
 
 ifeq ($(ARCH_ARM_HAVE_NEON),true)
 rs_base_CFLAGS += -DARCH_ARM_HAVE_NEON
@@ -19,10 +22,8 @@ LOCAL_MODULE := rsg-generator_support
 # These symbols are normally defined by BUILD_XXX, but we need to define them
 # here so that local-intermediates-dir works.
 
-LOCAL_IS_HOST_MODULE := true
 LOCAL_MODULE_CLASS := EXECUTABLES
 intermediates := $(local-intermediates-dir)
-LOCAL_MODULE_TAGS := optional
 
 LOCAL_SRC_FILES:= \
     spec.l \
@@ -37,7 +38,6 @@ include $(BUILD_HOST_EXECUTABLE)
 RSG_GENERATOR_SUPPORT:=$(LOCAL_BUILT_MODULE)
 
 include $(CLEAR_VARS)
-LOCAL_CLANG := true
 LOCAL_MODULE := libRSSupport
 LOCAL_SDK_VERSION := 9
 
@@ -181,7 +181,6 @@ LOCAL_C_INCLUDES += external/gemmlowp/eight_bit_int_gemm
 LOCAL_CFLAGS += $(rs_base_CFLAGS) -DGEMMLOWP_USE_STLPORT
 
 LOCAL_MODULE:= libRSSupport
-LOCAL_MODULE_TAGS := optional
 
 # TODO: why isn't this picked up from the host GLOBAL_CFLAGS?
 LOCAL_CFLAGS += -D__STDC_FORMAT_MACROS
