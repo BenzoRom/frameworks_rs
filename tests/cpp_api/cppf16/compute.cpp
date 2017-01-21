@@ -24,7 +24,10 @@ int main(int , char** )
 {
     sp<RS> rs = new RS();
 
-    bool r = rs->init("/system/bin");
+    if (!rs->init("/system/bin")) {
+        printf("Could not initialize RenderScript\n");
+        return 1;
+    }
 
     // Test ability to create 1D, 2D and 3D allocations of f16 scalars and
     // vectors

@@ -1,11 +1,8 @@
 LOCAL_MODULE_TAGS := tests
 
 LOCAL_RENDERSCRIPT_FLAGS += -g -O0 -target-api 0
-
-LOCAL_CFLAGS += --std=c++11
-LOCAL_LDFLAGS += \
-	-ldl \
-	-llog
+LOCAL_CFLAGS := -Werror -Wall -Wextra -std=c++11
+LOCAL_LDFLAGS += -llog
 
 LOCAL_STATIC_LIBRARIES += libRScpp_static
 
