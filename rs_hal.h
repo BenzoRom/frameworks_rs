@@ -106,10 +106,15 @@ class FBOCache;
  * v2 = reserved for use by vendor drivers
  */
 
+// RS_BASE_OBJ must have the same layout as _RS_OBJECT_DECL defined in
+// script_api/rs_object_types.spec.
+// TODO(jeanluc) Look at unifying.
 #ifndef __LP64__
 #define RS_BASE_OBJ(_t_) typedef struct { const _t_* p; } __attribute__((packed, aligned(4)))
+#define RS_BASE_NULL_OBJ {0}
 #else
 #define RS_BASE_OBJ(_t_) typedef struct { const _t_* p; const void* r; const void* v1; const void* v2; }
+#define RS_BASE_NULL_OBJ {0, 0, 0, 0}
 #endif
 
 RS_BASE_OBJ(ObjectBase) rs_object_base;

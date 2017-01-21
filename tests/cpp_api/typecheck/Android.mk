@@ -13,7 +13,5 @@ LOCAL_SRC_FILES:= \
 LOCAL_STATIC_LIBRARIES := \
 	libRScpp_static
 
-LOCAL_LDFLAGS += -llog -ldl
-
 include frameworks/rs/tests/cpp_api/common.mk
 include $(BUILD_EXECUTABLE)

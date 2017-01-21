@@ -22,7 +22,9 @@ rs-prebuilts-full: \
     host_cross_bcc_compat
 endif
 
-rs_base_CFLAGS := -Werror -Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -fno-exceptions -std=c++11
+rs_base_CFLAGS := -Werror -Wall -Wextra \
+	-Wno-unused-parameter -Wno-unused-variable \
+	-std=c++11
 
 ifneq ($(OVERRIDE_RS_DRIVER),)
   rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER)
@@ -37,9 +39,7 @@ ifeq ($(RS_FIND_OFFSETS), true)
 endif
 
 include $(CLEAR_VARS)
-LOCAL_CLANG := true
 LOCAL_MODULE := libRSDriver
-LOCAL_MODULE_TARGET_ARCH_WARN := arm mips mips64 x86 x86_64 arm64
 
 LOCAL_SRC_FILES:= \
 	driver/rsdAllocation.cpp \
@@ -71,12 +71,7 @@ LOCAL_SHARED_LIBRARIES += libbcinfo
 
 LOCAL_C_INCLUDES += frameworks/compile/libbcc/include
 
-LOCAL_CXX_STL := libc++
-
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
-LOCAL_CPPFLAGS += -fno-exceptions
-
-LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -101,13 +96,10 @@ LOCAL_SANITIZE := never
 
 include $(BUILD_HOST_EXECUTABLE)
 
-# TODO: This should go into build/core/config.mk
 RSG_GENERATOR:=$(LOCAL_BUILT_MODULE)
 
 include $(CLEAR_VARS)
-LOCAL_CLANG := true
 LOCAL_MODULE := libRS_internal
-LOCAL_MODULE_TARGET_ARCH_WARN := arm mips mips64 x86 x86_64 arm64
 
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 generated_sources:= $(local-generated-sources-dir)
@@ -191,23 +183,12 @@ LOCAL_SHARED_LIBRARIES += libft2 libpng
 
 LOCAL_SHARED_LIBRARIES += libbcinfo
 
-LOCAL_C_INCLUDES += external/freetype/include
-LOCAL_C_INCLUDES += frameworks/compile/libbcc/include
-
-LOCAL_CXX_STL := libc++
-
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
-
-LOCAL_CPPFLAGS += -fno-exceptions
-
-LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
-LOCAL_CLANG := true
 LOCAL_MODULE := libRS
-LOCAL_MODULE_TARGET_ARCH_WARN := arm mips mips64 x86 x86_64 arm64
 
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 generated_sources:= $(local-generated-sources-dir)
@@ -260,11 +241,7 @@ LOCAL_SHARED_LIBRARIES += liblog
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 
-LOCAL_CPPFLAGS += -fno-exceptions
-
 LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
-
-LOCAL_MODULE_TAGS := optional
 
 # These runtime modules, including libcompiler_rt.so, are required for
 # RenderScript.
@@ -286,7 +263,6 @@ include $(BUILD_SHARED_LIBRARY)
 # Now build a host version for serialization
 include $(CLEAR_VARS)
 LOCAL_MODULE:= libRS
-LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := STATIC_LIBRARIES
 LOCAL_IS_HOST_MODULE := true
 
@@ -325,7 +301,6 @@ LOCAL_GENERATED_SOURCES += $(GEN)
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 LOCAL_CFLAGS += -DANDROID_RS_SERIALIZE
 LOCAL_CFLAGS += -fPIC
-LOCAL_CPPFLAGS += -fno-exceptions
 
 LOCAL_SRC_FILES:= \
 	rsAllocation.cpp \
@@ -365,8 +340,6 @@ LOCAL_SRC_FILES:= \
 	rsType.cpp
 
 LOCAL_STATIC_LIBRARIES := libcutils libutils liblog
-
-LOCAL_CLANG := true
 
 include $(BUILD_HOST_STATIC_LIBRARY)
 
