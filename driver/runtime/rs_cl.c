@@ -1,8 +1,6 @@
 #include "rs_core.rsh"
 #include "rs_f16_util.h"
 
-#include <string.h>
-
 extern float2 __attribute__((overloadable)) convert_float2(int2 c);
 extern float3 __attribute__((overloadable)) convert_float3(int3 c);
 extern float4 __attribute__((overloadable)) convert_float4(int4 c);
@@ -308,10 +306,13 @@ static float posinf() {
 }
 
 static unsigned int float_bits(float f) {
-    unsigned int result;
+    /* TODO(jeanluc) Use this better approach once the Mac(SDK) build issues are fixed.
     // Get the bits while following the strict aliasing rules.
+    unsigned int result;
     memcpy(&result, &f, sizeof(f));
     return result;
+    */
+    return *(unsigned int*)(char*)(&f);
 }
 
 static bool isinf(float f) {
