@@ -271,13 +271,21 @@ public:
 // TODO: Add other types: bool, double, char, uchar, long, ulong
 //  and their vector counterparts.
 // TODO: Support vector types of width different than 4. eg. float3.
+
+// For kernels with integer arguments, Khronos LLVM/SPIR-V translator
+// generates SPIR-V functions with unsigned integer arguments as the kernel
+// prototypes in LLVM IR do not express signedness. Thus the wrapper
+// generated here needs to treat both signed and unsigned integer
+// arguments as unsigned, otherwise spirv-val would report error on
+// these inconsistencies.
+
 const std::map<RSType, TypeMapping> ReflectionPass::TypeMappings = {
     {RSType::rs_void, {RSType::rs_void, false, 1, "%void", ""}},
     {RSType::rs_uchar, {RSType::rs_uchar, false, 4, "%uchar", "R8ui"}},
-    {RSType::rs_int, {RSType::rs_void, false, 4, "%int", "R32i"}},
+    {RSType::rs_int, {RSType::rs_void, false, 4, "%uint", "R32i"}},
     {RSType::rs_float, {RSType::rs_float, false, 4, "%float", "R32f"}},
     {RSType::rs_uchar4, {RSType::rs_uchar4, true, 4, "%uchar", "Rgba8ui"}},
-    {RSType::rs_int4, {RSType::rs_int4, true, 4, "%int", "Rgba32i"}},
+    {RSType::rs_int4, {RSType::rs_int4, true, 4, "%uint", "Rgba32i"}},
     {RSType::rs_float4, {RSType::rs_float4, true, 4, "%float", "Rgba32f"}}};
 };
 
