@@ -296,7 +296,9 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   auto MainB = MainBs.begin();
   const auto ME = MainBs.end();
 
-  for (; KernelName != KE && MainB != ME; ++KernelName, ++MainB) {
+  unsigned processed_kernels = 0;
+  for (; KernelName != KE && MainB != ME;
+       ++KernelName, ++MainB, ++processed_kernels) {
     // Remove the leading "%" character in kernel names
     const std::string KernelNameStr = Prefix + KernelName->substr(1);
     DEBUG(dbgs() << "Kernel name: " << KernelNameStr << '\n');
@@ -307,7 +309,17 @@ bool Link(llvm::StringRef KernelFilename, llvm::StringRef WrapperFilename,
   }
 
   if (KernelName != KE || MainB != ME) {
-    errs() << "Inconsistent kernel metadata and definitions\n";
+    errs() << "Inconsistent kernel metadata and definitions";
+    if (MainB != ME) {
+      // At this point, the linker has walked thru all kernels provided
+      // by wrapper's header in the %RS_KERNELS
+      // but there are still unprocessed function blocks in wrapper.
+      errs() << ": not all " << MainBs.size()
+             << " wrapper function(s) linked to kernels; linked: "
+             << processed_kernels;
+    }
+    errs() << "\n";
+
     return false;
   }
 
@@ -411,7 +423,7 @@ bool InlineFunctionCalls(LinkerModule &LM, MainFunBlock &MB) {
     });
 
     if (Callee.size() != 1) {
-      errs() << "Callee not found\n";
+      errs() << "Callee not found: " << FInfo.FName << "\n";
       return false;
     }
 
