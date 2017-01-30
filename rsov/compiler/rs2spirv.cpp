@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#include "LinkerModule.h"
 #include "RSSPIRVWriter.h"
 #include "unit_tests/TestRunner.h"
 #include "llvm/Bitcode/ReaderWriter.h"
@@ -83,15 +84,6 @@ static std::string removeExt(const std::string &FileName) {
 }
 
 static int convertLLVMToSPIRV() {
-  if (!KernelFile.empty() && !WrapperFile.empty()) {
-    DEBUG(dbgs() << "Link " << KernelFile << " into " << WrapperFile << "\n");
-    if (!rs2spirv::Link(KernelFile, WrapperFile, OutputFile)) {
-      errs() << "Linking failed!\n\n";
-      return -1;
-    }
-    return 0;
-  }
-
   LLVMContext Context;
 
   std::string Err;
@@ -185,6 +177,15 @@ int main(int ac, char **av) {
 
   if (IsPrintAsWords)
     return printAsWords();
+
+  if (!KernelFile.empty() && !WrapperFile.empty()) {
+    DEBUG(dbgs() << "Link " << KernelFile << " into " << WrapperFile << "\n");
+    if (!rs2spirv::Link(KernelFile, WrapperFile, OutputFile)) {
+      errs() << "Linking failed!\n\n";
+      return -1;
+    }
+    return 0;
+  }
 
   return convertLLVMToSPIRV();
 }
