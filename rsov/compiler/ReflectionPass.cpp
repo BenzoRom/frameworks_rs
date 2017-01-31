@@ -1039,7 +1039,7 @@ bool ReflectionPass::emitMainUsingBuffersForInputOutput(
     inputPixels << ' ' << inputPixel;
   }
 
-  OS << TMP(tmp7) << " = OpFunctionCall " << RetTy << " %RS_SPIRV_DUMMY_"
+  OS << TMP(tmp7) << " = OpFunctionCall " << RetTy << " %rs_linker_" << Kernel.name
      << inputPixels.str();
   const auto CoordsNum = size_t(Kernel.coordsKind);
   for (size_t i = 0; i != CoordsNum; ++i)
