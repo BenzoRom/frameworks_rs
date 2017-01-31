@@ -17,7 +17,7 @@
 #ifndef RS_SPIRV_WRITER_H
 #define RS_SPIRV_WRITER_H
 
-#include "llvm/ADT/StringRef.h"
+#include <string>
 
 namespace llvm {
 class Module;
@@ -27,8 +27,6 @@ class raw_ostream;
 namespace rs2spirv {
 
 bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg);
-bool Link(llvm::StringRef KrrnelFilename, llvm::StringRef WrapperFilename,
-          llvm::StringRef OutputFilename);
 
 } // namespace rs2spirv
 
