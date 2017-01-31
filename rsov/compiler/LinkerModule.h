@@ -31,6 +31,9 @@
 
 namespace rs2spirv {
 
+bool Link(llvm::StringRef KrrnelFilename, llvm::StringRef WrapperFilename,
+          llvm::StringRef OutputFilename);
+
 class SPIRVLine {
   std::string Line;
 
