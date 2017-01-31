@@ -19,4 +19,5 @@ LOCAL_SRC_FILES := \
 	simple.rs
 
 include frameworks/rs/tests/lldb/cpp/common.mk
+LOCAL_RENDERSCRIPT_FLAGS := $(filter-out -g,$(LOCAL_RENDERSCRIPT_FLAGS))
 include $(BUILD_EXECUTABLE)
