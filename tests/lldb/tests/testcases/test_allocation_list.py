@@ -371,23 +371,8 @@ class TestAllocationList(TestBaseRemote):
 
     @ordered_test(5)
     def test_allocation_list_all3(self):
-        # TODO investigate why java tests show extra allocations
-        if self.app_type == 'java':
-            allocation_1_re = [
-                '1:\n'
-                # Regex for non zero hex number
-                '    Context: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                '    Address: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                '    Data pointer: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                '    Dimensions: \(64, 64, 0\)\n'
-                '    Data Type: uchar4\n'
-                '    Data Kind: RGBA Pixel'
-            ]
-        else:
-            allocation_1_re = []
         self.try_command('language renderscript allocation list',
                          [],
-                          allocation_1_re +
                          ['2:\n'
                           '    Context: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
                           '    Address: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
@@ -509,15 +494,8 @@ class TestAllocationList(TestBaseRemote):
 
         self.try_command('language renderscript allocation list',
                          [],
-                         ['1:\n'
+                         ['2:\n'
                           # Regex for non zero hex number
-                          '    Context: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                          '    Address: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                          '    Data pointer: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
-                          '    Dimensions: \(64, 64, 0\)\n'
-                          '    Data Type: uchar4\n'
-                          '    Data Kind: RGBA Pixel',
-                          '2:\n'
                           '    Context: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
                           '    Address: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
                           '    Data pointer: 0x0*[1-9a-fA-F][0-9a-fA-F]*\n'
