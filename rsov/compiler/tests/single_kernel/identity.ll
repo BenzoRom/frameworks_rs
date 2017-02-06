@@ -1,14 +1,12 @@
-; RUN: llvm-as < %s | rs2spirv -spirv-text -o %t
-; RUN: FileCheck < %t %s
+; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
+
 target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
 ; Function Attrs: norecurse nounwind readnone
-; CHECK: Name [[FooIdx:[0-9]+]] "foo"
-; CHECK: Name [[InIdx:[0-9]+]] "in"
-; CHECK: Decorate {{.*}}[[FooIdx]] LinkageAttributes "foo" Export
+; CHECK: OpEntryPoint GLCompute %{{[a-zA-Z_0-9]*}} "entry_foo" %gl_GlobalInvocationID{{.*}}
 define i32 @foo(i32 %in) #0 {
-; CHECK: ReturnValue {{.*}}[[InIdx]]
+; CHECK: OpReturnValue {{.*}}
   ret i32 %in
 }
 

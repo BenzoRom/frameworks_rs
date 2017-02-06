@@ -3,13 +3,19 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: %__rsov_entry_copy = OpFunction
+; CHECK: OpEntryPoint GLCompute [[WrapperId:%[a-zA-Z_0-9]*]] "entry_copy"
+; CHECK: [[KernelId:%[a-zA-Z_0-9]+]] = OpFunction {{.*}}
 
 ; Function Attrs: norecurse nounwind readnone
 define <4 x i8> @copy(<4 x i8> %v_in) #0 {
 entry:
   ret <4 x i8> %v_in
 }
+
+; CHECK: [[WrapperId]] = OpFunction {{.*}}
+; CHECK-NEXT: OpLabel
+; CHECK: %{{[0-9]+}} = OpFunctionCall %{{.*}} [[KernelId]]
+; CHECK: OpReturn
 
 attributes #0 = { norecurse nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="0" "stackrealign" "target-features"="+long64" "unsafe-fp-math"="false" "use-soft-float"="false" }
 

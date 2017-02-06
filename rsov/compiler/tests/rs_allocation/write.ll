@@ -3,16 +3,10 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: %rs_linker_struct___GPUBuffer = OpTypeStruct %uchar
-; CHECK: OpTypePointer Uniform %rs_linker_struct___GPUBuffer
+; CHECK: %struct___GPUBuffer = OpTypeStruct {{.*}}
+; CHECK: [[PTR_TYPE:%[a-zA-Z_0-9]+]] = OpTypePointer Uniform %struct___GPUBuffer
 
-; CHECK: %rs_linker___GPUBlock = OpVariable %{{.+}} Uniform
-
-; CHECK: %__rsov_entry_k1 = OpFunction
-
-; CHECK-NOT: OpFunctionCall
-
-; CHECK: OpImageWrite
+; CHECK: %__GPUBlock = OpVariable [[PTR_TYPE]] Uniform
 
 %struct.rs_allocation = type { i32* }
 

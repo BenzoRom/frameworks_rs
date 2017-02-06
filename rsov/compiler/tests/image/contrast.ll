@@ -3,25 +3,17 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: %rs_linker_struct___GPUBuffer = OpTypeStruct %float %float
-; CHECK: OpTypePointer Uniform %rs_linker_struct___GPUBuffer
+; CHECK: [[GLSL_EXT_INS:%.*]] = OpExtInstImport "GLSL.std.450"
+; CHECK: OpEntryPoint GLCompute [[WrapperId:%[a-zA-Z_0-9]*]] "entry_contrast"
 
-; CHECK: %rs_linker___GPUBlock = OpVariable %{{.+}} Uniform
-
-; CHECK-NOT: %rs_linker__Z14convert_float3Dv3_h = OpFunction %v3float
-; CHECK-NOT: %rs_linker__Z14convert_uchar3Dv3_f = OpFunction %v3uchar
-; CHECK-NOT: %rs_linker__Z5clampDv3_fff = OpFunction %v3float
-
-; CHECK: %__rsov_entry_contrast = OpFunction
-
-; CHECK-NOT: OpFunctionCall
+; CHECK-NOT: OpFunctionCall %v3float %_Z14convert_float3Dv3_h
+; CHECK-NOT: OpFunctionCall %v3float %_Z5clampDv3_fff
+; CHECK-NOT: OpFunctionCall %v3uchar %_Z14convert_uchar3Dv3_f
 
 ; CHECK: OpConvertUToF %v3float
-; CHECK: OpExtInst %v3float %glsl_ext_ins FClamp
+; CHECK: OpExtInst %v3float [[GLSL_EXT_INS]] FClamp
 ; CHECK: OpConvertFToU %v3uchar
 
-; Undef value representation.
-; CHECK-NOT: 4294967295
 
 @brightM = internal unnamed_addr global float 0.000000e+00, align 4
 @brightC = internal unnamed_addr global float 0.000000e+00, align 4

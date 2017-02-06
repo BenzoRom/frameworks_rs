@@ -1,5 +1,5 @@
 ; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
-; CHECK: OpEntryPoint GLCompute %__rsov_entry_inc "inc" %gl_GlobalInvocationID
+; CHECK: OpEntryPoint GLCompute %{{[a-zA-Z_0-9]*}} "entry_inc" %gl_GlobalInvocationID
 ; CHECK-NOT: an_invokable
 
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"

@@ -50,15 +50,7 @@ if [[ -z "$OUTPUT_FILE" ]]; then
     OUTPUT_FILE="${INPUT_FILE%.*}.spv"
 fi
 
-KERNEL="${INPUT_FILE%.*}_k.spv"
-KERNEL_TXT="${INPUT_FILE%.*}_k.spt"
-WRAPPER="${INPUT_FILE%.*}_w.spt"
-OUTPUT_TXT="${INPUT_FILE%.*}.spt"
-
-eval rs2spirv $INPUT_FILE -o $KERNEL -wo $WRAPPER &&
-eval spirv-dis $KERNEL --no-color -o $KERNEL_TXT &&
-eval rs2spirv -o $OUTPUT_TXT -lk $KERNEL_TXT -lw $WRAPPER &&
-eval spirv-as $OUTPUT_TXT -o $OUTPUT_FILE
+eval rs2spirv $INPUT_FILE -o $OUTPUT_FILE
 
 #rm -f $INPUT_FILE $KERNEL $KERNEL_TXT $WRAPPER $OUTPUT_TXT
 
