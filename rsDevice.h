@@ -39,6 +39,6 @@ protected:
     Vector<Context *> mContexts;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif

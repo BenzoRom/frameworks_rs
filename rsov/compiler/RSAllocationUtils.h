@@ -26,7 +26,7 @@ class CallInst;
 class GlobalVariable;
 class Module;
 class Type;
-}
+} // namespace llvm
 
 namespace rs2spirv {
 

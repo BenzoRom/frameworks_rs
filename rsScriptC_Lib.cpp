@@ -364,5 +364,5 @@ RsAllocation rsrAllocationCreateTyped(Context *rsc, const RsType type,
     return rsi_AllocationCreateTyped(rsc, type, mipmaps, usages, ptr);
 }
 
-}
-}
+} // namespace renderscript
+} // namespace android

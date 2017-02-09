@@ -267,5 +267,5 @@ void rsrFontColor(Context *rsc, float r, float g, float b, float a) {
     rsc->mStateFont.setFontColor(r, g, b, a);
 }
 
-}
-}
+} // namespace renderscript
+} // namespace android

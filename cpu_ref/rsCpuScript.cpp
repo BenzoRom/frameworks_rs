@@ -997,5 +997,5 @@ void RsdCpuScriptImpl::postLaunch(uint32_t slot, const Allocation ** ains,
                                   const RsScriptCall *sc) {}
 
 
-}
-}
+} // namespace renderscript
+} // namespace android

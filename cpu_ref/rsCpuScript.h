@@ -28,7 +28,7 @@
 
 namespace bcinfo {
     class MetadataExtractor;
-}
+} // namespace bcinfo
 
 namespace android {
 namespace renderscript {
@@ -151,7 +151,7 @@ uint32_t constructBuildChecksum(uint8_t const *bitcode, size_t bitcodeSize,
                                 const char *commandLine,
                                 const char ** bccFiles, size_t numFiles);
 
-}
+} // namespace renderscript
 
 #ifdef __LP64__
 #define SYSLIBPATH "/system/lib64"
@@ -167,6 +167,6 @@ uint32_t constructBuildChecksum(uint8_t const *bitcode, size_t bitcodeSize,
 #define SYSLIBPATH_VENDOR "/system/vendor/lib"
 #endif
 
-}
+} // namespace android
 
 #endif  // RSD_CPU_SCRIPT_H

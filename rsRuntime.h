@@ -226,5 +226,5 @@ void rsrMatrixTranspose_4x4(rs_matrix4x4 *m);
 void rsrMatrixTranspose_3x3(rs_matrix3x3 *m);
 void rsrMatrixTranspose_2x2(rs_matrix2x2 *m);
 
-}
-}
+} // namespace renderscript
+} // namespace android

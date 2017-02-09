@@ -99,8 +99,8 @@ public:
     Vector<Sampler *> mAllSamplers;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif //ANDROID_RS_SAMPLER_H
 
 

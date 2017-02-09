@@ -84,7 +84,7 @@ public:
     return true;
   }
 };
-}
+} // namespace
 
 char RemoveNonkernelsPass::ID = 0;
 

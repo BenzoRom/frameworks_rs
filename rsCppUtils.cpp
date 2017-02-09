@@ -101,5 +101,5 @@ bool rsuExecuteCommand(const char *exe, int nArgs, const char * const *args) {
 }
 #endif // RS_COMPATIBILITY_LIB
 
-}
-}
+} // namespace renderscript
+} // namespace android
