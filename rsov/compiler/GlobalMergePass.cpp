@@ -134,7 +134,7 @@ private:
     return !Globals.empty();
   }
 };
-}
+} // namespace
 
 char GlobalMergePass::ID = 0;
 

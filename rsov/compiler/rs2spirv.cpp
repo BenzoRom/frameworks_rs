@@ -37,7 +37,7 @@
 
 namespace kExt {
 const char SPIRVBinary[] = ".spv";
-}
+} // namespace kExt
 
 using namespace llvm;
 
@@ -74,7 +74,7 @@ static cl::opt<bool> RunTests("run-tests", cl::desc("Run unit tests"),
 
 namespace SPIRV {
 extern bool SPIRVUseTextFormat;
-}
+} // namespace SPIRV
 
 static std::string removeExt(const std::string &FileName) {
   size_t Pos = FileName.find_last_of(".");

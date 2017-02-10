@@ -24,8 +24,8 @@ namespace renderscript {
 
 class Context;
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 // An element is a group of Components that occupies one cell in a structure.
 class RsdVertexArray {

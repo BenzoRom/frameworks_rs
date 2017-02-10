@@ -4351,8 +4351,8 @@ class ScriptIntrinsicYuvToRGB : public ScriptIntrinsic {
 
 };
 
-}
+} // namespace RSC
 
-}
+} // namespace android
 
 #endif

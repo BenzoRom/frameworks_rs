@@ -36,8 +36,8 @@ protected:
     mutable bool mDirty;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif // ANDROID_RS_PROGRAM_BASE_H
 
 

@@ -253,7 +253,7 @@ protected:
                         float u4, float v4);
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #endif
