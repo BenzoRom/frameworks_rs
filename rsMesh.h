@@ -98,8 +98,8 @@ public:
     }
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif //ANDROID_RS_MESH_H
 
 

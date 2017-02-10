@@ -388,6 +388,6 @@ private:
 
 void LF_ObjDestroy_handcode(const Context *rsc, RsAsyncVoidPtr objPtr);
 
-} // renderscript
-} // android
+} // namespace renderscript
+} // namespace android
 #endif

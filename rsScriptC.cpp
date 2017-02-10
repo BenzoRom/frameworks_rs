@@ -467,5 +467,5 @@ RsScript rsi_ScriptCCreate(Context *rsc,
     return s;
 }
 
-}
-}
+} // namespace renderscript
+} // namespace android

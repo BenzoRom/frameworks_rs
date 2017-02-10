@@ -75,7 +75,7 @@ public:
     return true;
   }
 };
-}
+} // namespace
 
 char InlinePreparationPass::ID = 0;
 

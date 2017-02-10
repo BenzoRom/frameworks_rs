@@ -95,8 +95,8 @@ public:
     Vector<ProgramStore *> mStorePrograms;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif
 
 

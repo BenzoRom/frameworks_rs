@@ -94,8 +94,8 @@ protected:
 };
 
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif //ANDROID_RS_FILE_A3D_H
 
 

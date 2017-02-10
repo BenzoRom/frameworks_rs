@@ -107,7 +107,7 @@ private:
 };
 
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif
 

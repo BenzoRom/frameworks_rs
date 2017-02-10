@@ -27,8 +27,8 @@ class Element;
 class Context;
 class Program;
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 class RsdShaderCache;
 

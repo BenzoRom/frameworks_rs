@@ -61,7 +61,7 @@ protected:
     float mInputMax;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif //ANDROID_STRUCTURED_ELEMENT_H
 

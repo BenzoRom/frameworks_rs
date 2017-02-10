@@ -67,6 +67,6 @@ public:
 #endif
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif

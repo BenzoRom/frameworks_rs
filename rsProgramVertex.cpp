@@ -251,5 +251,5 @@ RsProgramVertex rsi_ProgramVertexCreate(Context *rsc, const char * shaderText, s
     return pv;
 }
 
-}
-}
+} // namespace renderscript
+} // namespace android

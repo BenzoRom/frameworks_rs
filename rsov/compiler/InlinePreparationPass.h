@@ -19,11 +19,11 @@
 
 namespace llvm {
 class ModulePass;
-}
+} // namespace llvm
 
 namespace bcinfo {
 class MetadataExtractor;
-}
+} // namespace bcinfo
 
 namespace rs2spirv {
 

@@ -90,7 +90,7 @@ protected:
 };
 
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif
 
