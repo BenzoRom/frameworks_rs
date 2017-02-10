@@ -253,6 +253,6 @@ private:
     void packVec3Allocation(Context *rsc, OStream *stream) const;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif

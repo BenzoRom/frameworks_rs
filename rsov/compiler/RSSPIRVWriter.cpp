@@ -44,7 +44,7 @@ using namespace SPIRV;
 
 namespace llvm {
 FunctionPass *createPromoteMemoryToRegisterPass();
-}
+} // namespace llvm
 
 namespace rs2spirv {
 

@@ -22,7 +22,7 @@
 namespace llvm {
 class Module;
 class raw_ostream;
-}
+} // namespace llvm
 
 namespace rs2spirv {
 

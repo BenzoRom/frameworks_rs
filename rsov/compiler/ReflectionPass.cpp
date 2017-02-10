@@ -287,7 +287,8 @@ const std::map<RSType, TypeMapping> ReflectionPass::TypeMappings = {
     {RSType::rs_uchar4, {RSType::rs_uchar4, true, 4, "%uchar", "Rgba8ui"}},
     {RSType::rs_int4, {RSType::rs_int4, true, 4, "%uint", "Rgba32i"}},
     {RSType::rs_float4, {RSType::rs_float4, true, 4, "%float", "Rgba32f"}}};
-};
+
+} // namespace
 
 char ReflectionPass::ID = 0;
 

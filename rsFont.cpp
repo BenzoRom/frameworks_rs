@@ -875,5 +875,5 @@ RsFont rsi_FontCreateFromMemory(Context *rsc,
     return newFont;
 }
 
-} // renderscript
-} // android
+} // namespace renderscript
+} // namespace android

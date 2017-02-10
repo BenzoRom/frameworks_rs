@@ -19,7 +19,7 @@
 
 namespace llvm {
 class ModulePass;
-}
+} // namespace llvm
 
 namespace rs2spirv {
 
