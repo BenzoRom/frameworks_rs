@@ -60,8 +60,8 @@ public:
     ObjectBaseRef<ProgramFragment> mLast;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 #endif
 
 
