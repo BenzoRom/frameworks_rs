@@ -22,8 +22,8 @@ namespace renderscript {
 
 class Context;
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 
 #if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)

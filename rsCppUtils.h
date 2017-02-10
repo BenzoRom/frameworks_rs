@@ -156,7 +156,7 @@ namespace android {
         }
     };
 
-}
+} // namespace android
 
 typedef int64_t nsecs_t;  // nano-seconds
 
@@ -306,8 +306,8 @@ bool rsuExecuteCommand(const char *exe, int nArgs, const char * const *args);
 #endif
 
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #endif //ANDROID_RS_OBJECT_BASE_H
 

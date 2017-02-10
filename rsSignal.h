@@ -40,8 +40,8 @@ protected:
     pthread_cond_t mCondition;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #endif
 

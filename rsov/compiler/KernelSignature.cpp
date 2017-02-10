@@ -56,7 +56,7 @@ std::string TypeToString(const Type *Ty) {
   badNameStream << ']';
   return badNameStream.str();
 }
-}
+} // namespace
 
 namespace rs2spirv {
 

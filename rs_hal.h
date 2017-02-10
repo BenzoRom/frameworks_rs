@@ -491,8 +491,8 @@ enum RsHalInitEnums {
     RS_HAL_GRAPHICS_STORE_DESTROY                           = 106002,
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #ifdef __cplusplus
 extern "C" {

@@ -162,8 +162,8 @@ protected:
     T * mRef;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #endif //ANDROID_RS_OBJECT_BASE_H
 

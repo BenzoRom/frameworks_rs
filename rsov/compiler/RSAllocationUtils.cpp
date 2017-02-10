@@ -192,4 +192,4 @@ bool solidifyRSAllocAccess(Module &M, RSAllocationCallInfo CallInfo) {
   return true;
 }
 
-} // rs2spirv
+} // namespace rs2spirv

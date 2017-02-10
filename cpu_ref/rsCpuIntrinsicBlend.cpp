@@ -34,8 +34,8 @@ protected:
                        uint32_t xend, uint32_t outstep);
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 
 enum {

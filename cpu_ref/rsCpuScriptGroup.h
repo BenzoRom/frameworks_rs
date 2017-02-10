@@ -56,7 +56,7 @@ protected:
     RsdCpuReferenceImpl *mCtx;
 };
 
-}
-}
+} // namespace renderscript
+} // namespace android
 
 #endif // RSD_SCRIPT_GROUP_H
