@@ -237,7 +237,7 @@ LOCAL_SRC_FILES:= \
 	rsApiType.cpp \
 
 LOCAL_SHARED_LIBRARIES += libRS_internal
-LOCAL_SHARED_LIBRARIES += liblog
+LOCAL_SHARED_LIBRARIES += liblog libui
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 
@@ -339,7 +339,7 @@ LOCAL_SRC_FILES:= \
 	rsThreadIO.cpp \
 	rsType.cpp
 
-LOCAL_STATIC_LIBRARIES := libcutils libutils liblog
+LOCAL_STATIC_LIBRARIES := libcutils libutils liblog libarect
 
 include $(BUILD_HOST_STATIC_LIBRARY)
 

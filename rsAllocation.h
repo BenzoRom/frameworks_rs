@@ -20,10 +20,9 @@
 #include "rsType.h"
 
 #if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include <ui/GraphicBuffer.h>
 #include "rsGrallocConsumer.h"
-#include "gui/CpuConsumer.h"
-#include "gui/GLConsumer.h"
+#include <gui/CpuConsumer.h>
+#include <gui/GLConsumer.h>
 #else
 struct ANativeWindowBuffer;
 #endif

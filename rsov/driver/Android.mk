@@ -37,7 +37,8 @@ LOCAL_SHARED_LIBRARIES := \
     libbcinfo \
     libc++ \
     liblog \
-    libvulkan
+    libvulkan \
+    libgui
 
 LOCAL_C_INCLUDES := \
     frameworks/compile/libbcc/include \

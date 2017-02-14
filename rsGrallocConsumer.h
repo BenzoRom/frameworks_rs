@@ -18,12 +18,9 @@
 #define ANDROID_RS_GRALLOC_CONSUMER_H
 
 #include <gui/ConsumerBase.h>
+#include <gui/BufferQueue.h>
 
 #include <ui/GraphicBuffer.h>
-
-#include <utils/String8.h>
-#include <utils/Vector.h>
-#include <utils/threads.h>
 
 
 // ---------------------------------------------------------------------------
