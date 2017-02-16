@@ -989,7 +989,7 @@ nElementGetSubElements(JNIEnv *_env, jobject _this, jlong con, jlong id,
 
     uintptr_t *ids = (uintptr_t *)malloc(dataSize * sizeof(uintptr_t));
     const char **names = (const char **)malloc((uint32_t)dataSize * sizeof(const char *));
-    uint32_t *arraySizes = (uint32_t *)malloc((uint32_t)dataSize * sizeof(uint32_t));
+    size_t *arraySizes = (size_t *)malloc(dataSize * sizeof(size_t));
 
     dispatchTab.ElementGetSubElements((RsContext)con, (RsElement)id, ids, names, arraySizes,
                                       (uint32_t)dataSize);
