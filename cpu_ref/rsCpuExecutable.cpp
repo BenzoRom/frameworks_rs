@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #else
-#include "bcc/Config/Config.h"
+#include "bcc/Config.h"
 #endif
 
 #include <dlfcn.h>
