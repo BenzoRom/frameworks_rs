@@ -11,7 +11,7 @@
 #include <vector>
 
 #ifndef RS_COMPATIBILITY_LIB
-#include "bcc/Config/Config.h"
+#include "bcc/Config.h"
 #endif
 
 #include "cpu_ref/rsCpuCore.h"
