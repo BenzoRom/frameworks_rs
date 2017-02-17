@@ -25,7 +25,7 @@
 #else
     #include "rsCppUtils.h"
 
-    #include <bcc/Config/Config.h>
+    #include <bcc/Config.h>
     #include <bcinfo/MetadataExtractor.h>
     #include <cutils/properties.h>
 
