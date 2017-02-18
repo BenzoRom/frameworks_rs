@@ -48,6 +48,7 @@ LOCAL_SRC_FILES := $(SPIRIT_SRCS)
 LOCAL_MODULE := $(LIBNAME)
 LOCAL_MULTILIB := first
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_IS_HOST_MODULE := true
 
 PATH_TO_GENERATED := $(local-generated-sources-dir)
 GEN := \
@@ -89,6 +90,7 @@ LOCAL_MODULE := word_stream_test
 LOCAL_MULTILIB := first
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE_CLASS := NATIVE_TESTS
+LOCAL_IS_HOST_MODULE := true
 
 PATH_TO_GENERATED := $(local-generated-sources-dir)
 GEN := \
@@ -125,6 +127,7 @@ LOCAL_MODULE := instructions_test
 LOCAL_MULTILIB := first
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE_CLASS := NATIVE_TESTS
+LOCAL_IS_HOST_MODULE := true
 
 PATH_TO_GENERATED := $(local-generated-sources-dir)
 GEN := \
@@ -163,6 +166,7 @@ LOCAL_MODULE := $(LIBNAME)_test
 LOCAL_MULTILIB := first
 LOCAL_MODULE_TAGS := tests
 LOCAL_MODULE_CLASS := NATIVE_TESTS
+LOCAL_IS_HOST_MODULE := true
 
 include $(BUILD_HOST_NATIVE_TEST)
 
