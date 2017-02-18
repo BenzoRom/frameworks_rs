@@ -24,19 +24,17 @@ def generate_header_file(filename, with_guard, printer):
     f = open(filename, 'w')
     orig_stdout = sys.stdout
     sys.stdout = f
+    print '// DO NOT MODIFY. AUTO-GENERATED.\n'
     if with_guard:
-        guard_macro = filename.upper().replace('.','_').replace('/','_')
-        print "#ifndef", guard_macro
-        print "#define", guard_macro
+        print "#pragma once"
+        print
         print "namespace android {"
         print "namespace spirit {"
         print
-    print '// DO NOT MODIFY. AUTO-GENERATED.\n'
     printer()
     if with_guard:
         print "} // namespace spirit"
         print "} // namespace android"
-        print "#endif  //", guard_macro
     f.close()
     sys.stdout = orig_stdout
 
