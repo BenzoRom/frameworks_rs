@@ -68,14 +68,7 @@ eval llvm-rs-cc -o "$output_folder" -S -emit-llvm -Wall -Werror -target-api 24 \
   -I "$AND_HOME/external/clang/lib/Headers" -I "$AND_HOME/frameworks/rs/script_api/include" \
   "$script_name" &&
 eval llvm-as "$output_folder/bc32/$script.ll" -o "$output_folder/$script.bc" &&
-eval rs2spirv "$output_folder/$script.bc" -o "$output_folder/$script.rs.spv" \
-              -wo "$output_folder/$script.w.spt" &&
-eval "$SPIRV_TOOLS_PATH/spirv-dis" "$output_folder/$script.rs.spv" \
-              --no-color > "$output_folder/$script.rs.spt" &&
-eval rs2spirv -o "$output_folder/$script.spt" -lk "$output_folder/$script.rs.spt" \
-              -lw "$output_folder/$script.w.spt" &&
-eval "$SPIRV_TOOLS_PATH/spirv-as" "$output_folder/$script.spt" \
-              -o "$output_folder/$script.spv" &&
+eval rs2spirv "$output_folder/$script.bc" -o "$output_folder/$script.spv" &&
 dump &&
 eval "$SPIRV_TOOLS_PATH/spirv-val" "$output_folder/$script.spv" &&
 

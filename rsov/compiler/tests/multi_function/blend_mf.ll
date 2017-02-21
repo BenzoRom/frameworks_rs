@@ -3,23 +3,21 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK-NOT: %rs_linker__Z14convert_uchar4Dv4_j = OpFunction %v4uchar
-; CHECK-NOT: %rs_linker__Z13convert_uint4Dv4_h = OpFunction %v4uint
-; CHECK-NOT: OpFunction %v4uchar
-; CHECK-NOT: OpFunction %uchar
-
-; CHECK: %__rsov_entry_setImageAlpha = OpFunction
-
-; CHECK: OpUConvert %v4uint
-; CHECK: OpUConvert %v4uchar
-
-; CHECK-NOT: OpFunctionCall
+; CHECK: OpEntryPoint GLCompute %[[WrapperId:[a-zA-Z_0-9]*]] "entry_setImageAlpha"
 
 ; Function Attrs: norecurse nounwind readnone
 define void @NOP() #0 {
 entry:
   ret void
 }
+
+; CHECK: [[KernelId:%[a-zA-Z_0-9]+]] = OpFunction {{.*}}
+
+; Function calls to _Z14convert_uchar4Dv4_j should be translated into OpUConvert instructions
+; CHECK-NOT: OpFunctionCall %v4uchar %_Z14convert_uchar4Dv4_j
+; CHECK-NOT: OpFunctionCall %v4uint %_Z13convert_uint4Dv4_h
+; CHECK: OpUConvert %v4uint
+; CHECK: OpUConvert %v4uchar
 
 ; Function Attrs: nounwind readnone
 define <4 x i8> @setImageAlpha(<4 x i8> %in) #1 {

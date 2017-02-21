@@ -1,14 +1,11 @@
-; RUN: llvm-as < %s | rs2spirv -spirv-text -o %t
-; RUN: FileCheck < %t %s
-
-; TODO: Complete the test.
-
+; Expecting validation failure
+; RUN: not rs2spirv_lit_driver.sh %s
 
 target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
 ; Function Attrs: nounwind readnone
-; CHECK: Name [[FooIdx:[0-9]+]] "fib"
+; CHECK: OpEntryPoint GLCompute %{{[a-zA-Z_0-9]*}} "entry_fib" %gl_GlobalInvocationID
 define i32 @fib(i32 %n) #0 {
 entry:
   %n.off8 = add i32 %n, -1

@@ -101,7 +101,7 @@ class RSoVScript : RsdCpuReference::CpuScript {
  private:
   void InitDescriptorAndPipelineLayouts(uint32_t inLen);
   void InitShader(uint32_t slot);
-  void InitDescriptorPool();
+  void InitDescriptorPool(uint32_t inLen);
   void InitDescriptorSet(const std::vector<RSoVAllocation *> &inputAllocations,
                          RSoVAllocation *outputAllocation);
   void InitPipelineCache();
