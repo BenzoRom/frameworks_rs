@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include "LinkerModule.h"
 #include "RSSPIRVWriter.h"
 #include "unit_tests/TestRunner.h"
 #include "llvm/Bitcode/ReaderWriter.h"
@@ -47,16 +46,6 @@ static cl::opt<std::string> InputFile(cl::Positional, cl::desc("<input file>"),
 static cl::opt<std::string> OutputFile("o",
                                        cl::desc("Override output filename"),
                                        cl::value_desc("filename"));
-
-static cl::opt<std::string>
-    KernelFile("lk", cl::desc("File with a compute shader kernel"),
-               cl::value_desc("kernel.spt"));
-
-static cl::opt<std::string> WrapperFile(
-    "lw",
-    cl::desc("Generated wrapper file"
-             "(with entrypoint function and input/output images or buffers)"),
-    cl::value_desc("wrapper.spt"));
 
 static cl::opt<bool> IsPrintAsWords(
     "print-as-words",
@@ -177,15 +166,6 @@ int main(int ac, char **av) {
 
   if (IsPrintAsWords)
     return printAsWords();
-
-  if (!KernelFile.empty() && !WrapperFile.empty()) {
-    DEBUG(dbgs() << "Link " << KernelFile << " into " << WrapperFile << "\n");
-    if (!rs2spirv::Link(KernelFile, WrapperFile, OutputFile)) {
-      errs() << "Linking failed!\n\n";
-      return -1;
-    }
-    return 0;
-  }
 
   return convertLLVMToSPIRV();
 }

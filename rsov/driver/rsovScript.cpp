@@ -129,7 +129,6 @@ RSoVScript::RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
 RSoVScript::~RSoVScript() {
   delete mCpuScript;
   delete mME;
-  // TODO: destroy shader
 }
 
 void RSoVScript::populateScript(Script *) {
@@ -255,7 +254,7 @@ void RSoVScript::InitDescriptorAndPipelineLayouts(uint32_t inLen) {
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
       .pNext = nullptr,
       .flags = 0,
-      .bindingCount = static_cast<uint32_t>(layout_bindings.size()),
+      .bindingCount = inLen + 1,
       .pBindings = layout_bindings.data(),
   };
 
@@ -301,7 +300,9 @@ void RSoVScript::InitShader(uint32_t slot) {
   rsAssert(RSKernelNames);
   rsAssert(RSKernelNames[slot]);
   ALOGV("slot = %d kernel name = %s", slot, RSKernelNames[slot]);
-  mShaderStage.pName = RSKernelNames[slot];
+  std::string entryName("entry_");
+  entryName.append(RSKernelNames[slot]);
+  mShaderStage.pName = strndup(entryName.c_str(), entryName.size());
 
   VkShaderModuleCreateInfo moduleCreateInfo = {
       .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
@@ -317,22 +318,14 @@ void RSoVScript::InitShader(uint32_t slot) {
   ALOGV("%s succeeded.", __FUNCTION__);
 }
 
-void RSoVScript::InitDescriptorPool() {
+void RSoVScript::InitDescriptorPool(uint32_t inLen) {
   /* DEPENDS on InitDescriptorAndPipelineLayouts() */
 
   VkResult res;
   VkDescriptorPoolSize type_count[] = {
       {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1,
+          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1 + inLen,
       },
-      {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1,
-      },
-#ifdef SUPPORT_GLOBAL_VARIABLES
-      {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1,
-      }
-#endif
   };
 
   VkDescriptorPoolCreateInfo descriptor_pool = {
@@ -364,6 +357,7 @@ void RSoVScript::InitDescriptorSet(
 
   mDescSet.resize(NUM_DESCRIPTOR_SETS);
   res = vkAllocateDescriptorSets(mDevice, &alloc_info, mDescSet.data());
+  ALOGD("vkAllocateDescriptorSets() result = %d", res);
   rsAssert(res == VK_SUCCESS);
 
   // TODO: support for set up the binding(s) of global variables
@@ -425,7 +419,7 @@ void RSoVScript::runForEach(
 
   InitDescriptorAndPipelineLayouts(inLen);
   InitShader(slot);
-  InitDescriptorPool();
+  InitDescriptorPool(inLen);
   InitDescriptorSet(inputAllocations, outputAllocation);
   // InitPipelineCache();
   InitPipeline();
@@ -501,7 +495,9 @@ void RSoVScript::runForEach(
   for (int i = 0; i < NUM_DESCRIPTOR_SETS; i++)
     vkDestroyDescriptorSetLayout(mDevice, mDescLayout[i], nullptr);
   vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
+  vkFreeDescriptorSets(mDevice, mDescPool, NUM_DESCRIPTOR_SETS, mDescSet.data());
   vkDestroyDescriptorPool(mDevice, mDescPool, nullptr);
+  free((void*)mShaderStage.pName);
   vkDestroyShaderModule(mDevice, mShaderStage.module, nullptr);
 
   ALOGV("%s succeeded.", __FUNCTION__);

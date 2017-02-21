@@ -2,22 +2,17 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: OpMemberDecorate %rs_linker_struct___GPUBuffer 0 Offset 0
-; CHECK: OpMemberDecorate %rs_linker_struct___GPUBuffer 1 Offset 8
-; CHECK: OpMemberDecorate %rs_linker_struct___GPUBuffer 2 Offset 24
-; CHECK: OpMemberDecorate %rs_linker_struct___GPUBuffer 3 Offset 28
-; CHECK: OpDecorate %rs_linker_struct___GPUBuffer BufferBlock
-; CHECK: OpDecorate %rs_linker___GPUBlock DescriptorSet 0
-; CHECK: OpDecorate %rs_linker___GPUBlock Binding 2
+; CHECK-DAG: OpDecorate [[GPUBlockVar:%[a-zA-Z_0-9]+]] Binding 0
+; CHECK-DAG: OpDecorate [[STRUCT:%struct__.*]] BufferBlock
+; CHECK-DAG: OpMemberDecorate [[STRUCT]] 0 Offset 0
+; CHECK-DAG: OpMemberDecorate [[STRUCT]] 1 Offset 8
+; CHECK-DAG: OpMemberDecorate [[STRUCT]] 2 Offset 24
+; CHECK-DAG: OpMemberDecorate [[STRUCT]] 3 Offset 28
 
-; CHECK: %rs_linker_struct___GPUBuffer = OpTypeStruct %float %v4float %uchar %uint
-; CHECK: OpTypePointer Uniform %rs_linker_struct___GPUBuffer
+; CHECK: [[STRUCT]] = OpTypeStruct %float %v4float %uchar %uint{{.*}}
+; CHECK: [[STRUCT_PTR_TY:%[a-zA-Z_0-9]+]] = OpTypePointer Uniform [[STRUCT]]
 
-; CHECK: %rs_linker___GPUBlock = OpVariable %{{.+}} Uniform
-
-; CHECK: %__rsov_entry_k1 = OpFunction
-
-; CHECK-NOT: OpInBoundsPtrAccessChain
+; CHECK: [[GPUBlockVar]] = OpVariable [[STRUCT_PTR_TY]] Uniform
 
 @c1 = common global float 0.000000e+00, align 4
 @c2 = common global <4 x float> zeroinitializer, align 16

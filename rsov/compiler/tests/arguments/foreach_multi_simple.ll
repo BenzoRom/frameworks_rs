@@ -2,18 +2,13 @@
 
 ; Decorations
 ; CHECK: OpDecorate %[[BUF_0S:.*]] BufferBlock
-; CHECK: OpDecorate %[[BUF_VAR0:.*]] DescriptorSet {{[0-9]}}
-; CHECK: OpDecorate %[[BUF_VAR0]] Binding 2
+; CHECK: OpDecorate %[[BUF_VAR0:.*]] Binding 2
 ; CHECK: OpDecorate %[[BUF_1S:.*]] BufferBlock
-; CHECK: OpDecorate %[[BUF_VAR1:.*]] DescriptorSet {{[0-9]}}
-; CHECK: OpDecorate %[[BUF_VAR1]]  Binding 3
+; CHECK: OpDecorate %[[BUF_VAR1:.*]] Binding 3
 
-; TypeAndConst
 ; CHECK:%[[BUF_PTR_TY0:.*]] = OpTypePointer Uniform %[[BUF_0S]]
-; CHECK:%[[BUF_PTR_TY1:.*]] = OpTypePointer Uniform %[[BUF_1S]]
-
-; Var
 ; CHECK:%[[BUF_VAR0]] = OpVariable %[[BUF_PTR_TY0]] Uniform
+; CHECK:%[[BUF_PTR_TY1:.*]] = OpTypePointer Uniform %[[BUF_1S]]
 ; CHECK:%[[BUF_VAR1]] = OpVariable %[[BUF_PTR_TY1]] Uniform
 
 ; Wrapper

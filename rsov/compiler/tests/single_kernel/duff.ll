@@ -1,13 +1,12 @@
-; RUN: llvm-as < %s | rs2spirv -spirv-text -o %t
-; RUN: FileCheck < %t %s
-
-; TODO: Complete the test.
+; Expecting validation failure
+; RUN: not rs2spirv_lit_driver.sh %s
 
 target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
+; CHECK: OpEntryPoint GLCompute %[[WrapperId:[a-zA-Z_0-9]*]] "entry_duff"
+; CHECK: [[KernelId:%[a-zA-Z_0-9]+]] = OpFunction {{.*}}
 ; Function Attrs: norecurse nounwind readnone
-; CHECK: Name [[FooIdx:[0-9]+]] "duff"
 define i32 @duff(i32 %count) #0 {
 entry:
   %add = add nsw i32 %count, 7
@@ -82,6 +81,11 @@ sw.epilog:                                        ; preds = %sw.bb14, %entry
   %x.8 = phi i32 [ 321, %entry ], [ %shl, %sw.bb14 ]
   ret i32 %x.8
 }
+
+; CHECK: %[[WrapperId]] = OpFunction {{.*}}
+; CHECK-NEXT: OpLabel
+; CHECK: %{{[0-9]+}} = OpFunctionCall %{{.*}} [[KernelId]]
+; CHECK: OpReturn
 
 attributes #0 = { norecurse nounwind readnone "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "stack-protector-buffer-size"="0" "stackrealign" "unsafe-fp-math"="false" "use-soft-float"="false" }
 

@@ -31,8 +31,8 @@
 
 #include "GlobalMergePass.h"
 #include "InlinePreparationPass.h"
-#include "ReflectionPass.h"
 #include "RemoveNonkernelsPass.h"
+#include "Wrapper.h"
 
 #include <fstream>
 #include <sstream>
@@ -52,7 +52,7 @@ static cl::opt<std::string> WrapperOutputFile("wo",
                                               cl::desc("Wrapper output file"),
                                               cl::value_desc("filename.spt"));
 
-static void HandleTargetTriple(Module &M) {
+static void HandleTargetTriple(llvm::Module &M) {
   Triple TT(M.getTargetTriple());
   auto Arch = TT.getArch();
 
@@ -97,7 +97,7 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
   PassMgr.add(createSPIRVLowerBool());
 }
 
-bool WriteSPIRV(Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
+bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
   std::unique_ptr<SPIRVModule> BM(SPIRVModule::createSPIRVModule());
 
   HandleTargetTriple(*M);
@@ -112,17 +112,6 @@ bool WriteSPIRV(Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
   llvm::legacy::PassManager PassMgr;
   addPassesForRS2SPIRV(PassMgr, ME);
 
-  std::ofstream WrapperF;
-  if (!WrapperOutputFile.empty()) {
-    WrapperF.open(WrapperOutputFile, std::ios::trunc);
-    if (!WrapperF.good()) {
-      errs() << "Could not create/open file:\t" << WrapperOutputFile << "\n";
-      return false;
-    }
-    DEBUG(dbgs() << "Wrapper output:\t" << WrapperOutputFile << "\n");
-    PassMgr.add(createReflectionPass(WrapperF, ME));
-  }
-
   PassMgr.add(createLLVMToSPIRV(BM.get()));
   PassMgr.run(*M);
   DEBUG(M->dump());
@@ -130,7 +119,25 @@ bool WriteSPIRV(Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
   if (BM->getError(ErrMsg) != SPIRVEC_Success)
     return false;
 
-  OS << *BM;
+  llvm::SmallString<4096> O;
+  llvm::raw_svector_ostream SVOS(O);
+
+  SVOS << *BM;
+
+  llvm::StringRef str = SVOS.str();
+  std::vector<uint32_t> words(str.size() / 4);
+
+  memcpy(words.data(), str.data(), str.size());
+
+  int error;
+  auto wordsOut = AddGLComputeWrappers(words, ME, *M, &error);
+
+  if (error != 0) {
+    OS << *BM;
+    return false;
+  }
+
+  OS.write(reinterpret_cast<const char*>(wordsOut.data()), wordsOut.size() * 4);
 
   return true;
 }

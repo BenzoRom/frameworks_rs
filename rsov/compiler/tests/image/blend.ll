@@ -3,22 +3,10 @@
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: OpMemberDecorate %rs_linker_struct___GPUBuffer 0 Offset 0
-; CHECK: OpDecorate %rs_linker_struct___GPUBuffer BufferBlock
-; CHECK: OpDecorate %rs_linker___GPUBlock DescriptorSet 0
-; CHECK: OpDecorate %rs_linker___GPUBlock Binding 2
+; CHECK: OpEntryPoint GLCompute [[WrapperId:%[a-zA-Z_0-9]*]] "entry_setImageAlpha"
 
-; CHECK: %rs_linker_struct___GPUBuffer = OpTypeStruct %uchar
-; CHECK: OpTypePointer Uniform %rs_linker_struct___GPUBuffer
-
-; CHECK: %rs_linker___GPUBlock = OpVariable %{{.+}} Uniform
-
-; CHECK-NOT: %rs_linker__Z14convert_uchar4Dv4_j = OpFunction %v4uchar
-; CHECK-NOT: %rs_linker__Z13convert_uint4Dv4_h = OpFunction %v4uint
-
-; CHECK: %__rsov_entry_setImageAlpha = OpFunction
-
-; CHECK-NOT: OpFunctionCall
+; CHECK-NOT: OpFunctionCall %v4uchar %__Z14convert_uchar4Dv4_j
+; CHECK-NOT: OpFunctionCall %v4uint %__Z13convert_uint4Dv4_h
 
 ; CHECK: OpUConvert %v4uint
 ; CHECK: OpUConvert %v4uchar
