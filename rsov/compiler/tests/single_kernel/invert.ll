@@ -1,7 +1,5 @@
 ; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
 
-; TODO: Complete the test.
-
 target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
