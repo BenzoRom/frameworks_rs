@@ -1,16 +1,10 @@
-; RUN: llvm-as < %s | rs2spirv -o %t.rs.spv -wo %t.w.spt
-; RUN: spirv-dis %t.rs.spv --no-color -o %t.rs.spt
-; RUN: rs2spirv -o %t.spt -lk %t.rs.spt -lw %t.w.spt
-; RUN: spirv-as %t.spt -o %t.spv
-; RUN: spirv-val %t.spv
-; RUN: spirv-dis %t.spv -o %t.dis.spt
-; RUN: FileCheck < %t.dis.spt %s
+; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
 
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"
 target triple = "armv7-none-linux-gnueabi"
 
-; CHECK: OpEntryPoint GLCompute [[FuncId1:%[0-9]+]] "invert" %gl_GlobalInvocationID
-; CHECK-NEXT: OpEntryPoint GLCompute [[FuncId2:%[0-9]+]] "scalebytwo" %gl_GlobalInvocationID
+; CHECK: OpEntryPoint GLCompute [[FuncId1:%[0-9]+]] "entry_invert" %gl_GlobalInvocationID
+; CHECK-NEXT: OpEntryPoint GLCompute [[FuncId2:%[0-9]+]] "entry_scalebytwo" %gl_GlobalInvocationID
 
 ; Multi-kernel testcase
 ;float4 RS_KERNEL invert(float4 a) {

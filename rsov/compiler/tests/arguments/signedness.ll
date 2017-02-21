@@ -1,13 +1,56 @@
 ; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
 
-; CHECK: %__rsov_increment4_inputMemTy0 = OpTypeRuntimeArray %v4uint
-; CHECK: %__rsov_increment4_outputMemTy = OpTypeRuntimeArray %v4uint
-; CHECK: %__rsov_uincrement4_inputMemTy0 = OpTypeRuntimeArray %v4uint
-; CHECK: %__rsov_uincrement4_outputMemTy = OpTypeRuntimeArray %v4uint
-; CHECK: %__rsov_increment_inputMemTy0 = OpTypeRuntimeArray %uint
-; CHECK: %__rsov_increment_outputMemTy = OpTypeRuntimeArray %uint
-; CHECK: %__rsov_uincrement_inputMemTy0 = OpTypeRuntimeArray %uint
-; CHECK: %__rsov_uincrement_outputMemTy = OpTypeRuntimeArray %uint
+; CHECK: OpDecorate [[InVar1:%.*]] Binding 2
+; CHECK: OpDecorate [[OutVar1:%.*]] Binding 1
+
+; CHECK: OpDecorate [[InVar2:%.*]] Binding 2
+; CHECK: OpDecorate [[OutVar2:%.*]] Binding 1
+
+; CHECK: OpDecorate [[InVar3:%.*]] Binding 2
+; CHECK: OpDecorate [[OutVar3:%.*]] Binding 1
+
+; CHECK: OpDecorate [[InVar4:%.*]] Binding 2
+; CHECK: OpDecorate [[OutVar4:%.*]] Binding 1
+
+; CHECK: [[MemberTy1:%.*]] = OpTypeRuntimeArray %v4uint
+; CHECK: [[Struct1:%.*]] = OpTypeStruct [[MemberTy1]]
+; CHECK: [[PtrTy1:%.*]] = OpTypePointer Uniform [[Struct1]]
+; CHECK: [[InVar1]] = OpVariable [[PtrTy1]]
+
+; CHECK: [[OutMemberTy1:%.*]] = OpTypeRuntimeArray %v4uint
+; CHECK: [[OutStruct1:%.*]] = OpTypeStruct [[OutMemberTy1]]
+; CHECK: [[OutPtrTy1:%.*]] = OpTypePointer Uniform [[OutStruct1]]
+; CHECK: [[OutVar1]] = OpVariable [[OutPtrTy1]]
+
+; CHECK: [[MemberTy2:%.*]] = OpTypeRuntimeArray %v4uint
+; CHECK: [[Struct2:%.*]] = OpTypeStruct [[MemberTy2]]
+; CHECK: [[PtrTy2:%.*]] = OpTypePointer Uniform [[Struct2]]
+; CHECK: [[InVar2]] = OpVariable [[PtrTy2]]
+
+; CHECK: [[OutMemberTy2:%.*]] = OpTypeRuntimeArray %v4uint
+; CHECK: [[OutStruct2:%.*]] = OpTypeStruct [[OutMemberTy2]]
+; CHECK: [[OutPtrTy2:%.*]] = OpTypePointer Uniform [[OutStruct2]]
+; CHECK: [[OutVar2]] = OpVariable [[OutPtrTy2]]
+
+; CHECK: [[MemberTy3:%.*]] = OpTypeRuntimeArray %uint
+; CHECK: [[Struct3:%.*]] = OpTypeStruct [[MemberTy3]]
+; CHECK: [[PtrTy3:%.*]] = OpTypePointer Uniform [[Struct3]]
+; CHECK: [[InVar3]] = OpVariable [[PtrTy3]]
+
+; CHECK: [[OutMemberTy3:%.*]] = OpTypeRuntimeArray %uint
+; CHECK: [[OutStruct3:%.*]] = OpTypeStruct [[OutMemberTy3]]
+; CHECK: [[OutPtrTy3:%.*]] = OpTypePointer Uniform [[OutStruct3]]
+; CHECK: [[OutVar3]] = OpVariable [[OutPtrTy3]]
+
+; CHECK: [[MemberTy4:%.*]] = OpTypeRuntimeArray %uint
+; CHECK: [[Struct4:%.*]] = OpTypeStruct [[MemberTy4]]
+; CHECK: [[PtrTy4:%.*]] = OpTypePointer Uniform [[Struct4]]
+; CHECK: [[InVar4]] = OpVariable [[PtrTy4]]
+
+; CHECK: [[OutMemberTy4:%.*]] = OpTypeRuntimeArray %uint
+; CHECK: [[OutStruct4:%.*]] = OpTypeStruct [[OutMemberTy4]]
+; CHECK: [[OutPtrTy4:%.*]] = OpTypePointer Uniform [[OutStruct4]]
+; CHECK: [[OutVar4]] = OpVariable [[OutPtrTy4]]
 
 ; // the RS the .rs from which this .ll is generated
 ; #pragma version(1)

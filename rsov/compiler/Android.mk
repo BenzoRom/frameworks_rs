@@ -24,15 +24,14 @@ RS2SPRIV_DEVICE_BUILD ?= true
 
 RS2SPIRV_SOURCES := \
   rs2spirv.cpp \
+  Builtin.cpp \
   GlobalMergePass.cpp \
   InlinePreparationPass.cpp \
   KernelSignature.cpp \
-  LinkerModule.cpp \
-  ReflectionPass.cpp \
   RemoveNonkernelsPass.cpp \
   RSAllocationUtils.cpp \
   RSSPIRVWriter.cpp \
-  unit_tests/LinkerModuleTests.cpp
+  Wrapper.cpp \
 
 RS2SPIRV_INCLUDES := \
   $(LIBSPIRV_ROOT_PATH) \
@@ -41,6 +40,66 @@ RS2SPIRV_INCLUDES := \
   $(LIBBCC_ROOT_PATH)/include \
   $(LLVM_ROOT_PATH)/include \
   $(LLVM_ROOT_PATH)/host/include
+
+#=====================================================================
+# Unit tests for Wrapper module
+#=====================================================================
+
+include $(CLEAR_VARS)
+include $(CLEAR_TBLGEN_VARS)
+
+LOCAL_SRC_FILES := \
+  Builtin.cpp \
+  RSAllocationUtils.cpp \
+  Wrapper.cpp \
+  Wrapper_test.cpp \
+
+LOCAL_STATIC_LIBRARIES := libgtest_host
+
+LOCAL_SHARED_LIBRARIES := libLLVM libbcinfo libspirit
+
+LOCAL_C_INCLUDES := \
+  $(LLVM_ROOT_PATH)/include \
+  $(LLVM_ROOT_PATH)/host/include
+
+# End protobuf section
+
+LOCAL_MODULE := Wrapper_test
+LOCAL_MULTILIB := first
+LOCAL_MODULE_TAGS := tests
+
+LOCAL_MODULE_CLASS := NATIVE_TESTS
+
+include $(LLVM_ROOT_PATH)/llvm.mk
+include $(LLVM_HOST_BUILD_MK)
+include $(LLVM_GEN_INTRINSICS_MK)
+include $(LLVM_GEN_ATTRIBUTES_MK)
+include $(BUILD_HOST_NATIVE_TEST)
+
+#=====================================================================
+# Unit tests for Builtin module
+#=====================================================================
+
+include $(CLEAR_VARS)
+include $(CLEAR_TBLGEN_VARS)
+
+LOCAL_SRC_FILES := \
+  Builtin.cpp \
+  Builtin_test.cpp \
+
+LOCAL_STATIC_LIBRARIES := libgtest_host
+
+LOCAL_SHARED_LIBRARIES := libspirit
+
+# End protobuf section
+
+LOCAL_MODULE := Builtin_test
+LOCAL_MULTILIB := first
+LOCAL_MODULE_TAGS := tests
+
+LOCAL_MODULE_CLASS := NATIVE_TESTS
+
+include $(BUILD_HOST_NATIVE_TEST)
 
 #=====================================================================
 # Host Executable rs2spirv
@@ -61,8 +120,6 @@ LOCAL_C_INCLUDES := \
 LOCAL_MODULE := rs2spirv
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-LOCAL_SHARED_LIBRARIES += libLLVM libbcinfo libSPIRV
-
 # TODO: fix the remaining warnings
 
 LOCAL_CFLAGS += $(TOOL_CFLAGS) \
@@ -78,6 +135,8 @@ LOCAL_CFLAGS += $(TOOL_CFLAGS) \
 ifeq (true, $(FORCE_RS2SPIRV_DEBUG_BUILD))
   LOCAL_CFLAGS += -O0 -DRS2SPIRV_DEBUG=1
 endif
+
+LOCAL_SHARED_LIBRARIES := libLLVM libbcinfo libSPIRV libspirit
 
 include $(LLVM_ROOT_PATH)/llvm.mk
 include $(LLVM_HOST_BUILD_MK)
@@ -105,7 +164,7 @@ LOCAL_C_INCLUDES := \
 LOCAL_MODULE := rs2spirv
 LOCAL_MODULE_CLASS := EXECUTABLES
 
-LOCAL_SHARED_LIBRARIES += libLLVM libbcinfo libSPIRV
+LOCAL_SHARED_LIBRARIES += libLLVM libbcinfo libSPIRV libspirit
 
 LOCAL_CFLAGS += $(TOOL_CFLAGS) \
   -D_SPIRV_LLVM_API \

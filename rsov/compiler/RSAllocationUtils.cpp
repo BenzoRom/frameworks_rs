@@ -16,7 +16,7 @@
 
 #include "RSAllocationUtils.h"
 
-#include "SPIRVInternal.h"
+#include "cxxabi.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
@@ -67,7 +67,7 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
   DEBUG(dbgs() << "getRSGEATCalls\n");
   DEBUG(dbgs() << "\n\n~~~~~~~~~~~~~~~~~~~~~\n\n");
 
-  std::unordered_map<Value *, GlobalVariable *> Mapping;
+  std::unordered_map<const Value *, const GlobalVariable *> Mapping;
 
   for (auto &A : Allocs) {
     auto *GV = A.GlobalVar;
@@ -107,9 +107,8 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
           const auto FName = F->getName();
           DEBUG(dbgs() << "Discovered function call to : " << FName << '\n');
 
-          std::string DemangledName;
-          oclIsBuiltin(FName, &DemangledName);
-          const StringRef DemangledNameRef(DemangledName);
+          char *demangled = __cxxabiv1::__cxa_demangle(FName.str().c_str(), nullptr, nullptr, nullptr);
+          const StringRef DemangledNameRef(demangled);
           DEBUG(dbgs() << "Demangled name: " << DemangledNameRef << '\n');
 
           const StringRef GEAPrefix = "rsGetElementAt_";
@@ -149,7 +148,7 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
     }
   }
 
-  std::unordered_map<GlobalVariable *, std::string> GVAccessTypes;
+  std::unordered_map<const GlobalVariable *, std::string> GVAccessTypes;
 
   for (auto &Access : Calls) {
     auto AccessElemTyIt = GVAccessTypes.find(Access.RSAlloc.GlobalVar);

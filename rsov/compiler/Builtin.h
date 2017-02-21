@@ -1,5 +1,5 @@
 /*
- * Copyright 2016, The Android Open Source Project
+ * Copyright 2017, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-#ifndef RS_SPIRV_REFLECTION_PASS_H
-#define RS_SPIRV_REFLECTION_PASS_H
+#ifndef BUILTIN_H
+#define BUILTIN_H
 
-#include "llvm/ADT/StringRef.h"
+#include <stdint.h>
 
-#include <iosfwd>
+#include <vector>
 
-namespace llvm {
-class ModulePass;
-} // namespace llvm
+namespace android {
+namespace spirit {
 
-namespace bcinfo {
-class MetadataExtractor;
-} // namespace bcinfo
+class Builder;
+class Module;
+
+} // namespace spirit
+} // namespace android
 
 namespace rs2spirv {
 
-llvm::ModulePass *createReflectionPass(std::ostream &OS,
-                                       bcinfo::MetadataExtractor &ME);
+std::vector<uint32_t> TranslateBuiltins(android::spirit::Builder &b,
+                                        android::spirit::Module *m, int *error);
 
 } // namespace rs2spirv
 
-#endif
+#endif // BUILTIN_H
