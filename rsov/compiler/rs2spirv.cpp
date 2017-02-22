@@ -86,7 +86,7 @@ static int convertLLVMToSPIRV() {
   std::error_code EC;
   llvm::raw_fd_ostream OFS(outFile, EC, llvm::sys::fs::F_None);
   if (!rs2spirv::WriteSPIRV(M.get(), OFS, Err)) {
-    errs() << "Fails to save LLVM as SPIRV: " << Err << '\n';
+    errs() << "compiler error: " << Err << '\n';
     return -1;
   }
 
