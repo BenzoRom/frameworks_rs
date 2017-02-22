@@ -370,7 +370,7 @@ void RSoVScript::InitDescriptorSet(
           .dstArrayElement = 0,
           .descriptorCount = 1,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-          .pBufferInfo = outputAllocation->getBufferInfo(),
+          .pBufferInfo = outputAllocation->getBuffer()->getBufferInfo(),
       },
   };
   for (uint32_t i = 0; i < inputAllocations.size(); ++i) {
@@ -381,7 +381,7 @@ void RSoVScript::InitDescriptorSet(
         .dstArrayElement = 0,
         .descriptorCount = 1,
         .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
-        .pBufferInfo = inputAllocations[i]->getBufferInfo(),
+        .pBufferInfo = inputAllocations[i]->getBuffer()->getBufferInfo(),
     });
   }
 
