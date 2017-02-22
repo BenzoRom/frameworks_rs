@@ -16,8 +16,6 @@
 
 #include "rsovAllocation.h"
 
-#include <map>
-
 #include "rsAllocation.h"
 #include "rsContext.h"
 #include "rsCppUtils.h"
@@ -31,43 +29,6 @@ namespace renderscript {
 namespace rsov {
 
 namespace {
-
-using std::make_pair;
-
-// TODO: handle 8-bit, 16-bit, and 64-bit integers and floating point numbers
-const std::map<std::pair<RsDataType, uint32_t>, VkFormat> mapElementToFormat{
-    make_pair(make_pair(RS_TYPE_FLOAT_32, 1), VK_FORMAT_R32_SFLOAT),
-    make_pair(make_pair(RS_TYPE_FLOAT_32, 2), VK_FORMAT_R32G32_SFLOAT),
-    make_pair(make_pair(RS_TYPE_FLOAT_32, 3), VK_FORMAT_R32G32B32_SFLOAT),
-    make_pair(make_pair(RS_TYPE_FLOAT_32, 4), VK_FORMAT_R32G32B32A32_SFLOAT),
-
-    make_pair(make_pair(RS_TYPE_SIGNED_32, 1), VK_FORMAT_R32_SINT),
-    make_pair(make_pair(RS_TYPE_SIGNED_32, 2), VK_FORMAT_R32G32_SINT),
-    make_pair(make_pair(RS_TYPE_SIGNED_32, 3), VK_FORMAT_R32G32B32_SINT),
-    make_pair(make_pair(RS_TYPE_SIGNED_32, 4), VK_FORMAT_R32G32B32A32_SINT),
-
-    make_pair(make_pair(RS_TYPE_UNSIGNED_32, 1), VK_FORMAT_R32_UINT),
-    make_pair(make_pair(RS_TYPE_UNSIGNED_32, 2), VK_FORMAT_R32G32_UINT),
-    make_pair(make_pair(RS_TYPE_UNSIGNED_32, 3), VK_FORMAT_R32G32B32_UINT),
-    make_pair(make_pair(RS_TYPE_UNSIGNED_32, 4), VK_FORMAT_R32G32B32A32_UINT),
-};
-
-VkFormat VkFormatFromRSElement(const Element &elem) {
-  // TODO: reject struct, allocation, and other non-numeric element
-  rsAssert(!elem.getFieldCount());
-
-  RsDataType dataType = elem.getType();
-  uint32_t vectorWidth = elem.getVectorSize();
-
-  auto it = mapElementToFormat.find(make_pair(dataType, vectorWidth));
-  if (it != mapElementToFormat.end()) {
-    return it->second;
-  }
-
-  rsAssert(0 && "Unexpected RS Element to map to VkFormat");
-
-  return VK_FORMAT_R32G32B32A32_SFLOAT;
-}
 
 size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
   // For the flexible YCbCr format, layout is initialized during call to
@@ -256,22 +217,25 @@ void mip8(const Allocation *alloc, int lod, RsAllocationCubemapFace face) {
 }  // anonymous namespace
 
 RSoVAllocation::RSoVAllocation(RSoVContext *context, const Type *type,
-                               size_t size)
-    : mRSoV(context),
-      mDevice(context->getDevice()),
+                               size_t bufferSize)
+    : mBuffer(new RSoVBuffer(context, bufferSize)),
       mType(type),
       mWidth(type->getDimX()),
       mHeight(type->getDimY()),
-      mDepth(type->getDimZ()) {
+      mDepth(type->getDimZ()) {}
+
+RSoVBuffer::RSoVBuffer(RSoVContext *context, size_t size)
+    : mRSoV(context), mDevice(context->getDevice()) {
   InitBuffer(size);
 }
 
-RSoVAllocation::~RSoVAllocation() {
+RSoVBuffer::~RSoVBuffer() {
+  vkUnmapMemory(mDevice, mMem);
   vkDestroyBuffer(mDevice, mBuf, nullptr);
   vkFreeMemory(mDevice, mMem, nullptr);
 }
 
-void RSoVAllocation::InitBuffer(size_t bufferSize) {
+void RSoVBuffer::InitBuffer(size_t bufferSize) {
   VkResult res;
 
   VkBufferCreateInfo buf_info = {
@@ -298,10 +262,11 @@ void RSoVAllocation::InitBuffer(size_t bufferSize) {
   };
 
   bool pass;
-  pass = mRSoV->MemoryTypeFromProperties(
-      mem_reqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-      &allocateInfo.memoryTypeIndex);
+  pass =
+      mRSoV->MemoryTypeFromProperties(mem_reqs.memoryTypeBits,
+                                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+                                          VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                                      &allocateInfo.memoryTypeIndex);
   ALOGV("TypeBits = 0x%08X", mem_reqs.memoryTypeBits);
   rsAssert(pass);
 
@@ -315,107 +280,6 @@ void RSoVAllocation::InitBuffer(size_t bufferSize) {
   mBufferInfo.buffer = mBuf;
   mBufferInfo.offset = 0;
   mBufferInfo.range = bufferSize;
-
-  res = vkMapMemory(mDevice, mMem, 0, mem_reqs.size, 0, (void **)&mPtr);
-  rsAssert(res == VK_SUCCESS);
-}
-
-void RSoVAllocation::InitImage() {
-  VkResult res;
-
-  mFormat = VkFormatFromRSElement(*mType->getElement());
-
-  const uint32_t width = mWidth;
-  const uint32_t height = mHeight;
-  const uint32_t depth = mDepth;
-
-  VkImageType imageType =
-      depth > 0 ? VK_IMAGE_TYPE_3D
-                : (height > 0 ? VK_IMAGE_TYPE_2D : VK_IMAGE_TYPE_1D);
-
-  VkImageCreateInfo createInfo = {
-      .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = 0,
-      .imageType = imageType,
-      .format = mFormat,
-      .extent = {width, rsMax(height, 1U), rsMax(depth, 1U)},
-      .mipLevels = 1,
-      .arrayLayers = 1,
-      .samples = VK_SAMPLE_COUNT_1_BIT,
-      .tiling = VK_IMAGE_TILING_LINEAR,
-      .usage = VK_IMAGE_USAGE_STORAGE_BIT,
-      .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-      .queueFamilyIndexCount = 0,
-      .pQueueFamilyIndices = nullptr,
-      .initialLayout = VK_IMAGE_LAYOUT_PREINITIALIZED,
-  };
-
-  res = vkCreateImage(mDevice, &createInfo, nullptr, &mImage);
-  rsAssert(res == VK_SUCCESS);
-
-  VkMemoryRequirements mem_reqs;
-  vkGetImageMemoryRequirements(mDevice, mImage, &mem_reqs);
-
-  ALOGI("size of memory needed = %u", (uint)mem_reqs.size);
-
-  VkMemoryAllocateInfo allocateInfo = {
-      .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
-      .pNext = nullptr,
-      .allocationSize = mem_reqs.size,
-  };
-
-  /* Use the memory properties to determine the type of memory required */
-  bool pass;
-  pass = mRSoV->MemoryTypeFromProperties(
-      mem_reqs.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                                   VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-      &allocateInfo.memoryTypeIndex);
-  ALOGI("TypeBits = 0x%08X", mem_reqs.memoryTypeBits);
-  rsAssert(pass);
-
-  // TODO: Make this aligned
-  res = vkAllocateMemory(mDevice, &allocateInfo, nullptr, &mMem);
-  rsAssert(res == VK_SUCCESS);
-
-  res = vkBindImageMemory(mDevice, mImage, mMem, 0);
-  rsAssert(res == VK_SUCCESS);
-
-  VkImageViewType viewType =
-      depth > 0 ? VK_IMAGE_VIEW_TYPE_3D
-                : (height > 0 ? VK_IMAGE_VIEW_TYPE_2D : VK_IMAGE_VIEW_TYPE_1D);
-
-  VkImageViewCreateInfo view_info = {
-      .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
-      .pNext = nullptr,
-      .image = mImage,
-      .viewType = viewType,
-      .format = mFormat,
-      .components =
-          {
-              .r = VK_COMPONENT_SWIZZLE_IDENTITY,
-              .g = VK_COMPONENT_SWIZZLE_IDENTITY,
-              .b = VK_COMPONENT_SWIZZLE_IDENTITY,
-              .a = VK_COMPONENT_SWIZZLE_IDENTITY,
-          },
-      .subresourceRange =
-          {
-              .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
-              .baseMipLevel = 0,
-              .levelCount = 1,
-              .baseArrayLayer = 0,
-              .layerCount = 1,
-          },
-  };
-
-  res = vkCreateImageView(mDevice, &view_info, nullptr, &mImageView);
-  rsAssert(res == VK_SUCCESS);
-
-  mImageLayout = VK_IMAGE_LAYOUT_GENERAL;
-
-  mImageInfo = {
-      .imageView = mImageView, .imageLayout = mImageLayout,
-  };
 
   res = vkMapMemory(mDevice, mMem, 0, mem_reqs.size, 0, (void **)&mPtr);
   rsAssert(res == VK_SUCCESS);

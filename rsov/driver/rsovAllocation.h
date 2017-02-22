@@ -33,39 +33,45 @@ class Type;
 namespace rsov {
 
 class RSoVContext;
-
-class RSoVAllocation {
+// Abstraction for a Vulkan Buffer
+class RSoVBuffer {
  public:
-  RSoVAllocation(RSoVContext *context, const Type *type, size_t bufferSize);
-  ~RSoVAllocation();
+  RSoVBuffer(RSoVContext *context, size_t bufferSize);
+  ~RSoVBuffer();
 
-  uint32_t getWidth() const { return mWidth; }
-  uint32_t getHeight() const { return mHeight; }
-  uint32_t getDepth() const { return mDepth; }
   const VkDescriptorBufferInfo *getBufferInfo() const { return &mBufferInfo; }
-  const VkDescriptorImageInfo *getImageInfo() const { return &mImageInfo; }
   char *getHostPtr() const { return mPtr; }
 
  private:
   void InitBuffer(size_t);
-  void InitImage();
 
-  char *mPtr;  // Host pointer to mmapped device memory for the Allocation
+  char *mPtr;  // Host pointer to mmapped device memory for the Buffer
   RSoVContext *mRSoV;
   VkDevice mDevice;
+
+  VkDeviceMemory mMem;
+  VkBuffer mBuf;
+  VkDescriptorBufferInfo mBufferInfo;
+};
+
+class RSoVAllocation {
+ public:
+  RSoVAllocation(RSoVContext *context, const Type *type, size_t bufferSize);
+  ~RSoVAllocation() { delete mBuffer; }
+
+  const Type *getType() const { return mType; }
+  uint32_t getWidth() const { return mWidth; }
+  uint32_t getHeight() const { return mHeight; }
+  uint32_t getDepth() const { return mDepth; }
+  RSoVBuffer *getBuffer() const { return mBuffer; }
+  char *getHostPtr() const { return mBuffer->getHostPtr(); }
+
+ private:
+  RSoVBuffer *mBuffer;
   const Type *mType;
   const uint32_t mWidth;
   const uint32_t mHeight;
   const uint32_t mDepth;
-
-  VkFormat mFormat;
-  VkDeviceMemory mMem;
-  VkImage mImage;
-  VkDescriptorImageInfo mImageInfo;
-  VkImageView mImageView;
-  VkImageLayout mImageLayout;
-  VkBuffer mBuf;
-  VkDescriptorBufferInfo mBufferInfo;
 };
 
 }  // namespace rsov
