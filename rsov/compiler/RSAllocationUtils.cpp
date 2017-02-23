@@ -17,6 +17,7 @@
 #include "RSAllocationUtils.h"
 
 #include "cxxabi.h"
+#include "llvm/IR/Constants.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
@@ -107,18 +108,21 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
           const auto FName = F->getName();
           DEBUG(dbgs() << "Discovered function call to : " << FName << '\n');
 
-          char *demangled = __cxxabiv1::__cxa_demangle(FName.str().c_str(), nullptr, nullptr, nullptr);
+          char *demangled = __cxxabiv1::__cxa_demangle(
+              FName.str().c_str(), nullptr, nullptr, nullptr);
           const StringRef DemangledNameRef(demangled);
           DEBUG(dbgs() << "Demangled name: " << DemangledNameRef << '\n');
 
           const StringRef GEAPrefix = "rsGetElementAt_";
           const StringRef SEAPrefix = "rsSetElementAt_";
+          const StringRef DIMXPrefix = "rsAllocationGetDimX";
           assert(GEAPrefix.size() == SEAPrefix.size());
 
           const bool IsGEA = DemangledNameRef.startswith(GEAPrefix);
           const bool IsSEA = DemangledNameRef.startswith(SEAPrefix);
+          const bool IsDIMX = DemangledNameRef.startswith(DIMXPrefix);
 
-          assert(!IsGEA || !IsSEA);
+          assert(IsGEA || IsSEA || IsDIMX);
 
           if (IsGEA || IsSEA) {
             DEBUG(dbgs() << "Found rsAlloc function!\n");
@@ -136,6 +140,10 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
             errs() << "Untyped accesses to global rs_allocations are not "
                       "supported.\n";
             return false;
+          } else if (IsDIMX) {
+            DEBUG(dbgs() << "Found rsAllocationGetDimX function!\n");
+            const auto Kind = RSAllocAccessKind::DIMX;
+            Calls.push_back({A, FCall, Kind, ""});
           }
         }
       }
@@ -169,21 +177,29 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
 }
 
 bool solidifyRSAllocAccess(Module &M, RSAllocationCallInfo CallInfo) {
-  DEBUG(dbgs() << "\tsolidifyRSAllocAccess " << CallInfo.RSAlloc.VarName
-               << '\n');
+  DEBUG(dbgs() << "solidifyRSAllocAccess " << CallInfo.RSAlloc.VarName << '\n');
   auto *FCall = CallInfo.FCall;
   auto *Fun = FCall->getCalledFunction();
   assert(Fun);
 
-  const auto FName = Fun->getName();
-
+  StringRef FName;
+  if (CallInfo.Kind == RSAllocAccessKind::DIMX)
+    FName = "rsAllocationGetDimX";
+  else
+    FName = Fun->getName();
+#if 0
   StringRef GVName = CallInfo.RSAlloc.VarName;
+#endif
   std::ostringstream OSS;
-  OSS << "RS_" << GVName.drop_front().str() << FName.str();
+  OSS << "__rsov_" << FName.str();
+  // Make up uint32_t F(uint32_t)
+  Type *UInt32Ty = IntegerType::get(M.getContext(), 32);
+  auto *NewFT = FunctionType::get(UInt32Ty, ArrayRef<Type *>(UInt32Ty), false);
 
-  auto *NewF = Function::Create(Fun->getFunctionType(),
+  auto *NewF = Function::Create(NewFT, // Fun->getFunctionType(),
                                 Function::ExternalLinkage, OSS.str(), &M);
   FCall->setCalledFunction(NewF);
+  FCall->setArgOperand(0, ConstantInt::get(UInt32Ty, 0, false));
   NewF->setAttributes(Fun->getAttributes());
 
   DEBUG(M.dump());
