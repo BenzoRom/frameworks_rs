@@ -23,8 +23,7 @@ rs-prebuilts-full: \
 endif
 
 rs_base_CFLAGS := -Werror -Wall -Wextra \
-	-Wno-unused-parameter -Wno-unused-variable \
-	-std=c++11
+	-Wno-unused-parameter -Wno-unused-variable
 
 ifneq ($(OVERRIDE_RS_DRIVER),)
   rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER)
@@ -124,6 +123,7 @@ LOCAL_GENERATED_SOURCES += $(GEN)
 # Generate custom source files
 
 GEN := $(addprefix $(generated_sources)/, \
+            rsgApi.cpp \
             rsgApiReplay.cpp \
         )
 
@@ -139,6 +139,13 @@ rs_generated_source += $(GEN)
 LOCAL_GENERATED_SOURCES += $(GEN)
 
 LOCAL_SRC_FILES:= \
+	rsApiAllocation.cpp \
+	rsApiContext.cpp \
+	rsApiDevice.cpp \
+	rsApiElement.cpp \
+	rsApiFileA3D.cpp \
+	rsApiMesh.cpp \
+	rsApiType.cpp \
 	rsAllocation.cpp \
 	rsAnimation.cpp \
 	rsComponent.cpp \
@@ -185,64 +192,6 @@ LOCAL_SHARED_LIBRARIES += libbcinfo
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 
-include $(BUILD_SHARED_LIBRARY)
-
-include $(CLEAR_VARS)
-LOCAL_MODULE := libRS
-
-LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-generated_sources:= $(local-generated-sources-dir)
-
-# Generate custom headers
-
-GEN := $(addprefix $(generated_sources)/, \
-            rsgApiStructs.h \
-            rsgApiFuncDecl.h \
-        )
-
-$(GEN) : PRIVATE_PATH := $(LOCAL_PATH)
-$(GEN) : PRIVATE_CUSTOM_TOOL = cat $(PRIVATE_PATH)/rs.spec $(PRIVATE_PATH)/rsg.spec | $(RSG_GENERATOR) $< $@
-$(GEN) : $(RSG_GENERATOR) $(LOCAL_PATH)/rs.spec $(LOCAL_PATH)/rsg.spec
-$(GEN): $(generated_sources)/%.h : $(LOCAL_PATH)/%.h.rsg
-	$(transform-generated-source)
-
-# used in jni/Android.mk
-rs_generated_source += $(GEN)
-LOCAL_GENERATED_SOURCES += $(GEN)
-
-# Generate custom source files
-
-GEN := $(addprefix $(generated_sources)/, \
-            rsgApi.cpp \
-        )
-
-$(GEN) : PRIVATE_PATH := $(LOCAL_PATH)
-$(GEN) : PRIVATE_CUSTOM_TOOL = cat $(PRIVATE_PATH)/rs.spec $(PRIVATE_PATH)/rsg.spec | $(RSG_GENERATOR) $< $@
-$(GEN) : $(RSG_GENERATOR) $(LOCAL_PATH)/rs.spec $(LOCAL_PATH)/rsg.spec
-$(GEN): $(generated_sources)/%.cpp : $(LOCAL_PATH)/%.cpp.rsg
-	$(transform-generated-source)
-
-# used in jni/Android.mk
-rs_generated_source += $(GEN)
-
-LOCAL_GENERATED_SOURCES += $(GEN)
-
-LOCAL_SRC_FILES:= \
-	rsApiAllocation.cpp \
-	rsApiContext.cpp \
-	rsApiDevice.cpp \
-	rsApiElement.cpp \
-	rsApiFileA3D.cpp \
-	rsApiMesh.cpp \
-	rsApiType.cpp \
-
-LOCAL_SHARED_LIBRARIES += libRS_internal
-LOCAL_SHARED_LIBRARIES += liblog
-
-LOCAL_CFLAGS += $(rs_base_CFLAGS)
-
-LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
-
 # These runtime modules, including libcompiler_rt.so, are required for
 # RenderScript.
 LOCAL_REQUIRED_MODULES := \
@@ -258,89 +207,35 @@ ifeq ($(ARCH_ARM_HAVE_NEON),true)
   LOCAL_REQUIRED_MODULES_arm += libclcore_neon.bc
 endif
 
+LOCAL_MODULE_TAGS := optional
+
 include $(BUILD_SHARED_LIBRARY)
 
-# Now build a host version for serialization
 include $(CLEAR_VARS)
-LOCAL_MODULE:= libRS
-LOCAL_MODULE_CLASS := STATIC_LIBRARIES
-LOCAL_IS_HOST_MODULE := true
+LOCAL_MODULE := libRS
 
-intermediates := $(call local-generated-sources-dir)
-
-# Generate custom headers
-
-GEN := $(addprefix $(intermediates)/, \
-            rsgApiStructs.h \
-            rsgApiFuncDecl.h \
-        )
-
-$(GEN) : PRIVATE_PATH := $(LOCAL_PATH)
-$(GEN) : PRIVATE_CUSTOM_TOOL = cat $(PRIVATE_PATH)/rs.spec $(PRIVATE_PATH)/rsg.spec | $(RSG_GENERATOR) $< $@
-$(GEN) : $(RSG_GENERATOR) $(LOCAL_PATH)/rs.spec $(LOCAL_PATH)/rsg.spec
-$(GEN): $(intermediates)/%.h : $(LOCAL_PATH)/%.h.rsg
-	$(transform-generated-source)
-
-LOCAL_GENERATED_SOURCES += $(GEN)
-
-# Generate custom source files
-
-GEN := $(addprefix $(intermediates)/, \
-            rsgApi.cpp \
-            rsgApiReplay.cpp \
-        )
-
-$(GEN) : PRIVATE_PATH := $(LOCAL_PATH)
-$(GEN) : PRIVATE_CUSTOM_TOOL = cat $(PRIVATE_PATH)/rs.spec $(PRIVATE_PATH)/rsg.spec | $(RSG_GENERATOR) $< $@
-$(GEN) : $(RSG_GENERATOR) $(LOCAL_PATH)/rs.spec $(LOCAL_PATH)/rsg.spec
-$(GEN): $(intermediates)/%.cpp : $(LOCAL_PATH)/%.cpp.rsg
-	$(transform-generated-source)
-
-LOCAL_GENERATED_SOURCES += $(GEN)
-
-LOCAL_CFLAGS += $(rs_base_CFLAGS)
-LOCAL_CFLAGS += -DANDROID_RS_SERIALIZE
-LOCAL_CFLAGS += -fPIC
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 
 LOCAL_SRC_FILES:= \
-	rsAllocation.cpp \
-	rsAnimation.cpp \
-	rsComponent.cpp \
-	rsContext.cpp \
-	rsClosure.cpp \
-	rsDevice.cpp \
-	rsDriverLoader.cpp \
-	rsElement.cpp \
-	rsFBOCache.cpp \
-	rsFifoSocket.cpp \
-	rsFileA3D.cpp \
-	rsFont.cpp \
-	rsObjectBase.cpp \
-	rsMatrix2x2.cpp \
-	rsMatrix3x3.cpp \
-	rsMatrix4x4.cpp \
-	rsMesh.cpp \
-	rsMutex.cpp \
-	rsProgram.cpp \
-	rsProgramFragment.cpp \
-	rsProgramStore.cpp \
-	rsProgramRaster.cpp \
-	rsProgramVertex.cpp \
-	rsSampler.cpp \
-	rsScript.cpp \
-	rsScriptC.cpp \
-	rsScriptC_Lib.cpp \
-	rsScriptC_LibGL.cpp \
-	rsScriptGroup.cpp \
-	rsScriptGroup2.cpp \
-	rsScriptIntrinsic.cpp \
-	rsSignal.cpp \
-	rsStream.cpp \
-	rsThreadIO.cpp \
-	rsType.cpp
+	rsApiStubs.cpp \
+	rsHidlAdaptation.cpp \
+	rsFallbackAdaptation.cpp
 
-LOCAL_STATIC_LIBRARIES := libcutils libutils liblog
+# Default CPU fallback
+LOCAL_REQUIRED_MODULES := libRS_internal libRSDriver
 
-include $(BUILD_HOST_STATIC_LIBRARY)
+# Treble configuration
+LOCAL_SHARED_LIBRARIES += libhidlbase libhidltransport libhwbinder libutils android.hardware.renderscript@1.0
+
+LOCAL_SHARED_LIBRARIES += liblog libcutils
+
+LOCAL_STATIC_LIBRARIES := \
+        libRSDispatch
+
+LOCAL_CFLAGS += $(rs_base_CFLAGS)
+
+LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
+
+include $(BUILD_SHARED_LIBRARY)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))

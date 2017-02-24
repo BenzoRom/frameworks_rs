@@ -25,20 +25,8 @@ using android::renderscript::Context;
 using android::renderscript::Device;
 using android::renderscript::ObjectBase;
 
-/*
- * This global will be found by the debugger and will have its value flipped.
- * It's independent of the Context class to allow the debugger to do the above
- * without knowing the type makeup. This allows the debugger to be attached at
- * an earlier stage.
- */
-extern "C" int gDebuggerPresent = 0;
-
 extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
                                       RsContextType ct, uint32_t flags) {
-    if (!gInternalDebuggerPresent) {
-        gInternalDebuggerPresent = &gDebuggerPresent;
-    }
-    //ALOGV("rsContextCreate dev=%p", vdev);
     Device * dev = static_cast<Device *>(vdev);
     Context *rsc = Context::createContext(dev, nullptr, ct, flags);
     if (rsc) {
@@ -54,10 +42,13 @@ extern "C" void rsaContextSetNativeLibDir(RsContext con, char *libDir, size_t le
 #endif
 }
 
+// TODO: Figure out better naming schemes for all the rs* functions.
+// Currently they share the same names as the NDK counterparts, and that is
+// causing lots of confusion.
 #ifndef RS_COMPATIBILITY_LIB
-RsContext rsContextCreateGL(RsDevice vdev, uint32_t version,
-                            uint32_t sdkVersion, RsSurfaceConfig sc,
-                            uint32_t dpi) {
+extern "C" RsContext rsContextCreateGL(RsDevice vdev, uint32_t version,
+                                       uint32_t sdkVersion, RsSurfaceConfig sc,
+                                       uint32_t dpi) {
     //ALOGV("rsContextCreateGL dev=%p", vdev);
     Device * dev = static_cast<Device *>(vdev);
     Context *rsc = Context::createContext(dev, &sc);
