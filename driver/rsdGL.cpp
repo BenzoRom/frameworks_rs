@@ -212,12 +212,6 @@ void getConfigData(const Context *rsc,
         configAttribsPtr += 2;
     }
 
-    if (rsc->mDev->mForceSW) {
-        configAttribsPtr[0] = EGL_CONFIG_CAVEAT;
-        configAttribsPtr[1] = EGL_SLOW_CONFIG;
-        configAttribsPtr += 2;
-    }
-
     if (numSamples > 1) {
         configAttribsPtr[0] = EGL_SAMPLE_BUFFERS;
         configAttribsPtr[1] = 1;
