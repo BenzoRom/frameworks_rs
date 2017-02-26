@@ -30,11 +30,14 @@
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/Scalar.h"
 
+#include "Builtin.h"
 #include "GlobalAllocPass.h"
+#include "GlobalAllocSPIRITPass.h"
 #include "GlobalMergePass.h"
 #include "InlinePreparationPass.h"
 #include "RemoveNonkernelsPass.h"
 #include "Wrapper.h"
+#include "pass_queue.h"
 
 #include <fstream>
 #include <sstream>
@@ -137,8 +140,13 @@ bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
 
   memcpy(words.data(), str.data(), str.size());
 
+  android::spirit::PassQueue spiritPasses;
+  spiritPasses.append(CreateWrapperPass(ME, *M));
+  spiritPasses.append(CreateBuiltinPass());
+  spiritPasses.append(CreateGAPass());
+
   int error;
-  auto wordsOut = AddGLComputeWrappers(words, ME, *M, &error);
+  auto wordsOut = spiritPasses.run(words, &error);
 
   if (error != 0) {
     OS << *BM;

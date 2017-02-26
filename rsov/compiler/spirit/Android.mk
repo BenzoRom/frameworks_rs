@@ -21,6 +21,8 @@ SPIRIT_SRCS := \
 	entity.cpp\
 	instructions.cpp\
 	module.cpp\
+	pass.cpp\
+	pass_queue.cpp\
 	transformer.cpp\
 	visitor.cpp\
 	word_stream.cpp\
@@ -144,6 +146,29 @@ $(FULL_GEN): $(SPIRV_CORE_GRAMMAR) $(GENERATOR)
 LOCAL_GENERATED_SOURCES := $(FULL_GEN)
 
 LOCAL_C_INCLUDES += $(PATH_TO_GENERATED)
+
+include $(BUILD_HOST_NATIVE_TEST)
+
+#=====================================================================
+# Tests for host module pass queue
+#=====================================================================
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := \
+  pass.cpp \
+  pass_queue.cpp \
+  pass_queue_test.cpp \
+
+LOCAL_STATIC_LIBRARIES := libgtest_host
+
+LOCAL_SHARED_LIBRARIES := $(LIBNAME)
+
+LOCAL_MODULE := pass_queue_test
+LOCAL_MULTILIB := first
+LOCAL_MODULE_TAGS := tests
+LOCAL_MODULE_CLASS := NATIVE_TESTS
+LOCAL_IS_HOST_MODULE := true
 
 include $(BUILD_HOST_NATIVE_TEST)
 

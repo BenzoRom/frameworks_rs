@@ -17,6 +17,7 @@
 #include "Builtin.h"
 
 #include "file_utils.h"
+#include "pass_queue.h"
 #include "spirit.h"
 #include "test_utils.h"
 #include "gtest/gtest.h"
@@ -30,19 +31,10 @@ TEST(BuiltinTest, testBuiltinTranslation) {
       "frameworks/rs/rsov/compiler/spirit/test_data/");
   const std::string &fullPath = getAbsolutePath(testDataPath + testFile);
   auto words = readFile<uint32_t>(fullPath);
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(std::move(words)));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
 
-  ASSERT_NE(nullptr, m);
-
-  Builder b;
-  m->setBuilder(&b);
-
-  int error;
-  auto words1 = rs2spirv::TranslateBuiltins(b, m.get(), &error);
-
-  ASSERT_EQ(0, error);
+  PassQueue passes;
+  passes.append(rs2spirv::CreateBuiltinPass());
+  auto words1 = passes.run(words);
 
   std::unique_ptr<InputWordStream> IS1(
       InputWordStream::Create(std::move(words1)));

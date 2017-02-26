@@ -21,19 +21,46 @@
 namespace android {
 namespace spirit {
 
-Module *Transformer::applyTo(Module *m) {
-  // TODO fix Module::accept() to have the header serialization code there
-  m->SerializeHeader(*mStream);
-  m->accept(this);
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(mStream->getWords()));
+Module *Transformer::run(Module *module, int *error) {
+  auto words = runAndSerialize(module, error);
+  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
   return Deserialize<Module>(*IS);
 }
 
-std::vector<uint32_t> Transformer::transformSerialize(Module *m) {
+std::vector<uint32_t> Transformer::runAndSerialize(Module *m, int *error) {
+  mModule = m;
+
+  // Since contents in the decoration or global section may change, transform
+  // and serialize the function definitions first.
+  mVisit = 0;
+  mShouldRecord = false;
+  mStream = mStreamFunctions.get();
+  m->accept(this);
+
+  // Record in the annotation section any new annotations added
+  m->consolidateAnnotations();
+
+  // After the functions are transformed, serialize the other sections to
+  // capture any changes made during the function transformation, and append
+  // the new words from function serialization.
+
+  mVisit = 1;
+  mShouldRecord = true;
+  mStream = mStreamFinal.get();
+
+  // TODO fix Module::accept() to have the header serialization code there
   m->SerializeHeader(*mStream);
   m->accept(this);
-  return mStream->getWords();
+
+  auto output = mStream->getWords();
+  auto functions = mStreamFunctions->getWords();
+  output.insert(output.end(), functions.begin(), functions.end());
+
+  if (error) {
+    *error = 0;
+  }
+
+  return output;
 }
 
 void Transformer::insert(Instruction *inst) {

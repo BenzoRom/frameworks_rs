@@ -15,6 +15,7 @@
  */
 
 #include "builder.h"
+
 #include "file_utils.h"
 #include "instructions.h"
 #include "module.h"

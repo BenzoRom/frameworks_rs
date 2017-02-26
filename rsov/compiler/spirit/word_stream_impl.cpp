@@ -27,10 +27,10 @@ WordStreamImpl::WordStreamImpl(const std::vector<uint32_t> &words)
 WordStreamImpl::WordStreamImpl(std::vector<uint32_t> &&words)
     : mWords(words), mIter(mWords.begin()) {}
 
-WordStreamImpl &WordStreamImpl::operator<<(const char *str) {
-  const size_t len = strlen(str);
-  const uint32_t *begin = (uint32_t *)str;
-  const uint32_t *end = ((uint32_t *)str) + (len / 4);
+WordStreamImpl &WordStreamImpl::operator<<(const std::string &str) {
+  const size_t len = str.length();
+  const uint32_t *begin = (uint32_t *)str.c_str();
+  const uint32_t *end = begin + (len / 4);
   mWords.insert(mWords.end(), begin, end);
 
   uint32_t lastWord = *end;
@@ -47,10 +47,11 @@ WordStreamImpl &WordStreamImpl::operator<<(const char *str) {
   return *this;
 }
 
-WordStreamImpl &WordStreamImpl::operator>>(const char **str) {
-  *str = (const char *)&*mIter;
-  while (*mIter++ & 0xFF000000)
-    ;
+WordStreamImpl &WordStreamImpl::operator>>(std::string *str) {
+  const char *s = (const char *)&*mIter;
+  str->assign(s);
+  while (*mIter++ & 0xFF000000) {
+  }
   return *this;
 }
 

@@ -16,6 +16,8 @@
 
 #include "Wrapper.h"
 
+#include "llvm/IR/Module.h"
+
 #include "Builtin.h"
 #include "GlobalAllocSPIRITPass.h"
 #include "RSAllocationUtils.h"
@@ -23,56 +25,15 @@
 #include "builder.h"
 #include "instructions.h"
 #include "module.h"
+#include "pass.h"
 #include "word_stream.h"
-#include "llvm/IR/Module.h"
+
+#include <vector>
 
 using bcinfo::MetadataExtractor;
+
 namespace android {
 namespace spirit {
-
-// Metadata buffer for global allocations
-// struct metadata {
-//  uint32_t element_size;
-//  uint32_t x_size;
-//  uint32_t y_size;
-//  uint32_t ??
-// };
-VariableInst *AddGAMetadata(/*Instruction *elementType, uint32_t binding, */ Builder &b,
-                        Module *m) {
-  TypeIntInst *UInt32Ty = m->getUnsignedIntType(32);
-  std::vector<Instruction *> metadata{
-    UInt32Ty,
-    UInt32Ty,
-    UInt32Ty,
-    UInt32Ty
-  };
-  auto MetadataStructTy = m->getStructType(metadata.data(), metadata.size());
-  // FIXME: workaround on a weird OpAccessChain member offset problem. Somehow
-  // when given constant indices, OpAccessChain returns pointers that are 4 bytes
-  // less than what are supposed to be (at runtime).
-  // For now workaround this with +4 the member offsets.
-  MetadataStructTy->memberDecorate(0, Decoration::Offset)->addExtraOperand(4);
-  MetadataStructTy->memberDecorate(1, Decoration::Offset)->addExtraOperand(8);
-  MetadataStructTy->memberDecorate(2, Decoration::Offset)->addExtraOperand(12);
-  MetadataStructTy->memberDecorate(3, Decoration::Offset)->addExtraOperand(16);
-  // TBD: Implement getArrayType. RuntimeArray requires buffers and hence we
-  // cannot use PushConstant underneath
-  auto MetadataBufSTy = m->getRuntimeArrayType(MetadataStructTy);
-  // Stride of metadata.
-  MetadataBufSTy->decorate(Decoration::ArrayStride)->addExtraOperand(
-      metadata.size()*sizeof(uint32_t));
-  auto MetadataSSBO = m->getStructType(MetadataBufSTy);
-  MetadataSSBO->decorate(Decoration::BufferBlock);
-  auto MetadataPtrTy = m->getPointerType(StorageClass::Uniform, MetadataSSBO);
-
-
-  VariableInst *MetadataVar = b.MakeVariable(MetadataPtrTy, StorageClass::Uniform);
-  MetadataVar->decorate(Decoration::DescriptorSet)->addExtraOperand(0);
-  MetadataVar->decorate(Decoration::Binding)->addExtraOperand(0);
-  m->addVariable(MetadataVar);
-
-  return MetadataVar;
-}
 
 VariableInst *AddBuffer(Instruction *elementType, uint32_t binding, Builder &b,
                         Module *m) {
@@ -356,8 +317,6 @@ void AddHeader(Module *m) {
   // m->addCapability(Capability::Addresses);
   m->setMemoryModel(AddressingModel::Physical32, MemoryModel::GLSL450);
 
-  m->addExtInstImport("GLSL.std.450");
-
   m->addSource(SourceLanguage::GLSL, 450);
   m->addSourceExtension("GL_ARB_separate_shader_objects");
   m->addSourceExtension("GL_ARB_shading_language_420pack");
@@ -394,45 +353,18 @@ void FixGlobalStorageClass(Module *m) {
 
 } // anonymous namespace
 
-} // namespace spirit
-} // namespace android
-
-using android::spirit::AddHeader;
-using android::spirit::AddWrapper;
-using android::spirit::DecorateGlobalBuffer;
-using android::spirit::InputWordStream;
-using android::spirit::FixGlobalStorageClass;
-
-namespace rs2spirv {
-
-std::vector<uint32_t>
-AddGLComputeWrappers(const std::vector<uint32_t> &kernel_spirv,
-                     const bcinfo::MetadataExtractor &metadata,
-                     llvm::Module &LM, int *error) {
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(std::move(kernel_spirv)));
-  std::unique_ptr<android::spirit::Module> m(
-      android::spirit::Deserialize<android::spirit::Module>(*IS));
-
-  if (!m) {
-    *error = -1;
-    return std::vector<uint32_t>();
-  }
-
-  if (!m->resolveIds()) {
-    *error = -2;
-    return std::vector<uint32_t>();
-  }
-
+bool AddWrappers(const bcinfo::MetadataExtractor &metadata,
+                 llvm::Module &LM,
+                 android::spirit::Module *m) {
   android::spirit::Builder b;
 
   m->setBuilder(&b);
 
-  FixGlobalStorageClass(m.get());
+  FixGlobalStorageClass(m);
 
-  AddHeader(m.get());
+  AddHeader(m);
 
-  DecorateGlobalBuffer(LM, b, m.get());
+  DecorateGlobalBuffer(LM, b, m);
 
   const size_t numKernel = metadata.getExportForEachSignatureCount();
   const char **kernelName = metadata.getExportForEachNameList();
@@ -441,53 +373,43 @@ AddGLComputeWrappers(const std::vector<uint32_t> &kernel_spirv,
 
   for (size_t i = 0; i < numKernel; i++) {
     bool success =
-        AddWrapper(kernelName[i], kernelSigature[i], inputCount[i], b, m.get());
+        AddWrapper(kernelName[i], kernelSigature[i], inputCount[i], b, m);
     if (!success) {
-      *error = -3;
-      return std::vector<uint32_t>();
+      return false;
     }
   }
 
   m->consolidateAnnotations();
-  auto words = rs2spirv::TranslateBuiltins(b, m.get(), error);
+  return true;
+}
 
-  // Recreate a module in known state after TranslateBuiltins
-  std::unique_ptr<InputWordStream> IS1(
-      InputWordStream::Create(std::move(words)));
-  std::unique_ptr<android::spirit::Module> m1(
-      android::spirit::Deserialize<android::spirit::Module>(*IS1));
+class WrapperPass : public Pass {
+public:
+  WrapperPass(const bcinfo::MetadataExtractor &Metadata,
+              const llvm::Module &LM) : mLLVMMetadata(Metadata),
+                                        mLLVMModule(const_cast<llvm::Module&>(LM)) {}
 
-  if (!m1) {
-    *error = -1;
-    return std::vector<uint32_t>();
+  Module *run(Module *m, int *error) override {
+    bool success = AddWrappers(mLLVMMetadata, mLLVMModule, m);
+    if (error) {
+      *error = success ? 0 : -1;
+    }
+    return m;
   }
 
-  if (!m1->resolveIds()) {
-    *error = -2;
-    return std::vector<uint32_t>();
-  }
+private:
+  const bcinfo::MetadataExtractor &mLLVMMetadata;
+  llvm::Module &mLLVMModule;
+};
 
-  // Builders can be reused
-  m1->setBuilder(&b);
+} // namespace spirit
+} // namespace android
 
-  // Create types and variable declarations for global allocation metadata
-  android::spirit::VariableInst *GAmetadata = AddGAMetadata(b, m1.get());
+namespace rs2spirv {
 
-  // Adding types on-the-fly inside a transformer is not well suported now;
-  // creating them here before we enter transformer to avoid problems.
-  // TODO: Fix the transformer
-  android::spirit::TypeIntInst *UInt32Ty = m1->getUnsignedIntType(32);
-  m1->getConstant(UInt32Ty, 0U);
-  m1->getConstant(UInt32Ty, 1U);
-  // TODO: Use constant memory for metadata
-  m1->getPointerType(android::spirit::StorageClass::Uniform,
-                     UInt32Ty);
-
-  // Transform calls to lowered allocation accessors to use metadata
-  // TODO: implement the lowering pass in LLVM
-  m1->consolidateAnnotations();
-  return rs2spirv::TranslateGAAccessors(b, m1.get(), GAmetadata, error);
-
+android::spirit::Pass* CreateWrapperPass(const bcinfo::MetadataExtractor &metadata,
+                                         const llvm::Module &LLVMModule) {
+  return new android::spirit::WrapperPass(metadata, LLVMModule);
 }
 
 } // namespace rs2spirv

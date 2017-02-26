@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-#include <vector>
-
 #include "word_stream.h"
+
 #include "gtest/gtest.h"
+
+#include <vector>
 
 namespace android {
 namespace spirit {
@@ -50,9 +51,9 @@ TEST(WordStreamTest, testStringInput1) {
   std::vector<uint32_t> words((uint32_t *)bytes,
                               (uint32_t *)(bytes + sizeof(bytes)));
   std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
-  const char *s;
+  std::string s;
   *IS >> &s;
-  EXPECT_STREQ("ABCDEFG", s);
+  EXPECT_STREQ("ABCDEFG", s.c_str());
 }
 
 TEST(WordStreamTest, testStringInput2) {
@@ -61,9 +62,9 @@ TEST(WordStreamTest, testStringInput2) {
   std::vector<uint32_t> words((uint32_t *)bytes,
                               (uint32_t *)(bytes + sizeof(bytes)));
   std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
-  const char *s;
+  std::string s;
   *IS >> &s;
-  EXPECT_STREQ("GLSL.std.450", s);
+  EXPECT_STREQ("GLSL.std.450", s.c_str());
 }
 
 } // namespace spirit
