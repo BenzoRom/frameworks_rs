@@ -36,9 +36,7 @@ TEST(BuiltinTest, testBuiltinTranslation) {
   passes.append(rs2spirv::CreateBuiltinPass());
   auto words1 = passes.run(words);
 
-  std::unique_ptr<InputWordStream> IS1(
-      InputWordStream::Create(std::move(words1)));
-  std::unique_ptr<Module> m1(Deserialize<Module>(*IS1));
+  std::unique_ptr<Module> m1(Deserialize<Module>(words1));
 
   ASSERT_NE(nullptr, m1);
 }
