@@ -17,30 +17,23 @@
 #ifndef ANDROID_RS_CPP_UTILS_H
 #define ANDROID_RS_CPP_UTILS_H
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include <utils/Log.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
-#include <cutils/atomic.h>
 #endif
 
 #include <stdint.h>
-
 #include <stdlib.h>
 #include <pthread.h>
 #include <time.h>
-
 #include <math.h>
 
 #ifdef RS_COMPATIBILITY_LIB
-#include <android/log.h>
-#endif
-
-#if defined(RS_SERVER) || defined(RS_COMPATIBILITY_LIB)
-
 #define ATRACE_TAG
 #define ATRACE_CALL(...)
 
+#include <android/log.h>
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -194,7 +187,7 @@ static inline nsecs_t nanoseconds_to_milliseconds(nsecs_t secs)
     return secs/1000000;
 }
 
-#endif // RS_SERVER || RS_COMPATIBILITY_LIB
+#endif // RS_COMPATIBILITY_LIB
 
 namespace android {
 namespace renderscript {

@@ -220,7 +220,7 @@ protected:
         mHal.state.type = t;
     }
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
     class NewBufferListener : public android::ConsumerBase::FrameAvailableListener {
     public:
         explicit NewBufferListener(uint32_t numAlloc);

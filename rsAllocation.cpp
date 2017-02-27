@@ -18,11 +18,6 @@
 #include "rsAllocation.h"
 #include "rs_hal.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "system/window.h"
-#include "gui/GLConsumer.h"
-#endif
-
 namespace android {
 namespace renderscript {
 
@@ -152,7 +147,7 @@ void Allocation::updateCache() {
 }
 
 Allocation::~Allocation() {
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
     if (mGrallocConsumer.get()) {
         mGrallocConsumer->releaseIdx(mCurrentIdx);
         mGrallocConsumer = nullptr;

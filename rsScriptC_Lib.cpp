@@ -21,10 +21,6 @@
 #include "rsMatrix2x2.h"
 #include "rsgApiStructs.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "utils/Timers.h"
-#endif
-
 #include <time.h>
 #include <sstream>
 
@@ -98,29 +94,17 @@ tm* rsrLocalTime(Context *rsc, tm *local, time_t *timer) {
 }
 
 int64_t rsrUptimeMillis(Context *rsc) {
-#ifndef RS_SERVER
     return nanoseconds_to_milliseconds(systemTime(SYSTEM_TIME_MONOTONIC));
-#else
-    return 0;
-#endif
 }
 
 int64_t rsrUptimeNanos(Context *rsc) {
-#ifndef RS_SERVER
     return systemTime(SYSTEM_TIME_MONOTONIC);
-#else
-    return 0;
-#endif
 }
 
 float rsrGetDt(Context *rsc, const Script *sc) {
-#ifndef RS_SERVER
     int64_t l = sc->mEnviroment.mLastDtTime;
     sc->mEnviroment.mLastDtTime = systemTime(SYSTEM_TIME_MONOTONIC);
     return ((float)(sc->mEnviroment.mLastDtTime - l)) / 1.0e9;
-#else
-    return 0.f;
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////
