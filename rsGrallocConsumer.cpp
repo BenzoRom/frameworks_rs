@@ -20,7 +20,6 @@
 #include "rsAllocation.h"
 #include "rs_hal.h"
 
-#include <cutils/compiler.h>
 #include <utils/Log.h>
 #include "rsGrallocConsumer.h"
 #include <gui/BufferItem.h>
@@ -260,8 +259,7 @@ status_t GrallocConsumer::releaseAcquiredBufferLocked(uint32_t idx) {
     // release the buffer if it hasn't already been freed by the BufferQueue.
     // This can happen, for example, when the producer of this buffer
     // disconnected after this buffer was acquired.
-    if (CC_LIKELY(mAcquiredBuffer[idx].mGraphicBuffer ==
-            mSlots[buf].mGraphicBuffer)) {
+    if (mAcquiredBuffer[idx].mGraphicBuffer == mSlots[buf].mGraphicBuffer) {
         releaseBufferLocked(
                 buf, mAcquiredBuffer[idx].mGraphicBuffer,
                 EGL_NO_DISPLAY, EGL_NO_SYNC_KHR);

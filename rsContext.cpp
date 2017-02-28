@@ -36,10 +36,6 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-#if !defined(RS_COMPATIBILITY_LIB) && defined(__ANDROID__)
-#include <cutils/properties.h>
-#endif
-
 #ifdef RS_COMPATIBILITY_LIB
 #include "rsCompatibilityLib.h"
 #endif

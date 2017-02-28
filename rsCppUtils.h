@@ -298,6 +298,11 @@ const char* rsuJoinStrings(int n, const char* const* strs);
 bool rsuExecuteCommand(const char *exe, int nArgs, const char * const *args);
 #endif
 
+// from cutils/properties.h
+#define PROPERTY_KEY_MAX 32
+#define PROPERTY_VALUE_MAX 92
+
+int property_get(const char *key, char *value, const char *default_value);
 
 } // namespace renderscript
 } // namespace android

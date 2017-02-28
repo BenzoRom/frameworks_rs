@@ -13,6 +13,8 @@ rs_cpp_SRC_FILES := \
 	ScriptIntrinsicBLAS.cpp \
 	Sampler.cpp
 
+rs_cpp_SRC_FILES += ../rsCppUtils.cpp
+
 LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
 include frameworks/compile/slang/rs_version.mk
 local_cflags_for_rs_cpp += $(RS_VERSION_DEFINE) \
@@ -26,7 +28,6 @@ LOCAL_CFLAGS += $(local_cflags_for_rs_cpp)
 
 LOCAL_SHARED_LIBRARIES := \
 	libz \
-	libcutils \
 	libutils \
 	liblog \
 	libdl \
@@ -61,8 +62,6 @@ endif
 LOCAL_CFLAGS += -DRS_COMPATIBILITY_LIB
 
 LOCAL_SRC_FILES := $(rs_cpp_SRC_FILES)
-
-LOCAL_SRC_FILES += ../rsCompatibilityLib.cpp
 
 LOCAL_WHOLE_STATIC_LIBRARIES := \
 	libRSDispatch
