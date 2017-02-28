@@ -17,26 +17,17 @@
 #ifndef GLOBALALLOCSPIRITPASS_H
 #define GLOBALALLOCSPIRITPASS_H
 
-#include <stdint.h>
-
-#include <vector>
-
 namespace android {
 namespace spirit {
 
-class Builder;
-class Module;
-class VariableInst;
+class Pass;
 
 } // namespace spirit
 } // namespace android
 
 namespace rs2spirv {
 
-// android::spirit::Module *
-std::vector<uint32_t>
-TranslateGAAccessors(android::spirit::Builder &b, android::spirit::Module *m,
-                     android::spirit::VariableInst *metadata, int *error);
+android::spirit::Pass *CreateGAPass();
 
 } // namespace rs2spirv
 
