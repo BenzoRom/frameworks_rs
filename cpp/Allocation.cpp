@@ -493,7 +493,7 @@ void Allocation::ioGetInput() {
 #endif
 }
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include <gui/Surface.h>
 
 sp<Surface> Allocation::getSurface() {

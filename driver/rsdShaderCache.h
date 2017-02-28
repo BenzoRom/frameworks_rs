@@ -25,13 +25,6 @@ class Context;
 } // namespace renderscript
 } // namespace android
 
-
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include <utils/String8.h>
-#include <utils/Vector.h>
-#else
-#include "rsUtils.h"
-#endif
 class RsdShader;
 
 // ---------------------------------------------------------------------------

@@ -22,11 +22,6 @@
 #include <bcinfo/BitcodeWrapper.h>
 #endif
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "utils/Timers.h"
-#include "cutils/trace.h"
-#endif
-
 #include <sys/stat.h>
 
 #include <sstream>
@@ -117,10 +112,8 @@ bool ScriptC::createCacheDir(const char *cacheDir) {
 #endif
 
 void ScriptC::setupScript(Context *rsc) {
-#ifndef RS_SERVER
     mEnviroment.mStartTimeMillis
                 = nanoseconds_to_milliseconds(systemTime(SYSTEM_TIME_MONOTONIC));
-#endif
 
     for (uint32_t ct=0; ct < mHal.info.exportedVariableCount; ct++) {
         if (mSlots[ct].get() && !mTypes[ct].get()) {

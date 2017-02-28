@@ -17,10 +17,6 @@
 #include "rsContext.h"
 #include "rsScriptC.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "utils/Timers.h"
-#endif
-
 #include <time.h>
 
 namespace android {
