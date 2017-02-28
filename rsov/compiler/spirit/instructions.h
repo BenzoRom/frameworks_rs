@@ -20,6 +20,7 @@
 #include <stdint.h>
 
 #include <iostream>
+#include <string>
 #include <vector>
 
 #include "core_defs.h"
@@ -38,8 +39,8 @@ template <typename T> uint16_t WordCount(T) { return 1; }
 inline uint16_t WordCount(PairLiteralIntegerIdRef) { return 2; }
 inline uint16_t WordCount(PairIdRefLiteralInteger) { return 2; }
 inline uint16_t WordCount(PairIdRefIdRef) { return 2; }
-inline uint16_t WordCount(const char *operand) {
-  return strlen(operand) / 4 + 1;
+inline uint16_t WordCount(const std::string &operand) {
+  return operand.length() / 4 + 1;
 }
 
 class Instruction : public Entity {

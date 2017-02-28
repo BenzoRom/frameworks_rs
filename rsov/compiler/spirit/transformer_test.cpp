@@ -16,13 +16,13 @@
 
 #include "transformer.h"
 
-#include <stdint.h>
-
 #include "file_utils.h"
 #include "spirit.h"
 #include "test_utils.h"
 #include "word_stream.h"
 #include "gtest/gtest.h"
+
+#include <stdint.h>
 
 namespace android {
 namespace spirit {
@@ -41,6 +41,22 @@ public:
 class Deleter : public Transformer {
 public:
   Instruction *transform(IMulInst *) override { return nullptr; }
+};
+
+class NewDataTypeTransformer : public Transformer {
+public:
+  Instruction *transform(IMulInst *mul) override {
+    insert(mul);
+    auto *DoubleTy = getModule()->getFloatType(64);
+    ConstantInst *ConstDouble2 = getModule()->getConstant(DoubleTy, 2.0);
+    auto ret = new IAddInst(DoubleTy, mul, ConstDouble2);
+
+    IdResult id = ret->getId();
+    ret->setId(mul->getId());
+    mul->setId(id);
+
+    return ret;
+  }
 };
 
 } // annonymous namespace
@@ -70,7 +86,7 @@ TEST_F(TransformerTest, testMulToAdd) {
   EXPECT_EQ(1, countEntity<IMulInst>(m.get()));
 
   MulToAddTransformer trans;
-  std::unique_ptr<Module> m1(trans.applyTo(m.get()));
+  std::unique_ptr<Module> m1(trans.run(m.get()));
 
   ASSERT_NE(nullptr, m1);
 
@@ -89,12 +105,33 @@ TEST_F(TransformerTest, testDeletion) {
   EXPECT_EQ(1, countEntity<IMulInst>(m.get()));
 
   Deleter trans;
-  std::unique_ptr<Module> m1(trans.applyTo(m.get()));
+  std::unique_ptr<Module> m1(trans.run(m.get()));
 
   ASSERT_NE(nullptr, m1.get());
 
   EXPECT_EQ(1, countEntity<IAddInst>(m1.get()));
   EXPECT_EQ(0, countEntity<IMulInst>(m1.get()));
+}
+
+TEST_F(TransformerTest, testAddInstructionUsingNewDataType) {
+  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
+  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+
+  ASSERT_NE(nullptr, m.get());
+
+  EXPECT_EQ(5, countEntity<ConstantInst>(m.get()));
+  EXPECT_EQ(1, countEntity<TypeFloatInst>(m.get()));
+  EXPECT_EQ(1, countEntity<IMulInst>(m.get()));
+
+  NewDataTypeTransformer trans;
+  std::unique_ptr<Module> m1(trans.run(m.get()));
+
+  ASSERT_NE(nullptr, m1.get());
+
+  EXPECT_EQ(6, countEntity<ConstantInst>(m.get()));
+  EXPECT_EQ(2, countEntity<TypeFloatInst>(m1.get()));
+  EXPECT_EQ(2, countEntity<IAddInst>(m1.get()));
+  EXPECT_EQ(1, countEntity<IMulInst>(m1.get()));
 }
 
 } // namespace spirit

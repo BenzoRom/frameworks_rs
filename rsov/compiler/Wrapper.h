@@ -17,7 +17,7 @@
 #ifndef WRAPPER_H
 #define WRAPPER_H
 
-#include <vector>
+#include <stdint.h>
 
 namespace bcinfo {
 class MetadataExtractor;
@@ -27,21 +27,13 @@ namespace llvm {
 class Module;
 }
 
-namespace rs2spirv {
-
-std::vector<uint32_t>
-AddGLComputeWrappers(const std::vector<uint32_t> &kernel_spirv,
-                     const bcinfo::MetadataExtractor &metadata, llvm::Module &M,
-                     int *error);
-
-} // namespace rs2spirv
-
 namespace android {
 namespace spirit {
 
 class Builder;
 class Instruction;
 class Module;
+class Pass;
 class VariableInst;
 
 // TODO: avoid exposing these methods while still unit testing them
@@ -58,5 +50,12 @@ bool DecorateGlobalBuffer(llvm::Module &M, Builder &b, Module *m);
 
 } // namespace spirit
 } // namespace android
+
+namespace rs2spirv {
+
+android::spirit::Pass* CreateWrapperPass(const bcinfo::MetadataExtractor &metadata,
+                                         const llvm::Module &LLVMModule);
+
+} // namespace rs2spirv
 
 #endif
