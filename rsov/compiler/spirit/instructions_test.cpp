@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-#include <memory>
-#include <vector>
-
 #include "instructions.h"
+
 #include "word_stream.h"
 #include "gtest/gtest.h"
+
+#include <memory>
+#include <vector>
 
 namespace android {
 namespace spirit {
@@ -39,7 +40,7 @@ TEST(InstructionTest, testOpExtension) {
   std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
   auto *i = Deserialize<ExtensionInst>(*IS);
   ASSERT_NE(nullptr, i);
-  EXPECT_STREQ("ABCDEFG", i->mOperand1);
+  EXPECT_STREQ("ABCDEFG", i->mOperand1.c_str());
 }
 
 TEST(InstructionTest, testOpExtInstImport) {
@@ -51,7 +52,7 @@ TEST(InstructionTest, testOpExtInstImport) {
   std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
   auto *i = Deserialize<ExtInstImportInst>(*IS);
   ASSERT_NE(nullptr, i);
-  EXPECT_STREQ("GLSL.std.450", i->mOperand1);
+  EXPECT_STREQ("GLSL.std.450", i->mOperand1.c_str());
 }
 
 } // namespace spirit

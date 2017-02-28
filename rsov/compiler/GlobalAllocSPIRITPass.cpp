@@ -22,6 +22,53 @@
 namespace android {
 namespace spirit {
 
+namespace {
+
+// Metadata buffer for global allocations
+// struct metadata {
+//  uint32_t element_size;
+//  uint32_t x_size;
+//  uint32_t y_size;
+//  uint32_t ??
+// };
+VariableInst *AddGAMetadata(Builder &b, Module *m) {
+  TypeIntInst *UInt32Ty = m->getUnsignedIntType(32);
+  std::vector<Instruction *> metadata{
+    UInt32Ty,
+    UInt32Ty,
+    UInt32Ty,
+    UInt32Ty
+  };
+  auto MetadataStructTy = m->getStructType(metadata.data(), metadata.size());
+  // FIXME: workaround on a weird OpAccessChain member offset problem. Somehow
+  // when given constant indices, OpAccessChain returns pointers that are 4 bytes
+  // less than what are supposed to be (at runtime).
+  // For now workaround this with +4 the member offsets.
+  MetadataStructTy->memberDecorate(0, Decoration::Offset)->addExtraOperand(4);
+  MetadataStructTy->memberDecorate(1, Decoration::Offset)->addExtraOperand(8);
+  MetadataStructTy->memberDecorate(2, Decoration::Offset)->addExtraOperand(12);
+  MetadataStructTy->memberDecorate(3, Decoration::Offset)->addExtraOperand(16);
+  // TBD: Implement getArrayType. RuntimeArray requires buffers and hence we
+  // cannot use PushConstant underneath
+  auto MetadataBufSTy = m->getRuntimeArrayType(MetadataStructTy);
+  // Stride of metadata.
+  MetadataBufSTy->decorate(Decoration::ArrayStride)->addExtraOperand(
+      metadata.size()*sizeof(uint32_t));
+  auto MetadataSSBO = m->getStructType(MetadataBufSTy);
+  MetadataSSBO->decorate(Decoration::BufferBlock);
+  auto MetadataPtrTy = m->getPointerType(StorageClass::Uniform, MetadataSSBO);
+
+
+  VariableInst *MetadataVar = b.MakeVariable(MetadataPtrTy, StorageClass::Uniform);
+  MetadataVar->decorate(Decoration::DescriptorSet)->addExtraOperand(0);
+  MetadataVar->decorate(Decoration::Binding)->addExtraOperand(0);
+  m->addVariable(MetadataVar);
+
+  return MetadataVar;
+}
+
+} // anonymous namespace
+
 // Replacing calls to lowered accessors, e.g., __rsov_rsAllocationGetDimX
 // which was created from rsAllocationGetDimX by replacing the allocation
 // with an ID in an earlier LLVM pass (see GlobalAllocationPass.cpp),
@@ -54,13 +101,15 @@ namespace spirit {
 
 class GAAccessorTransformer : public Transformer {
 public:
-  GAAccessorTransformer(Builder *b, Module *m, VariableInst *metadata)
-      : mBuilder(b), mModule(m), mMetadata(metadata) {}
+  std::vector<uint32_t> runAndSerialize(Module *module, int *error) override {
+    mMetadata = AddGAMetadata(mBuilder, module);
+    return Transformer::runAndSerialize(module, error);
+  }
 
   Instruction *transform(FunctionCallInst *call) {
     FunctionInst *func =
         static_cast<FunctionInst *>(call->mOperand1.mInstruction);
-    const char *name = mModule->lookupNameByInstruction(func);
+    const char *name = getModule()->lookupNameByInstruction(func);
     if (!name) {
       return call;
     }
@@ -69,19 +118,19 @@ public:
     // Maps name into a SPIR-V instruction
     // TODO: generalize it to support more accessors
     if (!strcmp(name, "__rsov_rsAllocationGetDimX")) {
-      TypeIntInst *UInt32Ty = mModule->getUnsignedIntType(32);
+      TypeIntInst *UInt32Ty = getModule()->getUnsignedIntType(32);
       // TODO: hardcoded layout
-      auto ConstZero = mModule->getConstant(UInt32Ty, 0U);
-      auto ConstOne = mModule->getConstant(UInt32Ty, 1U);
+      auto ConstZero = getModule()->getConstant(UInt32Ty, 0U);
+      auto ConstOne = getModule()->getConstant(UInt32Ty, 1U);
 
       // TODO: Use constant memory later
       auto resultPtrType =
-          mModule->getPointerType(StorageClass::Uniform, UInt32Ty);
-      AccessChainInst *LoadPtr = mBuilder->MakeAccessChain(
+          getModule()->getPointerType(StorageClass::Uniform, UInt32Ty);
+      AccessChainInst *LoadPtr = mBuilder.MakeAccessChain(
           resultPtrType, mMetadata, {ConstZero, ConstZero, ConstOne});
       insert(LoadPtr);
 
-      inst = mBuilder->MakeLoad(UInt32Ty, LoadPtr);
+      inst = mBuilder.MakeLoad(UInt32Ty, LoadPtr);
       inst->setId(call->getId());
     } else {
       inst = call;
@@ -90,8 +139,7 @@ public:
   }
 
 private:
-  Builder *mBuilder;
-  Module *mModule;
+  Builder mBuilder;
   VariableInst *mMetadata;
 };
 
@@ -100,13 +148,8 @@ private:
 
 namespace rs2spirv {
 
-// android::spirit::Module *
-std::vector<uint32_t>
-TranslateGAAccessors(android::spirit::Builder &b, android::spirit::Module *m,
-                     android::spirit::VariableInst *metadata, int *error) {
-  android::spirit::GAAccessorTransformer trans(&b, m, metadata);
-  *error = 0;
-  return trans.transformSerialize(m);
+android::spirit::Pass *CreateGAPass() {
+  return new android::spirit::GAAccessorTransformer();
 }
 
 } // namespace rs2spirv

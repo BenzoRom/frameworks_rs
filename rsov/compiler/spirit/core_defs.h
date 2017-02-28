@@ -17,13 +17,15 @@
 #ifndef CORE_DEFS_H
 #define CORE_DEFS_H
 
+#include <string>
+
 namespace android {
 namespace spirit {
 
 class Instruction;
 
 typedef int32_t LiteralInteger;
-typedef const char *LiteralString;
+typedef std::string LiteralString;
 typedef union {
   int32_t intValue;
   int64_t longValue;
