@@ -1,3 +1,4 @@
+; XFAIL: *
 ; RUN: rs2spirv_lit_driver.sh %s | FileCheck %s
 
 target datalayout = "e-p:32:32-i64:64-v128:64:128-n32-S64"

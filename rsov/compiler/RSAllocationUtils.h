@@ -36,7 +36,7 @@ struct RSAllocationInfo {
   llvm::GlobalVariable *GlobalVar;
 };
 
-enum class RSAllocAccessKind { GEA, SEA };
+enum class RSAllocAccessKind { GEA, SEA, DIMX };
 
 struct RSAllocationCallInfo {
   RSAllocationInfo &RSAlloc;

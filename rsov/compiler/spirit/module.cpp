@@ -411,12 +411,12 @@ Module *Module::addVariable(VariableInst *var) {
 }
 
 void Module::consolidateAnnotations() {
-  std::set<Instruction *> annotations(mAnnotations->begin(),
+  std::vector<Instruction *> annotations(mAnnotations->begin(),
                                       mAnnotations->end());
   std::unique_ptr<IVisitor> v(
       CreateInstructionVisitor([&annotations](Instruction *inst) -> void {
         const auto &ann = inst->getAnnotations();
-        annotations.insert(ann.begin(), ann.end());
+        annotations.insert(annotations.end(), ann.begin(), ann.end());
       }));
   v->visit(this);
   mAnnotations->clear();
