@@ -19,6 +19,8 @@
 
 #include "rsUtils.h"
 
+#include <vector>
+
 // ---------------------------------------------------------------------------
 namespace android {
 namespace renderscript {
@@ -36,7 +38,7 @@ public:
     bool mForceSW;
 
 protected:
-    Vector<Context *> mContexts;
+    std::vector<Context *> mContexts;
 };
 
 } // namespace renderscript

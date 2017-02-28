@@ -38,8 +38,7 @@ public:
 
     void dump() {
 #ifndef RS_COMPATIBILITY_LIB
-        String8 s = mStack.toString();
-        ALOGV("%s", s.string());
+        ALOGV("%s", mStack.toString().string());
         //mStack.dump();
 #endif
     }

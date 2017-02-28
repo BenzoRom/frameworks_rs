@@ -17,9 +17,11 @@
 #ifndef ANDROID_RENDERSCRIPT_EXECUTABLE_H
 #define ANDROID_RENDERSCRIPT_EXECUTABLE_H
 
-#include <stdlib.h>
 
 #include "rsCpuScript.h"
+
+#include <stdlib.h>
+#include <string>
 
 namespace android {
 namespace renderscript {
@@ -47,7 +49,7 @@ public:
                                    bool *alreadyLoaded = nullptr);
 
     // Create a len length string containing random characters from [A-Za-z0-9].
-    static String8 getRandomString(size_t len);
+    static std::string getRandomString(size_t len);
 
 private:
     // Attempt to load the shared library from origName, but then fall back to

@@ -24,11 +24,10 @@
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 
-using android::String8;
 using android::renderscript::Context;
 
 RsdShaderCache::RsdShaderCache() {
-    mEntries.setCapacity(16);
+    mEntries.resize(16);
     mVertexDirty = true;
     mFragmentDirty = true;
 }
@@ -138,7 +137,7 @@ bool RsdShaderCache::link(const Context *rsc) {
     ProgramEntry *e = new ProgramEntry(vtx->getAttribCount(),
                                        vtx->getUniformCount(),
                                        frag->getUniformCount());
-    mEntries.push(e);
+    mEntries.push_back(e);
     mCurrent = e;
     e->vtx = vID;
     e->frag = fID;
@@ -236,7 +235,7 @@ bool RsdShaderCache::link(const Context *rsc) {
     return true;
 }
 
-int32_t RsdShaderCache::vtxAttribSlot(const String8 &attrName) const {
+int32_t RsdShaderCache::vtxAttribSlot(const std::string &attrName) const {
     for (uint32_t ct=0; ct < mCurrent->vtxAttrCount; ct++) {
         if (attrName == mCurrent->vtxAttrs[ct].name) {
             return mCurrent->vtxAttrs[ct].slot;
@@ -255,7 +254,7 @@ void RsdShaderCache::cleanupVertex(RsdShader *s) {
                 glDeleteProgram(mEntries[ct]->program);
 
                 delete mEntries[ct];
-                mEntries.removeAt(ct);
+                mEntries.erase(mEntries.begin() + ct);
                 numEntries = (int32_t)mEntries.size();
                 ct --;
             }
@@ -273,7 +272,7 @@ void RsdShaderCache::cleanupFragment(RsdShader *s) {
                 glDeleteProgram(mEntries[ct]->program);
 
                 delete mEntries[ct];
-                mEntries.removeAt(ct);
+                mEntries.erase(mEntries.begin() + ct);
                 numEntries = (int32_t)mEntries.size();
                 ct --;
             }
