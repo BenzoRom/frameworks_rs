@@ -19,8 +19,7 @@
 
 #include "rsType.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include <ui/GraphicBuffer.h>
+#ifndef RS_COMPATIBILITY_LIB
 #include "rsGrallocConsumer.h"
 #include "gui/CpuConsumer.h"
 #include "gui/GLConsumer.h"
