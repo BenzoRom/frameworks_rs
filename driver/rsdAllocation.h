@@ -23,12 +23,10 @@
 
 #include "../cpu_ref/rsd_cpu.h"
 
-#ifndef RS_SERVER
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
-#endif
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include "gui/GLConsumer.h"
 #endif
 

@@ -36,20 +36,12 @@
 #include <inttypes.h>
 #include <unistd.h>
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB) && \
-        defined(__ANDROID__)
+#if !defined(RS_COMPATIBILITY_LIB) && defined(__ANDROID__)
 #include <cutils/properties.h>
 #endif
 
 #ifdef RS_COMPATIBILITY_LIB
 #include "rsCompatibilityLib.h"
-#endif
-
-#ifdef RS_SERVER
-// Android exposes gettid(), standard Linux does not
-static pid_t gettid() {
-    return syscall(SYS_gettid);
-}
 #endif
 
 namespace android {
@@ -213,7 +205,7 @@ void Context::setupProgramStore() {
 #endif
 
 static uint32_t getProp(const char *str) {
-#if !defined(RS_SERVER) && defined(__ANDROID__)
+#ifdef __ANDROID__
     char buf[PROPERTY_VALUE_MAX];
     property_get(str, buf, "0");
     return atoi(buf);

@@ -25,12 +25,6 @@
 #include "rsElement.h"
 #include "rsScriptC.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "utils/Vector.h"
-#include "utils/Timers.h"
-#include "utils/StopWatch.h"
-#endif
-
 using android::renderscript::Allocation;
 using android::renderscript::Context;
 using android::renderscript::Element;

@@ -16,10 +16,6 @@
 
 #include "rsContext.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include "system/graphics.h"
-#endif
-
 #ifdef RS_COMPATIBILITY_LIB
 #include "rsCompatibilityLib.h"
 #endif

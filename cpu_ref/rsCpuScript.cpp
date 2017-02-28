@@ -59,9 +59,6 @@ static bool allocationLODIsNull(const android::renderscript::Allocation *alloc) 
 #ifndef RS_COMPATIBILITY_LIB
 
 static bool is_force_recompile() {
-#ifdef RS_SERVER
-  return false;
-#else
   char buf[PROPERTY_VALUE_MAX];
 
   // Re-compile if floating point precision has been overridden.
@@ -77,7 +74,6 @@ static bool is_force_recompile() {
   } else {
     return false;
   }
-#endif  // RS_SERVER
 }
 
 static void setCompileArguments(std::vector<const char*>* args,
