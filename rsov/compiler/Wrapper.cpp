@@ -17,6 +17,7 @@
 #include "Wrapper.h"
 
 #include "Builtin.h"
+#include "GlobalAllocSPIRITPass.h"
 #include "RSAllocationUtils.h"
 #include "bcinfo/MetadataExtractor.h"
 #include "builder.h"
@@ -28,6 +29,50 @@
 using bcinfo::MetadataExtractor;
 namespace android {
 namespace spirit {
+
+// Metadata buffer for global allocations
+// struct metadata {
+//  uint32_t element_size;
+//  uint32_t x_size;
+//  uint32_t y_size;
+//  uint32_t ??
+// };
+VariableInst *AddGAMetadata(/*Instruction *elementType, uint32_t binding, */ Builder &b,
+                        Module *m) {
+  TypeIntInst *UInt32Ty = m->getUnsignedIntType(32);
+  std::vector<Instruction *> metadata{
+    UInt32Ty,
+    UInt32Ty,
+    UInt32Ty,
+    UInt32Ty
+  };
+  auto MetadataStructTy = m->getStructType(metadata.data(), metadata.size());
+  // FIXME: workaround on a weird OpAccessChain member offset problem. Somehow
+  // when given constant indices, OpAccessChain returns pointers that are 4 bytes
+  // less than what are supposed to be (at runtime).
+  // For now workaround this with +4 the member offsets.
+  MetadataStructTy->memberDecorate(0, Decoration::Offset)->addExtraOperand(4);
+  MetadataStructTy->memberDecorate(1, Decoration::Offset)->addExtraOperand(8);
+  MetadataStructTy->memberDecorate(2, Decoration::Offset)->addExtraOperand(12);
+  MetadataStructTy->memberDecorate(3, Decoration::Offset)->addExtraOperand(16);
+  // TBD: Implement getArrayType. RuntimeArray requires buffers and hence we
+  // cannot use PushConstant underneath
+  auto MetadataBufSTy = m->getRuntimeArrayType(MetadataStructTy);
+  // Stride of metadata.
+  MetadataBufSTy->decorate(Decoration::ArrayStride)->addExtraOperand(
+      metadata.size()*sizeof(uint32_t));
+  auto MetadataSSBO = m->getStructType(MetadataBufSTy);
+  MetadataSSBO->decorate(Decoration::BufferBlock);
+  auto MetadataPtrTy = m->getPointerType(StorageClass::Uniform, MetadataSSBO);
+
+
+  VariableInst *MetadataVar = b.MakeVariable(MetadataPtrTy, StorageClass::Uniform);
+  MetadataVar->decorate(Decoration::DescriptorSet)->addExtraOperand(0);
+  MetadataVar->decorate(Decoration::Binding)->addExtraOperand(0);
+  m->addVariable(MetadataVar);
+
+  return MetadataVar;
+}
 
 VariableInst *AddBuffer(Instruction *elementType, uint32_t binding, Builder &b,
                         Module *m) {
@@ -404,8 +449,45 @@ AddGLComputeWrappers(const std::vector<uint32_t> &kernel_spirv,
   }
 
   m->consolidateAnnotations();
+  auto words = rs2spirv::TranslateBuiltins(b, m.get(), error);
 
-  return rs2spirv::TranslateBuiltins(b, m.get(), error);
+  // Recreate a module in known state after TranslateBuiltins
+  std::unique_ptr<InputWordStream> IS1(
+      InputWordStream::Create(std::move(words)));
+  std::unique_ptr<android::spirit::Module> m1(
+      android::spirit::Deserialize<android::spirit::Module>(*IS1));
+
+  if (!m1) {
+    *error = -1;
+    return std::vector<uint32_t>();
+  }
+
+  if (!m1->resolveIds()) {
+    *error = -2;
+    return std::vector<uint32_t>();
+  }
+
+  // Builders can be reused
+  m1->setBuilder(&b);
+
+  // Create types and variable declarations for global allocation metadata
+  android::spirit::VariableInst *GAmetadata = AddGAMetadata(b, m1.get());
+
+  // Adding types on-the-fly inside a transformer is not well suported now;
+  // creating them here before we enter transformer to avoid problems.
+  // TODO: Fix the transformer
+  android::spirit::TypeIntInst *UInt32Ty = m1->getUnsignedIntType(32);
+  m1->getConstant(UInt32Ty, 0U);
+  m1->getConstant(UInt32Ty, 1U);
+  // TODO: Use constant memory for metadata
+  m1->getPointerType(android::spirit::StorageClass::Uniform,
+                     UInt32Ty);
+
+  // Transform calls to lowered allocation accessors to use metadata
+  // TODO: implement the lowering pass in LLVM
+  m1->consolidateAnnotations();
+  return rs2spirv::TranslateGAAccessors(b, m1.get(), GAmetadata, error);
+
 }
 
 } // namespace rs2spirv

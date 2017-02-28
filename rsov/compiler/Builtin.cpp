@@ -279,7 +279,8 @@ public:
   // TODO: Move these in its own pass
 
   Instruction *transform(CapabilityInst *inst) override {
-    if (inst->mOperand1 == Capability::Linkage) {
+    if (inst->mOperand1 == Capability::Linkage ||
+        inst->mOperand1 == Capability::Kernel) {
       return nullptr;
     }
     return inst;
@@ -300,7 +301,8 @@ public:
   }
 
   Instruction *transform(DecorateInst *inst) override {
-    if (inst->mOperand2 == Decoration::LinkageAttributes) {
+    if (inst->mOperand2 == Decoration::LinkageAttributes ||
+        inst->mOperand2 == Decoration::Alignment) {
       return nullptr;
     }
     return inst;
