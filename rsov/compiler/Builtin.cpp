@@ -16,12 +16,15 @@
 
 #include "Builtin.h"
 
-#include <map>
-#include <string>
-
 #include "cxxabi.h"
 #include "spirit.h"
 #include "transformer.h"
+
+#include <stdint.h>
+
+#include <map>
+#include <string>
+#include <vector>
 
 namespace android {
 namespace spirit {
@@ -271,12 +274,15 @@ BuiltinLookupTable::sNameCode constexpr BuiltinLookupTable::mFPMathFuncOpCode[];
 
 class BuiltinTransformer : public Transformer {
 public:
-  BuiltinTransformer(Builder *b, Module *m) : mBuilder(b), mModule(m) {}
-
   // BEGIN: cleanup unrelated to builtin functions, but necessary for LLVM-SPIRV
   // converter generated code.
 
   // TODO: Move these in its own pass
+
+  std::vector<uint32_t> runAndSerialize(Module *module, int *error) override {
+    module->addExtInstImport("GLSL.std.450");
+    return Transformer::runAndSerialize(module, error);
+  }
 
   Instruction *transform(CapabilityInst *inst) override {
     if (inst->mOperand1 == Capability::Linkage ||
@@ -287,7 +293,7 @@ public:
   }
 
   Instruction *transform(ExtInstImportInst *inst) override {
-    if (strcmp(inst->mOperand1, "OpenCL.std") == 0) {
+    if (inst->mOperand1.compare("OpenCL.std") == 0) {
       return nullptr;
     }
     return inst;
@@ -316,7 +322,7 @@ public:
     // TODO: attach name to the instruction to avoid linear search in the debug
     // section, i.e.,
     // const char *name = func->getName();
-    const char *name = mModule->lookupNameByInstruction(func);
+    const char *name = getModule()->lookupNameByInstruction(func);
     if (!name) {
       return call;
     }
@@ -327,7 +333,7 @@ public:
     if (!fpTranslate) {
       return call;
     }
-    Instruction *inst = fpTranslate(name, call, this, mBuilder, mModule);
+    Instruction *inst = fpTranslate(name, call, this, &mBuilder, getModule());
 
     if (inst) {
       inst->setId(call->getId());
@@ -337,8 +343,7 @@ public:
   }
 
 private:
-  Builder *mBuilder;
-  Module *mModule;
+  Builder mBuilder;
 };
 
 } // namespace spirit
@@ -346,12 +351,9 @@ private:
 
 namespace rs2spirv {
 
-std::vector<uint32_t> TranslateBuiltins(android::spirit::Builder &b,
-                                        android::spirit::Module *m,
-                                        int *error) {
-  android::spirit::BuiltinTransformer trans(&b, m);
-  *error = 0;
-  return trans.transformSerialize(m);
+android::spirit::Pass *CreateBuiltinPass() {
+  return new android::spirit::BuiltinTransformer();
 }
 
 } // namespace rs2spirv
+

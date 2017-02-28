@@ -19,6 +19,8 @@
 
 #include "word_stream.h"
 
+#include <string>
+
 namespace android {
 namespace spirit {
 
@@ -44,7 +46,7 @@ public:
     return *this >> (uint32_t *)(&RHS->intValue);
   }
 
-  WordStreamImpl &operator>>(const char **str) override;
+  WordStreamImpl &operator>>(std::string *str) override;
 
   std::vector<uint32_t> getWords() override { return mWords; }
 
@@ -61,7 +63,7 @@ public:
     // double, etc.
     return *this << (uint32_t)(RHS.intValue);
   }
-  WordStreamImpl &operator<<(const char *str) override;
+  WordStreamImpl &operator<<(const std::string &str) override;
 
 private:
   std::vector<uint32_t> mWords;

@@ -17,12 +17,13 @@
 #ifndef WORD_STREAM_H
 #define WORD_STREAM_H
 
-#include <stdint.h>
-
-#include <vector>
-
 #include "core_defs.h"
 #include "types_generated.h"
+
+#include <stdint.h>
+
+#include <string>
+#include <vector>
 
 namespace android {
 namespace spirit {
@@ -48,7 +49,7 @@ public:
 
   virtual InputWordStream &operator>>(uint32_t *RHS) = 0;
   virtual InputWordStream &operator>>(LiteralContextDependentNumber *num) = 0;
-  virtual InputWordStream &operator>>(const char **str) = 0;
+  virtual InputWordStream &operator>>(std::string *str) = 0;
 
   InputWordStream &operator>>(int32_t *RHS) { return *this >> (uint32_t *)RHS; }
 
@@ -98,7 +99,7 @@ public:
   virtual OutputWordStream &operator<<(const uint32_t RHS) = 0;
   virtual OutputWordStream &
   operator<<(const LiteralContextDependentNumber &RHS) = 0;
-  virtual OutputWordStream &operator<<(const char *str) = 0;
+  virtual OutputWordStream &operator<<(const std::string &str) = 0;
 
   OutputWordStream &operator<<(const int32_t RHS) {
     return *this << (uint32_t)RHS;

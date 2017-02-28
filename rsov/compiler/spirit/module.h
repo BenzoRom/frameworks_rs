@@ -23,6 +23,7 @@
 
 #include "core_defs.h"
 #include "entity.h"
+#include "instructions.h"
 #include "stl_util.h"
 #include "types_generated.h"
 #include "visitor.h"
@@ -134,6 +135,10 @@ public:
   getFunctionDefinitionFromInstruction(FunctionInst *) const;
   FunctionDefinition *lookupFunctionDefinitionByName(const char *name) const;
 
+  // Find the name of the instruction, e.g., the name of a function (OpFunction
+  // instruction).
+  // The returned string is owned by the OpName instruction, whose first operand
+  // is the instruction being queried on.
   const char *lookupNameByInstruction(const Instruction *) const;
 
   VariableInst *getInvocationId();

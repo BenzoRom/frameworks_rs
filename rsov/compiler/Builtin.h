@@ -17,23 +17,17 @@
 #ifndef BUILTIN_H
 #define BUILTIN_H
 
-#include <stdint.h>
-
-#include <vector>
-
 namespace android {
 namespace spirit {
 
-class Builder;
-class Module;
+class Pass;
 
 } // namespace spirit
 } // namespace android
 
 namespace rs2spirv {
 
-std::vector<uint32_t> TranslateBuiltins(android::spirit::Builder &b,
-                                        android::spirit::Module *m, int *error);
+android::spirit::Pass *CreateBuiltinPass();
 
 } // namespace rs2spirv
 

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-#include <fstream>
-#include <memory>
+#include "module.h"
 
 #include "file_utils.h"
 #include "instructions.h"
-#include "module.h"
 #include "test_utils.h"
 #include "word_stream.h"
 #include "gtest/gtest.h"
+
+#include <fstream>
+#include <memory>
 
 namespace android {
 namespace spirit {
