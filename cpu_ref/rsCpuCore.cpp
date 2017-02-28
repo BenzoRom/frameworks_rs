@@ -30,18 +30,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include <cutils/properties.h>
-#include "utils/StopWatch.h"
-#endif
-
-#ifdef RS_SERVER
-// Android exposes gettid(), standard Linux does not
-static pid_t gettid() {
-    return syscall(SYS_gettid);
-}
-#endif
-
 #define REDUCE_ALOGV(mtls, level, ...) do { if ((mtls)->logReduce >= (level)) ALOGV(__VA_ARGS__); } while(0)
 
 static pthread_key_t gThreadTLSKey = 0;

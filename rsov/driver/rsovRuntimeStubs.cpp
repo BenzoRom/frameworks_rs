@@ -70,9 +70,7 @@ typedef uint64_t ulong4 __attribute__((ext_vector_type(4)));
 typedef uint8_t uchar;
 typedef uint16_t ushort;
 typedef uint32_t uint;
-#ifndef RS_SERVER
 typedef uint64_t ulong;
-#endif
 
 // Add NOLINT to suppress wrong warnings from clang-tidy.
 #ifndef __LP64__

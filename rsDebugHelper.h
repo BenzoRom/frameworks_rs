@@ -20,7 +20,7 @@
 #include "rsUtils.h"
 #include "rsInternalDefines.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include <utils/CallStack.h>
 #endif
 
@@ -31,13 +31,13 @@ namespace renderscript {
 class DebugHelper {
 public:
     DebugHelper() {
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
         mStack.update(2);
 #endif
     }
 
     void dump() {
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
         String8 s = mStack.toString();
         ALOGV("%s", s.string());
         //mStack.dump();
@@ -45,7 +45,7 @@ public:
     }
 
 private:
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
     CallStack mStack;
 #endif
 };

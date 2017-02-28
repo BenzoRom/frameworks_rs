@@ -16,11 +16,9 @@
 
 #include "rsContext.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include "system/graphics.h"
-#endif
-
-#ifdef RS_COMPATIBILITY_LIB
+#else
 #include "rsCompatibilityLib.h"
 #endif
 
@@ -118,7 +116,6 @@ void Type::compute() {
     if (mHal.state.faces) {
         mCellCount *= 6;
     }
-#ifndef RS_SERVER
     // YUV only supports basic 2d
     // so we can stash the plane pointers in the mipmap levels.
     if (mHal.state.dimYuv) {
@@ -144,7 +141,6 @@ void Type::compute() {
             rsAssert(0);
         }
     }
-#endif
     mHal.state.element = mElement.get();
 }
 
