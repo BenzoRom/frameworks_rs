@@ -28,7 +28,9 @@
 #include "llvm/Support/SPIRV.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/Scalar.h"
 
+#include "GlobalAllocPass.h"
 #include "GlobalMergePass.h"
 #include "InlinePreparationPass.h"
 #include "RemoveNonkernelsPass.h"
@@ -88,6 +90,12 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
   // Remove dead func decls.
   PassMgr.add(createStripDeadPrototypesPass());
   PassMgr.add(createGlobalMergePass());
+  // Transform global allocations and accessors (rs[GS]etElementAt)
+  PassMgr.add(createGlobalAllocPass());
+  PassMgr.add(createAggressiveDCEPass());
+  // Delete unreachable globals.
+  PassMgr.add(createGlobalDCEPass());
+  // Remove global allocations
   PassMgr.add(createPromoteMemoryToRegisterPass());
   PassMgr.add(createTransOCLMD());
   // TODO: investigate removal of OCLTypeToSPIRV pass.
