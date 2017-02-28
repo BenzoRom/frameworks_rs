@@ -19,7 +19,7 @@
 
 #include "rsAllocation.h"
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
 #include "system/window.h"
 #include "ui/Rect.h"
 #include "ui/GraphicBufferMapper.h"
@@ -37,11 +37,6 @@
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 #include <GLES/glext.h>
-#endif
-
-#ifdef RS_SERVER
-// server requires malloc.h for memalign
-#include <malloc.h>
 #endif
 
 #ifndef RS_COMPATIBILITY_LIB
@@ -285,7 +280,6 @@ static size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
     state->yuv.step = 1;
     state->lodCount = 3;
 
-#ifndef RS_SERVER
     switch(yuv) {
     case HAL_PIXEL_FORMAT_YV12:
         state->lod[2].stride = rsRound(state->lod[0].stride >> 1, 16);
@@ -311,7 +305,6 @@ static size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
     default:
         rsAssert(0);
     }
-#endif
     return uvSize;
 }
 
@@ -467,7 +460,6 @@ bool rsdAllocationInitStrided(const Context *rsc, Allocation *alloc, bool forceZ
         rsAssert(!"Size mismatch");
     }
 
-#ifndef RS_SERVER
     drv->glTarget = GL_NONE;
     if (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_GRAPHICS_TEXTURE) {
         if (alloc->mHal.state.hasFaces) {
@@ -480,7 +472,6 @@ bool rsdAllocationInitStrided(const Context *rsc, Allocation *alloc, bool forceZ
             drv->glTarget = GL_ARRAY_BUFFER;
         }
     }
-#endif
 
 #ifndef RS_COMPATIBILITY_LIB
     drv->glType = rsdTypeToGLType(alloc->mHal.state.type->getElement()->getComponent().getType());

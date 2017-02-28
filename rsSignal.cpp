@@ -80,9 +80,7 @@ void Signal::wait() {
     if (!status) {
         mSet = false;
     } else {
-#ifndef RS_SERVER
         ALOGE("Signal::wait: error waiting for condition: %s", strerror(status));
-#endif
     }
 
     status = pthread_mutex_unlock(&mMutex);

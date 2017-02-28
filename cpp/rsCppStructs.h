@@ -651,7 +651,7 @@ public:
      */
     void ioGetInput();
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
+#ifndef RS_COMPATIBILITY_LIB
     /**
      * Returns the handle to a raw buffer that is being managed by the screen
      * compositor. This operation is only valid for Allocations with USAGE_IO_INPUT.

@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-#if !defined(RS_SERVER) && !defined(RS_COMPATIBILITY_LIB)
-#include <cutils/compiler.h>
-#endif
-
 #include "rsContext.h"
 #include "rsScriptC.h"
 #include "rsMatrix4x4.h"
