@@ -22,8 +22,6 @@
 #include <sys/resource.h>
 #include <sched.h>
 
-#include <cutils/properties.h>
-
 #include <GLES/gl.h>
 #include <GLES/glext.h>
 #include <GLES2/gl2.h>
