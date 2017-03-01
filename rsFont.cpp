@@ -20,9 +20,6 @@
 #include "rsFont.h"
 #include "rsProgramFragment.h"
 #include "rsMesh.h"
-#ifdef __ANDROID__
-#include <cutils/properties.h>
-#endif
 
 #ifndef ANDROID_RS_SERIALIZE
 #include <ft2build.h>
