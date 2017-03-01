@@ -17,7 +17,6 @@
 #include "pass_queue.h"
 
 #include "module.h"
-#include "word_stream.h"
 
 namespace android {
 namespace spirit {
@@ -72,9 +71,7 @@ std::vector<uint32_t> PassQueue::run(const std::vector<uint32_t> &spirvWords,
     return spirvWords;
   }
 
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(std::move(spirvWords)));
-  Module *module = Deserialize<Module>(*IS);
+  Module *module = Deserialize<Module>(spirvWords);
   if (!module || !module->resolveIds()) {
     return std::vector<uint32_t>();
   }
@@ -85,9 +82,7 @@ std::vector<uint32_t> PassQueue::run(const std::vector<uint32_t> &spirvWords,
 std::vector<uint32_t> PassQueue::runAndSerialize(Module *module, int *error) {
   const int n = mPasses.size();
   if (n < 1) {
-    std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
-    module->Serialize(*OS);
-    return OS->getWords();
+    return Serialize<Module>(module);
   }
 
   // A unique ptr to keep intermediate modules from leaking

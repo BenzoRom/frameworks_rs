@@ -28,9 +28,6 @@
 namespace android {
 namespace spirit {
 
-// TODO: this constant might be too small
-constexpr uint32_t MAXIMUM_STRING_LITERAL_LENGTH = 256;
-
 struct IdRef;
 class Instruction;
 
@@ -111,7 +108,6 @@ public:
 
   OutputWordStream &operator<<(const IdRef &RHS) {
     return *this << RHS.mId;
-    ;
   }
 
   OutputWordStream &operator<<(const PairLiteralIntegerIdRef &RHS) {

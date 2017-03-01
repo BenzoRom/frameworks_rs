@@ -17,7 +17,6 @@
 #include "pass.h"
 
 #include "module.h"
-#include "word_stream.h"
 
 namespace android {
 namespace spirit {
@@ -31,8 +30,7 @@ Module *Pass::run(Module *module, int *error) {
     }
     return nullptr;
   }
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
-  return Deserialize<Module>(*IS);
+  return Deserialize<Module>(words);
 }
 
 std::vector<uint32_t> Pass::runAndSerialize(Module *module, int *error) {
@@ -44,9 +42,7 @@ std::vector<uint32_t> Pass::runAndSerialize(Module *module, int *error) {
     }
     return std::vector<uint32_t>();
   }
-  std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
-  m1->Serialize(*OS);
-  return OS->getWords();
+  return Serialize<Module>(m1);
 }
 
 } // namespace spirit

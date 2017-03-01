@@ -20,13 +20,13 @@
 #include <memory>
 #include <vector>
 
+#include "word_stream.h"
+
 namespace android {
 namespace spirit {
 
 class Builder;
-class InputWordStream;
 class IVisitor;
-class OutputWordStream;
 
 class Entity {
 public:
@@ -54,11 +54,23 @@ template <typename T> T *Deserialize(InputWordStream &IS) {
   return entity.release();
 }
 
+template <typename T> T *Deserialize(const std::vector<uint32_t> &words) {
+  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
+  return Deserialize<T>(*IS);
+}
+
 template <class T>
 void DeserializeZeroOrMore(InputWordStream &IS, std::vector<T *> &all) {
   while (auto entity = Deserialize<T>(IS)) {
     all.push_back(entity);
   }
+}
+
+template <class T>
+std::vector<uint32_t> Serialize(T* e) {
+  std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
+  e->Serialize(*OS);
+  return OS->getWords();
 }
 
 } // namespace spirit

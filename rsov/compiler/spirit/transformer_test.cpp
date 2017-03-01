@@ -19,7 +19,6 @@
 #include "file_utils.h"
 #include "spirit.h"
 #include "test_utils.h"
-#include "word_stream.h"
 #include "gtest/gtest.h"
 
 #include <stdint.h>
@@ -77,8 +76,7 @@ private:
 };
 
 TEST_F(TransformerTest, testMulToAdd) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -97,8 +95,7 @@ TEST_F(TransformerTest, testMulToAdd) {
 }
 
 TEST_F(TransformerTest, testDeletion) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m.get());
 
@@ -114,8 +111,7 @@ TEST_F(TransformerTest, testDeletion) {
 }
 
 TEST_F(TransformerTest, testAddInstructionUsingNewDataType) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m.get());
 
