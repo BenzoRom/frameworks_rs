@@ -21,7 +21,6 @@
 #include "instructions.h"
 #include "module.h"
 #include "test_utils.h"
-#include "word_stream.h"
 #include "gtest/gtest.h"
 
 namespace android {
@@ -63,8 +62,7 @@ TEST_F(WrapperTest, testAddBuffer) {
 }
 
 TEST_F(WrapperTest, testAddWrapper1) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -85,8 +83,7 @@ TEST_F(WrapperTest, testAddWrapper1) {
 }
 
 TEST_F(WrapperTest, testAddWrapper2) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsInvert));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsInvert));
 
   ASSERT_NE(nullptr, m);
 
@@ -105,8 +102,7 @@ TEST_F(WrapperTest, testAddWrapper2) {
 }
 
 TEST_F(WrapperTest, testAddWrapperForRoot) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsInvert));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsInvert));
 
   ASSERT_NE(nullptr, m);
 

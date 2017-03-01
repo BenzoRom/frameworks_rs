@@ -26,7 +26,6 @@
 #include "instructions.h"
 #include "module.h"
 #include "pass.h"
-#include "word_stream.h"
 
 #include <vector>
 

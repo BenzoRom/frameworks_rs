@@ -20,7 +20,6 @@
 #include "instructions.h"
 #include "module.h"
 #include "test_utils.h"
-#include "word_stream.h"
 #include "gtest/gtest.h"
 
 namespace android {
@@ -182,17 +181,12 @@ TEST(BuilderTest, testBuildAndSerialize) {
 
   m->consolidateAnnotations();
 
-  std::unique_ptr<WordStream> S(WordStream::Create());
-  m->Serialize(*S);
-  auto words = S->getWords();
+  auto words = Serialize<Module>(m);
 
-  std::unique_ptr<InputWordStream> S1(InputWordStream::Create(words));
-  auto m1 = Deserialize<Module>(*S1);
+  auto m1 = Deserialize<Module>(words);
   ASSERT_NE(nullptr, m1);
 
-  std::unique_ptr<WordStream> S2(WordStream::Create());
-  m1->Serialize(*S2);
-  auto words1 = S2->getWords();
+  auto words1 = Serialize<Module>(m1);
 
   EXPECT_TRUE(words == words1);
 }
@@ -202,9 +196,7 @@ TEST(BuilderTest, testLoadAndModify) {
       "frameworks/rs/rsov/compiler/spirit/test_data/");
   const std::string &fullPath = getAbsolutePath(testDataPath + "greyscale.spv");
 
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(fullPath.c_str()));
-  Module *m = Deserialize<Module>(*IS);
+  Module *m = Deserialize<Module>(readFile<uint32_t>(fullPath.c_str()));
 
   ASSERT_NE(nullptr, m);
 
@@ -227,17 +219,12 @@ TEST(BuilderTest, testLoadAndModify) {
 
   m->consolidateAnnotations();
 
-  std::unique_ptr<OutputWordStream> S(OutputWordStream::Create());
-  m->Serialize(*S);
-  auto words = S->getWords();
+  auto words = Serialize<Module>(m);
 
-  std::unique_ptr<InputWordStream> S1(InputWordStream::Create(words));
-  auto m1 = Deserialize<Module>(*S1);
+  auto m1 = Deserialize<Module>(words);
   ASSERT_NE(nullptr, m1);
 
-  std::unique_ptr<OutputWordStream> S2(OutputWordStream::Create());
-  m1->Serialize(*S2);
-  auto words1 = S2->getWords();
+  auto words1 = Serialize<Module>(m1);
 
   EXPECT_TRUE(words == words1);
 }
