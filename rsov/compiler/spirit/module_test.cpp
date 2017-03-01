@@ -19,7 +19,6 @@
 #include "file_utils.h"
 #include "instructions.h"
 #include "test_utils.h"
-#include "word_stream.h"
 #include "gtest/gtest.h"
 
 #include <fstream>
@@ -50,8 +49,7 @@ private:
 };
 
 TEST_F(ModuleTest, testDeserialization1) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  auto m = Deserialize<Module>(*IS);
+  auto m = Deserialize<Module>(mWordsGreyscale);
 
   ASSERT_NE(nullptr, m);
 
@@ -115,55 +113,44 @@ TEST_F(ModuleTest, testDeserialization1) {
 }
 
 TEST_F(ModuleTest, testDeserialization2) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsInvert));
-  Module *m = Deserialize<Module>(*IS);
+  Module *m = Deserialize<Module>(mWordsInvert);
   ASSERT_NE(nullptr, m);
 
   std::unique_ptr<Module> mDeleter(m);
 
-  std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
-  m->Serialize(*OS);
-  auto outwords = OS->getWords();
+  auto outwords = Serialize<Module>(m);
 
   EXPECT_TRUE(mWordsInvert == outwords);
 }
 
 TEST_F(ModuleTest, testSerialization1) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  Module *m = Deserialize<Module>(*IS);
+  Module *m = Deserialize<Module>(mWordsGreyscale);
   ASSERT_NE(nullptr, m);
 
   std::unique_ptr<Module> mDeleter(m);
 
   EXPECT_EQ(2, countEntity<FunctionDefinition>(m));
 
-  std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
-  m->Serialize(*OS);
-  auto outwords = OS->getWords();
+  auto outwords = Serialize<Module>(m);
 
   EXPECT_TRUE(mWordsGreyscale == outwords);
 }
 
 TEST_F(ModuleTest, testSerialization2) {
-  std::unique_ptr<InputWordStream> IS(
-      InputWordStream::Create(mWordsGreyscale2));
-  Module *m = Deserialize<Module>(*IS);
+  Module *m = Deserialize<Module>(mWordsGreyscale2);
   ASSERT_NE(nullptr, m);
 
   std::unique_ptr<Module> mDeleter(m);
 
   EXPECT_EQ(1, countEntity<FunctionDefinition>(m));
 
-  std::unique_ptr<OutputWordStream> OS(OutputWordStream::Create());
-  m->Serialize(*OS);
-  auto outwords = OS->getWords();
+  auto outwords = Serialize<Module>(m);
 
   EXPECT_TRUE(mWordsGreyscale2 == outwords);
 }
 
 TEST_F(ModuleTest, testLookupByName) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  Module *m = Deserialize<Module>(*IS);
+  Module *m = Deserialize<Module>(mWordsGreyscale);
 
   ASSERT_NE(nullptr, m);
 
