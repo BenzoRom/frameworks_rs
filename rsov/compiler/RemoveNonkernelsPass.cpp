@@ -16,15 +16,13 @@
 
 #include "RemoveNonkernelsPass.h"
 
-#include "bcinfo/MetadataExtractor.h"
-
 #include "llvm/ADT/StringSet.h"
-#include "llvm/IR/Attributes.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/PassManager.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
+
+#include "bcinfo/MetadataExtractor.h"
 
 #define DEBUG_TYPE "rs2spirv-remove"
 

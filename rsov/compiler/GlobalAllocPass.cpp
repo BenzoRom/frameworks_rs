@@ -16,17 +16,12 @@
 
 #include "GlobalAllocPass.h"
 
-#include "RSAllocationUtils.h"
-
-#include "llvm/IR/Attributes.h"
-#include "llvm/IR/Constants.h"
-#include "llvm/IR/DataLayout.h"
 #include "llvm/IR/GlobalVariable.h"
-#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/PassManager.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
+
+#include "RSAllocationUtils.h"
 
 #define DEBUG_TYPE "rs2spirv-global-alloc"
 

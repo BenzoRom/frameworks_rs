@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include "RSSPIRVWriter.h"
-#include "unit_tests/TestRunner.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
@@ -24,13 +22,11 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/PrettyStackTrace.h"
-#include "llvm/Support/SPIRV.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include <fstream>
-#include <iterator>
+#include "RSSPIRVWriter.h"
 
 #define DEBUG_TYPE "rs2spirv"
 
@@ -46,24 +42,6 @@ static cl::opt<std::string> InputFile(cl::Positional, cl::desc("<input file>"),
 static cl::opt<std::string> OutputFile("o",
                                        cl::desc("Override output filename"),
                                        cl::value_desc("filename"));
-
-static cl::opt<bool> IsPrintAsWords(
-    "print-as-words",
-    cl::desc("Print an input .spv file as a brace-init-list of words"),
-    cl::init(false));
-
-static cl::opt<bool>
-    IsRegularization("s",
-                     cl::desc("Regularize LLVM to be representable by SPIR-V"));
-
-#ifdef RS2SPIRV_DEBUG
-static cl::opt<bool> RunTests("run-tests", cl::desc("Run unit tests"),
-                              cl::init(false));
-#endif
-
-namespace SPIRV {
-extern bool SPIRVUseTextFormat;
-} // namespace SPIRV
 
 static std::string removeExt(const std::string &FileName) {
   size_t Pos = FileName.find_last_of(".");
@@ -115,57 +93,12 @@ static int convertLLVMToSPIRV() {
   return 0;
 }
 
-static int printAsWords() {
-  std::ifstream IFS(InputFile, std::ios::binary);
-  if (!IFS.good()) {
-    errs() << "Could not open input file\n";
-    return -1;
-  }
-
-  uint64_t FSize;
-  const auto EC = llvm::sys::fs::file_size(InputFile, FSize);
-  if (EC) {
-    errs() << "Fails to open input file: " << EC.message() << '\n';
-    return -1;
-  }
-
-  if (FSize % 4 != 0) {
-    errs() << "Input file is not a stream of words. Size mismatch.\n";
-    return -1;
-  }
-
-  std::istreambuf_iterator<char> It(IFS);
-  const std::istreambuf_iterator<char> End;
-
-  outs() << '{';
-
-  while (It != End) {
-    uint32_t val = 0;
-    // Mask the sign-extended values to prevent higher bits pollution.
-    val += uint32_t(*(It++)) & 0x000000FF;
-    val += (uint32_t(*(It++)) << 8) & 0x0000FF00;
-    val += (uint32_t(*(It++)) << 16) & 0x00FF0000;
-    val += (uint32_t(*(It++)) << 24) & 0xFF000000;
-    outs() << val << (It != End ? ", " : "};\n");
-  }
-
-  return 0;
-}
-
 int main(int ac, char **av) {
   EnablePrettyStackTrace();
   sys::PrintStackTraceOnErrorSignal(av[0]);
   PrettyStackTraceProgram X(ac, av);
 
   cl::ParseCommandLineOptions(ac, av, "RenderScript to SPIRV translator");
-
-#ifdef RS2SPIRV_DEBUG
-  if (RunTests)
-    return rs2spirv::TestRunnerContext::runTests();
-#endif
-
-  if (IsPrintAsWords)
-    return printAsWords();
 
   return convertLLVMToSPIRV();
 }
