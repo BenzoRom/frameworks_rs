@@ -5,9 +5,10 @@
 #include <set>
 #include <memory>
 
+#include <sys/stat.h>
+
 #ifdef RS_COMPATIBILITY_LIB
 #include <stdio.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #else
 #include "bcc/Config.h"
