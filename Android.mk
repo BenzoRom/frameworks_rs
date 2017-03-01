@@ -64,7 +64,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES += libRS_internal libRSCpuRef
 LOCAL_SHARED_LIBRARIES += liblog libutils libEGL libGLESv1_CM libGLESv2
-LOCAL_SHARED_LIBRARIES += libui libgui
+LOCAL_SHARED_LIBRARIES += libui libgui libandroid
 
 LOCAL_SHARED_LIBRARIES += libbcinfo
 
