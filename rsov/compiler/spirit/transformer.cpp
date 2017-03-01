@@ -23,8 +23,7 @@ namespace spirit {
 
 Module *Transformer::run(Module *module, int *error) {
   auto words = runAndSerialize(module, error);
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(words));
-  return Deserialize<Module>(*IS);
+  return Deserialize<Module>(words);
 }
 
 std::vector<uint32_t> Transformer::runAndSerialize(Module *m, int *error) {

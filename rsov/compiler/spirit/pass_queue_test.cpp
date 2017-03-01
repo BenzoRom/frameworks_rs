@@ -20,7 +20,6 @@
 #include "spirit.h"
 #include "test_utils.h"
 #include "transformer.h"
-#include "word_stream.h"
 #include "gtest/gtest.h"
 
 #include <stdint.h>
@@ -92,8 +91,7 @@ private:
 };
 
 TEST_F(PassQueueTest, testMulToAdd) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -113,8 +111,7 @@ TEST_F(PassQueueTest, testMulToAdd) {
 }
 
 TEST_F(PassQueueTest, testInPlaceModifying) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -136,8 +133,7 @@ TEST_F(PassQueueTest, testInPlaceModifying) {
 }
 
 TEST_F(PassQueueTest, testDeletion) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m.get());
 
@@ -152,8 +148,7 @@ TEST_F(PassQueueTest, testDeletion) {
 }
 
 TEST_F(PassQueueTest, testMulToAddToDiv) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -175,8 +170,7 @@ TEST_F(PassQueueTest, testMulToAddToDiv) {
 }
 
 TEST_F(PassQueueTest, testAMix) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -203,8 +197,7 @@ TEST_F(PassQueueTest, testAMix) {
 }
 
 TEST_F(PassQueueTest, testAnotherMix) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -219,8 +212,7 @@ TEST_F(PassQueueTest, testAnotherMix) {
   passes.append(new AddToDivTransformer());
   auto outputWords = passes.runAndSerialize(m.get());
 
-  std::unique_ptr<InputWordStream> IS1(InputWordStream::Create(outputWords));
-  std::unique_ptr<Module> m1(Deserialize<Module>(*IS1));
+  std::unique_ptr<Module> m1(Deserialize<Module>(outputWords));
 
   ASSERT_NE(nullptr, m1);
 
@@ -238,8 +230,7 @@ TEST_F(PassQueueTest, testMulToAddToDivFromWords) {
   passes.append(new AddToDivTransformer());
   auto outputWords = passes.run(std::move(mWordsGreyscale));
 
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(outputWords));
-  std::unique_ptr<Module> m1(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m1(Deserialize<Module>(outputWords));
 
   ASSERT_NE(nullptr, m1);
 
@@ -251,8 +242,7 @@ TEST_F(PassQueueTest, testMulToAddToDivFromWords) {
 }
 
 TEST_F(PassQueueTest, testMulToAddToDivToWords) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -264,8 +254,7 @@ TEST_F(PassQueueTest, testMulToAddToDivToWords) {
   passes.append(new AddToDivTransformer());
   auto outputWords = passes.runAndSerialize(m.get());
 
-  std::unique_ptr<InputWordStream> IS1(InputWordStream::Create(outputWords));
-  std::unique_ptr<Module> m1(Deserialize<Module>(*IS1));
+  std::unique_ptr<Module> m1(Deserialize<Module>(outputWords));
 
   ASSERT_NE(nullptr, m1);
 
@@ -277,8 +266,7 @@ TEST_F(PassQueueTest, testMulToAddToDivToWords) {
 }
 
 TEST_F(PassQueueTest, testAddMulAfterAdd) {
-  std::unique_ptr<InputWordStream> IS(InputWordStream::Create(mWordsGreyscale));
-  std::unique_ptr<Module> m(Deserialize<Module>(*IS));
+  std::unique_ptr<Module> m(Deserialize<Module>(mWordsGreyscale));
 
   ASSERT_NE(nullptr, m);
 
@@ -293,8 +281,7 @@ TEST_F(PassQueueTest, testAddMulAfterAdd) {
   }
   auto outputWords = passes.runAndSerialize(m.get());
 
-  std::unique_ptr<InputWordStream> IS1(InputWordStream::Create(outputWords));
-  std::unique_ptr<Module> m1(Deserialize<Module>(*IS1));
+  std::unique_ptr<Module> m1(Deserialize<Module>(outputWords));
 
   ASSERT_NE(nullptr, m1);
 
