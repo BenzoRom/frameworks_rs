@@ -27,7 +27,6 @@
 
     #include <bcc/Config.h>
     #include <bcinfo/MetadataExtractor.h>
-    #include <cutils/properties.h>
 
     #include <zlib.h>
     #include <sys/file.h>
@@ -62,13 +61,13 @@ static bool is_force_recompile() {
   char buf[PROPERTY_VALUE_MAX];
 
   // Re-compile if floating point precision has been overridden.
-  property_get("debug.rs.precision", buf, "");
+  android::renderscript::property_get("debug.rs.precision", buf, "");
   if (buf[0] != '\0') {
     return true;
   }
 
   // Re-compile if debug.rs.forcerecompile is set.
-  property_get("debug.rs.forcerecompile", buf, "0");
+  android::renderscript::property_get("debug.rs.forcerecompile", buf, "0");
   if ((::strcmp(buf, "1") == 0) || (::strcmp(buf, "true") == 0)) {
     return true;
   } else {
@@ -178,7 +177,7 @@ bool isChecksumNeeded(const char *cacheDir) {
         (::strcmp(SYSLIBPATH_VENDOR, cacheDir) == 0))
         return false;
     char buf[PROPERTY_VALUE_MAX];
-    property_get("ro.debuggable", buf, "");
+    android::renderscript::property_get("ro.debuggable", buf, "");
     return (buf[0] == '1');
 }
 

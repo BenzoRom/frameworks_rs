@@ -88,7 +88,6 @@ LOCAL_SRC_FILES:= \
 	rsApiElement.cpp \
 	rsApiType.cpp \
 	rsClosure.cpp \
-	rsCompatibilityLib.cpp \
 	rsComponent.cpp \
 	rsContext.cpp \
 	rsCppUtils.cpp \
