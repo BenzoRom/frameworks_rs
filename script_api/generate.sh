@@ -17,6 +17,8 @@
 
 CLANG=$ANDROID_BUILD_TOP/prebuilts/clang/host/linux-x86/clang-stable/bin/clang++
 
+cd `dirname $0`
+
 set -e
 $CLANG Generator.cpp Specification.cpp GenerateDocumentation.cpp GenerateHeaderFiles.cpp GenerateTestFiles.cpp Scanner.cpp Utilities.cpp GenerateStubsWhiteList.cpp -g -std=c++11 -Wall -o generator
 
@@ -51,6 +53,6 @@ for ((i=11; i<=RS_API_LEVEL; i++))
 done
 rm -rf slangtest
 
-mv RSStubsWhiteList.cpp ../../compile/libbcc/lib/Renderscript/
+mv RSStubsWhiteList.cpp ../../compile/libbcc/lib/
 
 echo "Be sure to update platform/frameworks/base/docs/html/guide/guide_toc.cs if needed."
