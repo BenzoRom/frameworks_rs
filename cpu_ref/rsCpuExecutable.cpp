@@ -15,6 +15,7 @@
 #endif
 
 #include <dlfcn.h>
+#include <sys/stat.h>
 
 namespace android {
 namespace renderscript {
