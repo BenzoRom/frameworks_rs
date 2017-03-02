@@ -16,16 +16,15 @@
 
 #include "RSAllocationUtils.h"
 
-#include "cxxabi.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Transforms/Utils/Cloning.h"
 
-#include <algorithm>
+#include "cxxabi.h"
+
 #include <sstream>
 #include <unordered_map>
 
@@ -187,9 +186,7 @@ bool solidifyRSAllocAccess(Module &M, RSAllocationCallInfo CallInfo) {
     FName = "rsAllocationGetDimX";
   else
     FName = Fun->getName();
-#if 0
-  StringRef GVName = CallInfo.RSAlloc.VarName;
-#endif
+
   std::ostringstream OSS;
   OSS << "__rsov_" << FName.str();
   // Make up uint32_t F(uint32_t)

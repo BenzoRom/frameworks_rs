@@ -16,10 +16,6 @@
 
 #include "RSSPIRVWriter.h"
 
-#include "SPIRVModule.h"
-#include "bcinfo/MetadataExtractor.h"
-
-#include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
@@ -36,26 +32,17 @@
 #include "GlobalMergePass.h"
 #include "InlinePreparationPass.h"
 #include "RemoveNonkernelsPass.h"
+#include "SPIRVModule.h"
 #include "Wrapper.h"
+#include "bcinfo/MetadataExtractor.h"
 #include "pass_queue.h"
-
-#include <fstream>
-#include <sstream>
 
 #define DEBUG_TYPE "rs2spirv-writer"
 
 using namespace llvm;
 using namespace SPIRV;
 
-namespace llvm {
-FunctionPass *createPromoteMemoryToRegisterPass();
-} // namespace llvm
-
 namespace rs2spirv {
-
-static cl::opt<std::string> WrapperOutputFile("wo",
-                                              cl::desc("Wrapper output file"),
-                                              cl::value_desc("filename.spt"));
 
 static void HandleTargetTriple(llvm::Module &M) {
   Triple TT(M.getTargetTriple());
