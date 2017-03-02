@@ -303,6 +303,13 @@ void PermutationWriter::writeJavaCheckMethod(bool generateCallToVerifier) const 
     writeJavaCallToRs(false, generateCallToVerifier);
     writeJavaCallToRs(true, generateCallToVerifier);
 
+    // Generate code to destroy input Allocations.
+    for (auto p : mAllInputsAndOutputs) {
+        if (!p->isOutParameter) {
+            mJava->indent() << p->javaAllocName << ".destroy();\n";
+        }
+    }
+
     mJava->endBlock();
     *mJava << "\n";
 }
@@ -860,6 +867,14 @@ void PermutationWriter::writeJavaCallToRs(bool relaxed, bool generateCallToVerif
         }
         *mJava << ");\n";
     }
+
+    // Generate code to destroy output Allocations.
+    for (auto p : mAllInputsAndOutputs) {
+        if (p->isOutParameter) {
+            mJava->indent() << p->javaAllocName << ".destroy();\n";
+        }
+    }
+
     mJava->decreaseIndent();
     mJava->indent() << "} catch (Exception e) {\n";
     mJava->increaseIndent();
@@ -1028,6 +1043,18 @@ static bool startJavaFile(GeneratedFile* file, const Function& function, const s
 
     file->endBlock();
     *file << "\n";
+
+    file->indent() << "@Override\n";
+    file->indent() << "protected void tearDown() throws Exception";
+    file->startBlock();
+
+    file->indent() << "script.destroy();\n";
+    file->indent() << "scriptRelaxed.destroy();\n";
+    file->indent() << "super.tearDown();\n";
+
+    file->endBlock();
+    *file << "\n";
+
     return true;
 }
 
