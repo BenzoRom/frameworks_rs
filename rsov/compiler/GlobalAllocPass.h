@@ -24,6 +24,7 @@ class ModulePass;
 namespace rs2spirv {
 
 llvm::ModulePass *createGlobalAllocPass();
+llvm::ModulePass *createRemoveAllGlobalAllocPass();
 
 } // namespace rs2spirv
 
