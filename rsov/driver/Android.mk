@@ -37,13 +37,15 @@ LOCAL_SHARED_LIBRARIES := \
     libbcinfo \
     libc++ \
     liblog \
+    libspirit \
     libvulkan
 
 LOCAL_C_INCLUDES := \
     frameworks/compile/libbcc/include \
     frameworks/native/vulkan/include \
     frameworks/rs \
-    frameworks/rs/cpu_ref
+    frameworks/rs/cpu_ref \
+    frameworks/rs/rsov/compiler \
 
 LOCAL_C_INCLUDES += \
 

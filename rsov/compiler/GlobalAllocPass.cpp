@@ -16,12 +16,13 @@
 
 #include "GlobalAllocPass.h"
 
+#include "Context.h"
+#include "RSAllocationUtils.h"
+
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
-
-#include "RSAllocationUtils.h"
 
 #define DEBUG_TYPE "rs2spirv-global-alloc"
 
@@ -60,7 +61,9 @@ bool collectGlobalAllocs(Module &M,
 class GlobalAllocPass : public ModulePass {
 public:
   static char ID;
-  GlobalAllocPass() : ModulePass(ID) {}
+  GlobalAllocPass()
+      : ModulePass(ID), Allocs(Context::getInstance().getGlobalAllocs()) {}
+
   const char *getPassName() const override { return "GlobalAllocPass"; }
 
   bool runOnModule(Module &M) override {
@@ -72,7 +75,6 @@ public:
     if (!CollectRes)
       return false; // Module not modified.
 
-    SmallVector<RSAllocationInfo, 8> Allocs;
     SmallVector<RSAllocationCallInfo, 8> Calls;
     getRSAllocationInfo(M, Allocs);
     getRSAllocAccesses(Allocs, Calls);
@@ -87,6 +89,9 @@ public:
     DEBUG(dbgs() << "RS2SPIRVGlobalAllocPass end\n");
     return true;
   }
+
+private:
+  SmallVectorImpl<RSAllocationInfo> &Allocs;
 };
 
 // A simple pass to remove all global allocations forcibly

@@ -52,23 +52,27 @@ bool isRSAllocation(const GlobalVariable &GV) {
 
 bool getRSAllocationInfo(Module &M, SmallVectorImpl<RSAllocationInfo> &Allocs) {
   DEBUG(dbgs() << "getRSAllocationInfo\n");
-
   for (auto &GV : M.globals()) {
     if (GV.isDeclaration() || !isRSAllocation(GV))
       continue;
 
-    Allocs.push_back({'%' + GV.getName().str(), None, &GV});
+    Allocs.push_back({'%' + GV.getName().str(), None, &GV, -1});
   }
 
   return true;
 }
 
+// Collect Allocation access calls into the Calls
+// Also update Allocs with assigned ID.
+// After calling this function, Allocs would contain the mapping from
+// GV name to the corresponding ID.
 bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
                         SmallVectorImpl<RSAllocationCallInfo> &Calls) {
   DEBUG(dbgs() << "getRSGEATCalls\n");
   DEBUG(dbgs() << "\n\n~~~~~~~~~~~~~~~~~~~~~\n\n");
 
   std::unordered_map<const Value *, const GlobalVariable *> Mapping;
+  int id_assigned = 0;
 
   for (auto &A : Allocs) {
     auto *GV = A.GlobalVar;
@@ -137,6 +141,9 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
           const bool IsDIMX = DemangledNameRef.startswith(DIMXPrefix);
 
           assert(IsGEA || IsSEA || IsDIMX);
+          if (!A.hasID()) {
+            A.assignID(id_assigned++);
+          }
 
           if (IsGEA || IsSEA) {
             DEBUG(dbgs() << "Found rsAlloc function!\n");

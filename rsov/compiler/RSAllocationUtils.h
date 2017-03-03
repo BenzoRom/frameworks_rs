@@ -35,6 +35,13 @@ struct RSAllocationInfo {
   std::string VarName;
   llvm::Optional<std::string> RSElementType;
   llvm::GlobalVariable *GlobalVar;
+  // Assigned unique identifier for this allocation;
+  // not the slot #.
+  // Represents the index of this allocation's metadata
+  // in the global allocation metadata Vulkan buffer
+  int ID;
+  bool hasID(void) const { return ID >= 0; }
+  void assignID(int no) { ID = no; }
 };
 
 enum class RSAllocAccessKind { GEA, SEA, DIMX };
