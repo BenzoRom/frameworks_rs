@@ -16,6 +16,7 @@
 
 #include "RSAllocationUtils.h"
 
+#include "llvm/ADT/StringRef.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/GlobalVariable.h"
 #include "llvm/IR/Instructions.h"

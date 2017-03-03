@@ -29,7 +29,6 @@ RS2SPIRV_SOURCES := \
   GlobalAllocSPIRITPass.cpp \
   GlobalMergePass.cpp \
   InlinePreparationPass.cpp \
-  KernelSignature.cpp \
   RemoveNonkernelsPass.cpp \
   RSAllocationUtils.cpp \
   RSSPIRVWriter.cpp \
