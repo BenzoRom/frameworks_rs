@@ -21,6 +21,7 @@ target triple = "armv7-none-linux-gnueabi"
 
 @g = common global %struct.rs_allocation zeroinitializer, align 4
 
+; CHECK-NOT: %g = OpVariable %{{.*}} Uniform
 ; CHECK-NOT: OpFunctionCall %uint %__rsov_rsAllocationGetDimX
 ; CHECK: [[DimX:%[a-zA-Z_0-9]*]] = OpAccessChain %_ptr_Uniform_uint [[Metadata]]
 ; CHECK: [[Res:%[a-zA-Z_0-9]*]] = OpLoad %uint [[DimX]]

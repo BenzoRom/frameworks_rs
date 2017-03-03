@@ -106,9 +106,23 @@ bool getRSAllocAccesses(SmallVectorImpl<RSAllocationInfo> &Allocs,
         if (auto *F = FCall->getCalledFunction()) {
           const auto FName = F->getName();
           DEBUG(dbgs() << "Discovered function call to : " << FName << '\n');
+          // Treat memcpy as moves for the purpose of this analysis
+          if (FName.startswith("llvm.memcpy")) {
+            assert(FCall->getNumArgOperands() > 0);
+            Value *CopyDest = FCall->getArgOperand(0);
+            // We are interested in the users of the dest operand of
+            // memcpy here
+            Value *LocalCopy = CopyDest->stripPointerCasts();
+            User *NewU = dyn_cast<User>(LocalCopy);
+            assert(NewU);
+            WorkList.push_back(NewU);
+            continue;
+          }
 
           char *demangled = __cxxabiv1::__cxa_demangle(
               FName.str().c_str(), nullptr, nullptr, nullptr);
+          if (!demangled)
+            continue;
           const StringRef DemangledNameRef(demangled);
           DEBUG(dbgs() << "Demangled name: " << DemangledNameRef << '\n');
 

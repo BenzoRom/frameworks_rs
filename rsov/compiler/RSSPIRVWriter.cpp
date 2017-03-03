@@ -82,10 +82,11 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
   PassMgr.add(createGlobalMergePass());
   // Transform global allocations and accessors (rs[GS]etElementAt)
   PassMgr.add(createGlobalAllocPass());
+  // Removed dead MemCpys in 64-bit targets after global alloc pass
+  PassMgr.add(createDeadStoreEliminationPass());
   PassMgr.add(createAggressiveDCEPass());
-  // Delete unreachable globals.
-  PassMgr.add(createGlobalDCEPass());
-  // Remove global allocations
+  // Delete unreachable globals (after removing global allocations)
+  PassMgr.add(createRemoveAllGlobalAllocPass());
   PassMgr.add(createPromoteMemoryToRegisterPass());
   PassMgr.add(createTransOCLMD());
   // TODO: investigate removal of OCLTypeToSPIRV pass.

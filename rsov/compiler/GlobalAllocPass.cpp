@@ -30,6 +30,19 @@ using namespace llvm;
 namespace rs2spirv {
 
 namespace {
+bool collectGlobalAllocs(Module &M,
+                         SmallVectorImpl<GlobalVariable *> &GlobalAllocs) {
+  for (auto &GV : M.globals()) {
+    if (!isRSAllocation(GV))
+      continue;
+
+    DEBUG(GV.dump());
+    GlobalAllocs.push_back(&GV);
+  }
+
+  return !GlobalAllocs.empty();
+}
+
 //
 // This pass would enumerate used global rs_allocations (TBD) and
 // lowers calls to accessors of the following type:
@@ -74,25 +87,43 @@ public:
     DEBUG(dbgs() << "RS2SPIRVGlobalAllocPass end\n");
     return true;
   }
+};
 
-private:
-  bool collectGlobalAllocs(Module &M,
-                           SmallVectorImpl<GlobalVariable *> &GlobalAllocs) {
-    for (auto &GV : M.globals()) {
-      if (!isRSAllocation(GV))
-        continue;
+// A simple pass to remove all global allocations forcibly
+class RemoveAllGlobalAllocPass : public ModulePass {
+public:
+  static char ID;
+  RemoveAllGlobalAllocPass() : ModulePass(ID) {}
+  const char *getPassName() const override {
+    return "RemoveAllGlobalAllocPass";
+  }
 
-      DEBUG(GV.dump());
-      GlobalAllocs.push_back(&GV);
+  bool runOnModule(Module &M) override {
+    DEBUG(dbgs() << "RemoveAllGlobalAllocPass\n");
+    DEBUG(M.dump());
+
+    SmallVector<GlobalVariable *, 8> GlobalAllocs;
+    const bool CollectRes = collectGlobalAllocs(M, GlobalAllocs);
+    if (!CollectRes)
+      return false; // Module not modified.
+    // Remove global allocations
+    for (auto *G : GlobalAllocs) {
+      G->eraseFromParent();
     }
-
-    return !GlobalAllocs.empty();
+    DEBUG(dbgs() << "RemoveAllGlobalAllocPass end\n");
+    DEBUG(M.dump());
+    // Return true, as the pass modifies module.
+    return true;
   }
 };
+
 } // namespace
-
 char GlobalAllocPass::ID = 0;
+char RemoveAllGlobalAllocPass::ID = 0;
 
+ModulePass *createRemoveAllGlobalAllocPass() {
+  return new RemoveAllGlobalAllocPass();
+}
 ModulePass *createGlobalAllocPass() { return new GlobalAllocPass(); }
 
 } // namespace rs2spirv
