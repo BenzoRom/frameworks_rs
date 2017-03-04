@@ -214,6 +214,14 @@ Module *Module::addSourceExtension(const char *ext) {
   return this;
 }
 
+Module *Module::addString(const char *str) {
+  if (!mDebugInfo) {
+    mDebugInfo.reset(mBuilder->MakeDebugInfoSection());
+  }
+  mDebugInfo->addString(str);
+  return this;
+}
+
 Module *Module::addEntryPoint(EntryPointDefinition *entry) {
   mEntryPoints.push_back(entry);
   auto newModes = entry->getExecutionModes();
@@ -512,6 +520,12 @@ DebugInfoSection *DebugInfoSection::addSource(SourceLanguage lang,
 DebugInfoSection *DebugInfoSection::addSourceExtension(const char *ext) {
   SourceExtensionInst *inst = mBuilder->MakeSourceExtension(ext);
   mSources.push_back(inst);
+  return this;
+}
+
+DebugInfoSection *DebugInfoSection::addString(const char *str) {
+  StringInst *source = mBuilder->MakeString(str);
+  mSources.push_back(source);
   return this;
 }
 
