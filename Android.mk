@@ -188,7 +188,9 @@ LOCAL_SHARED_LIBRARIES += liblog libutils libEGL libGLESv1_CM libGLESv2
 LOCAL_SHARED_LIBRARIES += libdl libgui libui
 LOCAL_SHARED_LIBRARIES += libft2 libpng
 
-LOCAL_SHARED_LIBRARIES += libbcinfo
+LOCAL_SHARED_LIBRARIES += libbcinfo libmediandk
+
+LOCAL_C_INCLUDES += frameworks/av/include/ndk
 
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 

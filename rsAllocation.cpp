@@ -18,6 +18,10 @@
 #include "rsAllocation.h"
 #include "rs_hal.h"
 
+#ifndef RS_COMPATIBILITY_LIB
+#include "rsGrallocConsumer.h"
+#endif
+
 namespace android {
 namespace renderscript {
 
@@ -148,8 +152,11 @@ void Allocation::updateCache() {
 
 Allocation::~Allocation() {
 #ifndef RS_COMPATIBILITY_LIB
-    if (mGrallocConsumer.get()) {
+    if (mGrallocConsumer) {
         mGrallocConsumer->releaseIdx(mCurrentIdx);
+        if (!mGrallocConsumer->isActive()) {
+            delete mGrallocConsumer;
+        }
         mGrallocConsumer = nullptr;
     }
 #endif
@@ -569,29 +576,6 @@ void Allocation::resize2D(Context *rsc, uint32_t dimX, uint32_t dimY) {
     rsc->setError(RS_ERROR_FATAL_DRIVER, "resize2d not implemented");
 }
 
-#ifndef RS_COMPATIBILITY_LIB
-Allocation::NewBufferListener::NewBufferListener(uint32_t numAlloc) {
-    alloc = new const Allocation *[numAlloc];
-    mNumAlloc = numAlloc;
-    for (uint32_t i = 0; i < numAlloc; i++) {
-        alloc[i] = nullptr;
-    }
-}
-
-Allocation::NewBufferListener::~NewBufferListener() {
-    delete[] alloc;
-}
-
-void Allocation::NewBufferListener::onFrameAvailable(const BufferItem& /* item */) {
-    for (uint32_t i = 0; i < mNumAlloc; i++) {
-        if (alloc[i] != nullptr) {
-            intptr_t ip = (intptr_t)alloc[i];
-            rsc->sendMessageToClient(&ip, RS_MESSAGE_TO_CLIENT_NEW_BUFFER, 0, sizeof(ip), true);
-        }
-    }
-}
-#endif
-
 void Allocation::setupGrallocConsumer(const Context *rsc, uint32_t numAlloc) {
 #ifndef RS_COMPATIBILITY_LIB
     // Configure GrallocConsumer to be in asynchronous mode
@@ -599,17 +583,9 @@ void Allocation::setupGrallocConsumer(const Context *rsc, uint32_t numAlloc) {
         rsc->setError(RS_ERROR_FATAL_DRIVER, "resize2d not implemented");
         return;
     }
-    sp<IGraphicBufferConsumer> bc;
-    BufferQueue::createBufferQueue(&mGraphicBufferProducer, &bc);
-    mGrallocConsumer = new GrallocConsumer(this, bc, mHal.drvState.grallocFlags, numAlloc);
-
-    mBufferListener = new NewBufferListener(numAlloc);
-    mBufferListener->rsc = rsc;
-    mBufferListener->alloc[0] = this;
+    mGrallocConsumer = new GrallocConsumer(rsc, this, numAlloc);
     mCurrentIdx = 0;
     mBufferQueueInited = true;
-
-    mGrallocConsumer->setFrameAvailableListener(mBufferListener);
 #endif
 }
 
@@ -622,12 +598,10 @@ void * Allocation::getSurface(const Context *rsc) {
         // multi-frame case.
         setupGrallocConsumer(rsc, 1);
     }
-    mGraphicBufferProducer->incStrong(nullptr);
-    return mGraphicBufferProducer.get();
+    return mGrallocConsumer->getNativeWindow();
 #else
     return nullptr;
 #endif
-    //return rsc->mHal.funcs.allocation.getSurface(rsc, this);
 }
 
 void Allocation::shareBufferQueue(const Context *rsc, const Allocation *alloc) {
@@ -638,10 +612,6 @@ void Allocation::shareBufferQueue(const Context *rsc, const Allocation *alloc) {
         rsc->setError(RS_ERROR_DRIVER, "Maximum allocations attached to a BufferQueue");
         return;
     }
-
-    mGraphicBufferProducer = alloc->mGraphicBufferProducer;
-    mBufferListener = alloc->mBufferListener;
-    mBufferListener->alloc[mCurrentIdx] = this;
     mBufferQueueInited = true;
 #endif
 }
@@ -661,11 +631,11 @@ void Allocation::ioReceive(const Context *rsc) {
     size_t stride = 0;
 #ifndef RS_COMPATIBILITY_LIB
     if (mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT) {
-        status_t ret = mGrallocConsumer->lockNextBuffer(mCurrentIdx);
+        media_status_t ret = mGrallocConsumer->lockNextBuffer(mCurrentIdx);
 
-        if (ret == OK) {
+        if (ret == AMEDIA_OK) {
             rsc->mHal.funcs.allocation.ioReceive(rsc, this);
-        } else if (ret == BAD_VALUE) {
+        } else if (ret == AMEDIA_IMGREADER_NO_BUFFER_AVAILABLE) {
             // No new frame, don't do anything
         } else {
             rsc->setError(RS_ERROR_DRIVER, "Error receiving IO input buffer.");
