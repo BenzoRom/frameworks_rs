@@ -258,7 +258,7 @@ public:
     VersionInfo getVersionInfo() const { return mVersionInfo; }
 };
 
-/* Defines one of the many variations of a constant.  There's a one to one correspondance between
+/* Defines one of the many variations of a constant.  There's a one to one correspondence between
  * ConstantSpecification objects and entries in the spec file.
  */
 class ConstantSpecification : public Specification {
@@ -266,11 +266,13 @@ private:
     Constant* mConstant;  // Not owned
 
     std::string mValue;  // E.g. "3.1415"
+    std::string mType;   // E.g. "float"
 public:
     ConstantSpecification(Constant* constant) : mConstant(constant) {}
 
     Constant* getConstant() const { return mConstant; }
     std::string getValue() const { return mValue; }
+    std::string getType() const { return mType; }
 
     // Parse a constant specification and add it to specFile.
     static void scanConstantSpecification(Scanner* scanner, SpecFile* specFile, unsigned int maxApiLevel);
@@ -283,7 +285,7 @@ enum TypeKind {
     ENUM,
 };
 
-/* Defines one of the many variations of a type.  There's a one to one correspondance between
+/* Defines one of the many variations of a type.  There's a one to one correspondence between
  * TypeSpecification objects and entries in the spec file.
  */
 class TypeSpecification : public Specification {
@@ -326,7 +328,7 @@ public:
 // Maximum number of placeholders (like #1, #2) in function specifications.
 const int MAX_REPLACEABLES = 4;
 
-/* Defines one of the many variations of the function.  There's a one to one correspondance between
+/* Defines one of the many variations of the function.  There's a one to one correspondence between
  * FunctionSpecification objects and entries in the spec file.  Some of the strings that are parts
  * of a FunctionSpecification can include placeholders, which are "#1", "#2", "#3", and "#4".  We'll
  * replace these by values before generating the files.
