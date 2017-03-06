@@ -99,7 +99,7 @@ typedef uint64_t ulong;
     typedef struct { const int* const p; } __attribute__((packed, aligned(4))) t; /*NOLINT*/
 #else
 #define OPAQUETYPE(t) \
-    typedef struct { const void* p; const void* r; const void* v1; const void* v2; } t; /*NOLINT*/
+    typedef struct { const void* p; const void* unused1; const void* unused2; const void* unused3; } t; /*NOLINT*/
 #endif
 
 OPAQUETYPE(rs_element)
