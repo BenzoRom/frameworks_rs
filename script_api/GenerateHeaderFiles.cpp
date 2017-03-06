@@ -120,7 +120,8 @@ static void writeConstantSpecification(GeneratedFile* file, const ConstantSpecif
     const Constant* constant = spec.getConstant();
     VersionInfo info = spec.getVersionInfo();
     writeVersionGuardStart(file, info, constant->getFinalVersion());
-    *file << "#define " << constant->getName() << " " << spec.getValue() << "\n\n";
+    *file << "static const " << spec.getType() << " " << constant->getName()
+          << " = " << spec.getValue() << ";\n\n";
     writeVersionGuardEnd(file, info);
 }
 
