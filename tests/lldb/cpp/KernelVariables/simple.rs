@@ -174,3 +174,24 @@ uchar4 __attribute__((kernel)) kernel(uchar4 in)
     uchar4 result = {1,2,3,4};
     return result;
 }
+
+float use_constants_global;
+
+void setup(void)
+{
+  use_constants_global =
+      M_1_PI +
+      M_2_PI +
+      M_2_PIl +
+      M_2_SQRTPI +
+      M_E +
+      M_LN10 +
+      M_LN2 +
+      M_LOG10E +
+      M_LOG2E +
+      M_PI +
+      M_PI_2 +
+      M_PI_4 +
+      M_SQRT1_2 +
+      M_SQRT2;
+}
