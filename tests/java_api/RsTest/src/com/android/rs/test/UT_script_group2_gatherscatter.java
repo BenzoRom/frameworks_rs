@@ -99,6 +99,10 @@ public class UT_script_group2_gatherscatter extends UnitTest {
         ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
+
+        group.destroy();
+        input.destroy();
+        s.destroy();
         pRS.destroy();
 
         boolean failed = false;

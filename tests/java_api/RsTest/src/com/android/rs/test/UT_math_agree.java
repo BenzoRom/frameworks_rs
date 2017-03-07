@@ -576,6 +576,7 @@ public class UT_math_agree extends UnitTest {
         s.invoke_math_agree_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -23,6 +23,13 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
 public class UT_alloc extends UnitTest {
+    private Type T;
+    private Type mTFaces;
+    private Type mTLOD;
+    private Type mTFacesLOD;
+    private Allocation mAFaces;
+    private Allocation mALOD;
+    private Allocation mAFacesLOD;
 
     protected UT_alloc(RSTestCore rstc, Context ctx) {
         super(rstc, "Alloc", ctx);
@@ -37,20 +44,24 @@ public class UT_alloc extends UnitTest {
         s.set_dimY(Y);
         s.set_dimZ(Z);
         typeBuilder.setX(X);  // Only build a 1-D version of this
-        Allocation A = Allocation.createTyped(RS, typeBuilder.create());
+        T = typeBuilder.create();
+        Allocation A = Allocation.createTyped(RS, T);
         s.bind_a(A);
         s.set_aRaw(A);
 
         typeBuilder = new Type.Builder(RS, Element.I32(RS));
         typeBuilder.setX(X).setY(Y).setFaces(true);
-        Allocation AFaces = Allocation.createTyped(RS, typeBuilder.create());
-        s.set_aFaces(AFaces);
+        mTFaces = typeBuilder.create();
+        mAFaces = Allocation.createTyped(RS, mTFaces);
+        s.set_aFaces(mAFaces);
         typeBuilder.setFaces(false).setMipmaps(true);
-        Allocation ALOD = Allocation.createTyped(RS, typeBuilder.create());
-        s.set_aLOD(ALOD);
+        mTLOD = typeBuilder.create();
+        mALOD = Allocation.createTyped(RS, mTLOD);
+        s.set_aLOD(mALOD);
         typeBuilder.setFaces(true).setMipmaps(true);
-        Allocation AFacesLOD = Allocation.createTyped(RS, typeBuilder.create());
-        s.set_aFacesLOD(AFacesLOD);
+        mTFacesLOD = typeBuilder.create();
+        mAFacesLOD = Allocation.createTyped(RS, mTFacesLOD);
+        s.set_aFacesLOD(mAFacesLOD);
 
         return;
     }
@@ -64,6 +75,15 @@ public class UT_alloc extends UnitTest {
         s.invoke_alloc_test();
         pRS.finish();
         waitForMessage();
+        T.destroy();
+        s.get_a().destroy();
+        mAFaces.destroy();
+        mALOD.destroy();
+        mAFacesLOD.destroy();
+        mTFaces.destroy();
+        mTLOD.destroy();
+        mTFacesLOD.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }
