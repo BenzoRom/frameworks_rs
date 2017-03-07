@@ -19,7 +19,8 @@
 
 #include "llvm/ADT/Optional.h"
 #include "llvm/ADT/SmallVector.h"
-#include "llvm/ADT/StringRef.h"
+
+#include <string>
 
 namespace llvm {
 class CallInst;
@@ -46,7 +47,6 @@ struct RSAllocationCallInfo {
 };
 
 bool isRSAllocation(const llvm::GlobalVariable &GV);
-llvm::Optional<llvm::StringRef> getRSTypeName(const llvm::GlobalVariable &GV);
 bool getRSAllocationInfo(llvm::Module &M,
                          llvm::SmallVectorImpl<RSAllocationInfo> &Allocs);
 bool getRSAllocAccesses(llvm::SmallVectorImpl<RSAllocationInfo> &Allocs,
