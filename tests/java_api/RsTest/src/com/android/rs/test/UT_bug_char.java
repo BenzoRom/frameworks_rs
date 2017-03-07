@@ -83,6 +83,7 @@ public class UT_bug_char extends UnitTest {
         s.invoke_bug_char_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

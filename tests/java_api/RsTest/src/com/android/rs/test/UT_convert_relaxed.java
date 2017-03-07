@@ -33,6 +33,7 @@ public class UT_convert_relaxed extends UnitTest {
         s.invoke_convert_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

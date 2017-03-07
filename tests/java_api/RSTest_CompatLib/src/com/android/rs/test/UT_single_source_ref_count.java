@@ -37,6 +37,7 @@ public class UT_single_source_ref_count extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

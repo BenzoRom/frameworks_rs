@@ -68,6 +68,9 @@ public class UT_foreach_bounds extends UnitTest {
         s.invoke_foreach_bounds_test();
         pRS.finish();
         waitForMessage();
+        A.getType().destroy();
+        A.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

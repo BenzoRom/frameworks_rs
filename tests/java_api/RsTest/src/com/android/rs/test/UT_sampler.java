@@ -76,6 +76,7 @@ public class UT_sampler extends UnitTest {
         s.invoke_sampler_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
     }
 
     private void testJavaSide(RenderScript RS) {

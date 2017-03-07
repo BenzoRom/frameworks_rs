@@ -95,6 +95,7 @@ public class UT_primitives extends UnitTest {
             pRS.finish();
             waitForMessage();
         }
+        s.destroy();
         pRS.destroy();
     }
 }

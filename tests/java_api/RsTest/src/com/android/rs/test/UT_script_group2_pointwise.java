@@ -50,15 +50,17 @@ public class UT_script_group2_pointwise extends UnitTest {
 
         ScriptGroup.Input unbound = builder.addInput();
 
+        Type T = Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE);
+
         ScriptGroup.Closure c0 =
                 builder.addKernel(s_inc.getKernelID_increment(),
-                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                        unbound);
+                                  T,
+                                  unbound);
 
         ScriptGroup.Closure c1 =
                 builder.addKernel(s_double.getKernelID_doubleKernel(),
-                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                        c0.getReturn());
+                                  T,
+                                  c0.getReturn());
 
         ScriptGroup group = builder.create("AddDouble", c1.getReturn());
 
@@ -66,6 +68,11 @@ public class UT_script_group2_pointwise extends UnitTest {
         ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
+        group.destroy();
+        T.destroy();
+        input.destroy();
+        s_double.destroy();
+        s_inc.destroy();
         pRS.destroy();
 
         boolean failed = false;

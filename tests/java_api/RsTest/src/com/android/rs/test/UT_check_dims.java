@@ -25,6 +25,7 @@ import android.renderscript.Type;
 public class UT_check_dims extends UnitTest {
     byte mFailedArr[];
     int mData[];
+    Allocation mAFailed;
     Allocation mA;
     static final int Pattern = 0xA5A5A5A5;
 
@@ -35,12 +36,12 @@ public class UT_check_dims extends UnitTest {
     private void initializeGlobals(RenderScript RS, ScriptC_check_dims s) {
         Type.Builder typeBuilder = new Type.Builder(RS, Element.U8(RS));
         typeBuilder.setX(1);
-        Allocation AFailed = Allocation.createTyped(RS, typeBuilder.create());
-        s.set_aFailed(AFailed);
+        mAFailed = Allocation.createTyped(RS, typeBuilder.create());
+        s.set_aFailed(mAFailed);
 
         mFailedArr = new byte[1];
         mFailedArr[0] = 0;
-        AFailed.copyFrom(mFailedArr);
+        mAFailed.copyFrom(mFailedArr);
 
         typeBuilder = new Type.Builder(RS, Element.I32(RS));
         int X = 5;
@@ -67,6 +68,9 @@ public class UT_check_dims extends UnitTest {
         s.invoke_check_dims_test();
         pRS.finish();
         waitForMessage();
+        mAFailed.destroy();
+        mA.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

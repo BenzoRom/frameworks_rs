@@ -32,6 +32,7 @@ public class UT_convert extends UnitTest {
         s.invoke_convert_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

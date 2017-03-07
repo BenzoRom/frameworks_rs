@@ -32,6 +32,7 @@ public class UT_int4 extends UnitTest {
         s.invoke_int4_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }
