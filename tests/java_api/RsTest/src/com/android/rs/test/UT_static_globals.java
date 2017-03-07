@@ -33,11 +33,15 @@ public class UT_static_globals extends UnitTest {
         ScriptC_static_globals s = new ScriptC_static_globals(pRS);
         pRS.setMessageHandler(mRsMessage);
         Type.Builder typeBuilder = new Type.Builder(pRS, Element.I32(pRS));
-        Allocation A = Allocation.createTyped(pRS, typeBuilder.setX(1).create());
+        Type t = typeBuilder.setX(1).create();
+        Allocation A = Allocation.createTyped(pRS, t);
         s.forEach_root(A);
         s.invoke_static_globals_test();
         pRS.finish();
         waitForMessage();
+        A.destroy();
+        t.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -23,6 +23,8 @@ import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
 public class UT_kernel extends UnitTest {
+    private Type TA;
+    private Type TB;
     private Allocation A;
     private Allocation B;
 
@@ -35,9 +37,11 @@ public class UT_kernel extends UnitTest {
         int X = 5;
         s.set_dimX(X);
         typeBuilder.setX(X);
-        A = Allocation.createTyped(RS, typeBuilder.create());
+        TA = typeBuilder.create();
+        A = Allocation.createTyped(RS, TA);
         s.bind_ain(A);
-        B = Allocation.createTyped(RS, typeBuilder.create());
+        TB = typeBuilder.create();
+        B = Allocation.createTyped(RS, TB);
         s.bind_aout(B);
 
         return;
@@ -54,6 +58,11 @@ public class UT_kernel extends UnitTest {
         s.invoke_kernel_test();
         pRS.finish();
         waitForMessage();
+        A.destroy();
+        B.destroy();
+        TA.destroy();
+        TB.destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

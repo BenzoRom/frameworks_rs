@@ -26,6 +26,7 @@ public class UT_fp16 extends UnitTest {
     private int dimX = 7;
     private int dimY = 5;
     private int dimZ = 3;
+    private Type type;
     private Allocation alloc;
 
     protected UT_fp16(RSTestCore rstc, Context ctx) {
@@ -45,7 +46,8 @@ public class UT_fp16 extends UnitTest {
                 typeBuilder.setX(dimX).setY(dimY).setZ(dimZ);
                 break;
         }
-        alloc = Allocation.createTyped(RS, typeBuilder.create());
+        type = typeBuilder.create();
+        alloc = Allocation.createTyped(RS, type);
 
         s.set_gDimX(dimX);
         s.set_gDimY(nDims > 1 ? dimY : 0);
@@ -60,10 +62,18 @@ public class UT_fp16 extends UnitTest {
         s.forEach_set_kernel_half(alloc);
         s.invoke_verify_half();
 
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
+
         initializeGlobals(RS, s, Element.F16(RS), nDims);
         // rsSetElementAt in invoke and verify in kernel
         s.invoke_set_half();
         s.forEach_verify_kernel_half(alloc);
+
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
     }
 
     private void TestHalf2(RenderScript RS, ScriptC_fp16 s, int nDims) {
@@ -73,10 +83,18 @@ public class UT_fp16 extends UnitTest {
         s.forEach_set_kernel_half2(alloc);
         s.invoke_verify_half2();
 
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
+
         initializeGlobals(RS, s, Element.F16_2(RS), nDims);
         // rsSetElementAt in invoke and verify in kernel
         s.invoke_set_half2();
         s.forEach_verify_kernel_half2(alloc);
+
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
     }
 
     private void TestHalf3(RenderScript RS, ScriptC_fp16 s, int nDims) {
@@ -86,10 +104,18 @@ public class UT_fp16 extends UnitTest {
         s.forEach_set_kernel_half3(alloc);
         s.invoke_verify_half3();
 
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
+
         initializeGlobals(RS, s, Element.F16_3(RS), nDims);
         // rsSetElementAt in invoke and verify in kernel
         s.invoke_set_half3();
         s.forEach_verify_kernel_half3(alloc);
+
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
     }
 
     private void TestHalf4(RenderScript RS, ScriptC_fp16 s, int nDims) {
@@ -99,10 +125,18 @@ public class UT_fp16 extends UnitTest {
         s.forEach_set_kernel_half4(alloc);
         s.invoke_verify_half4();
 
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
+
         initializeGlobals(RS, s, Element.F16_4(RS), nDims);
         // rsSetElementAt in invoke and verify in kernel
         s.invoke_set_half4();
         s.forEach_verify_kernel_half4(alloc);
+
+        RS.finish();
+        alloc.destroy();
+        type.destroy();
     }
 
     public void run() {
@@ -121,6 +155,7 @@ public class UT_fp16 extends UnitTest {
         s.invoke_fp16_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

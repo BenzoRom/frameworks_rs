@@ -53,6 +53,11 @@ public class UT_kernel_struct extends UnitTest {
         s.invoke_kernel_struct_test();
         pRS.finish();
         waitForMessage();
+        A.destroy();
+        B.destroy();
+        s.get_ain().getElement().destroy();
+        s.get_aout().getElement().destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -51,21 +51,23 @@ public class UT_script_group2_nochain extends UnitTest {
 
         ScriptGroup.Input unbound = builder.addInput();
 
+        Type T = Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE);
+
         ScriptGroup.Closure c0 =
                 builder.addKernel(s_inc.getKernelID_increment(),
-                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                        unbound);
+                                  T,
+                                  unbound);
 
         ScriptGroup.Closure c1 =
                 builder.addKernel(s_inc2.getKernelID_increment2(),
-                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                        unbound,
-                        new ScriptGroup.Binding(s_inc2.getFieldID_a(), unbound));
+                                  T,
+                                  unbound,
+                                  new ScriptGroup.Binding(s_inc2.getFieldID_a(), unbound));
 
         ScriptGroup.Closure c2 =
                 builder.addKernel(s_double.getKernelID_doubleKernel(),
-                        Type.createX(pRS, Element.I32_4(pRS), ARRAY_SIZE),
-                        unbound);
+                                  T,
+                                  unbound);
 
         ScriptGroup group = builder.create("AddDouble2", c2.getReturn());
 
@@ -73,6 +75,12 @@ public class UT_script_group2_nochain extends UnitTest {
         ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
+        group.destroy();
+        T.destroy();
+        input.destroy();
+        s_inc.destroy();
+        s_inc2.destroy();
+        s_double.destroy();
         pRS.destroy();
 
         boolean failed = false;

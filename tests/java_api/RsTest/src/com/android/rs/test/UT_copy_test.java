@@ -113,6 +113,7 @@ public class UT_copy_test extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

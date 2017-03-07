@@ -65,6 +65,7 @@ public class UT_single_source_alloc extends UnitTest {
         s.invoke_single_source_alloc_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

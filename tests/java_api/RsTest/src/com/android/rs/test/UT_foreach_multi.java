@@ -104,6 +104,7 @@ public class UT_foreach_multi extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

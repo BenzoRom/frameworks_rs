@@ -53,22 +53,22 @@ public class UT_script_group2_float extends UnitTest {
         final float floatVal = 3.14f;
         final double doubleVal = 1.23456789;
         final long longVal = 0x100000000L;
+        final Type T = Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE);
         ScriptGroup.Closure c0 =
                 builder.addKernel(s_float.getKernelID_foo(),
-                        Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
-                        unbound,
-                        new ScriptGroup.Binding(s_float.getFieldID_floatVal(),
-                                floatVal),
-                        new ScriptGroup.Binding(s_float.getFieldID_val(),
-                                doubleVal));
+                                  T,
+                                  unbound,
+                                  new ScriptGroup.Binding(s_float.getFieldID_floatVal(),
+                                                          floatVal),
+                                  new ScriptGroup.Binding(s_float.getFieldID_val(),
+                                                          doubleVal));
 
         ScriptGroup.Closure c1 =
                 builder.addKernel(s_float.getKernelID_goo(),
-                        Type.createX(pRS, Element.F64(pRS), ARRAY_SIZE),
-                        c0.getReturn(),
-                        new ScriptGroup.Binding(s_float.getFieldID_valLong(),
-                                longVal));
-
+                                  T,
+                                  c0.getReturn(),
+                                  new ScriptGroup.Binding(s_float.getFieldID_valLong(),
+                                                          longVal));
 
         ScriptGroup group = builder.create("TestFloatAnd64bit", c1.getReturn());
 
@@ -76,6 +76,10 @@ public class UT_script_group2_float extends UnitTest {
         ((Allocation) group.execute(input)[0]).copyTo(a);
 
         pRS.finish();
+        T.destroy();
+        group.destroy();
+        input.destroy();
+        s_float.destroy();
         pRS.destroy();
 
         boolean failed = false;

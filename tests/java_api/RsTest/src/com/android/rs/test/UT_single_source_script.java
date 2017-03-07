@@ -53,6 +53,7 @@ public class UT_single_source_script extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }
