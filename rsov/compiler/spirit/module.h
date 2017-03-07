@@ -124,6 +124,7 @@ public:
   Module *addExtInstImport(const char *extName);
   Module *addSource(SourceLanguage lang, int version);
   Module *addSourceExtension(const char *ext);
+  Module *addString(const char *ext);
   Module *addEntryPoint(EntryPointDefinition *entry);
 
   ExtInstImportInst *getGLExt() const { return mGLExt; }
@@ -312,6 +313,7 @@ public:
 
   DebugInfoSection *addSource(SourceLanguage lang, int version);
   DebugInfoSection *addSourceExtension(const char *ext);
+  DebugInfoSection *addString(const char *str);
 
   Instruction *lookupByName(const char *name) const;
   const char *lookupNameByInstruction(const Instruction *) const;
