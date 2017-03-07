@@ -32,6 +32,7 @@ public class UT_min extends UnitTest {
         s.invoke_min_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -37,6 +37,7 @@ public class UT_math_fp16 extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

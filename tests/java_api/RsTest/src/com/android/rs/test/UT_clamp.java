@@ -32,6 +32,7 @@ public class UT_clamp extends UnitTest {
         s.invoke_clamp_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

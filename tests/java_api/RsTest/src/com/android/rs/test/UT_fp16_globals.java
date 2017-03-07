@@ -54,6 +54,7 @@ public class UT_fp16_globals extends UnitTest {
 
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

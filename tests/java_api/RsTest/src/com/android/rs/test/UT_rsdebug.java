@@ -32,6 +32,7 @@ public class UT_rsdebug extends UnitTest {
         s.invoke_test_rsdebug(0, 0);
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

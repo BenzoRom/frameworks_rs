@@ -86,6 +86,9 @@ public class UT_element extends UnitTest {
         s.invoke_element_test();
         pRS.finish();
         waitForMessage();
+        s.get_complexStruct().getAllocation().destroy();
+        s.get_complexStruct().getElement().destroy();
+        s.destroy();
     }
 
     private void testJavaSide(RenderScript RS) {

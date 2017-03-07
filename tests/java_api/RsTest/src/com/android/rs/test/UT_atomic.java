@@ -32,6 +32,7 @@ public class UT_atomic extends UnitTest {
         s.invoke_atomic_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }

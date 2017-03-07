@@ -33,6 +33,7 @@ public class UT_rstime extends UnitTest {
         s.invoke_test_rstime(0, 0);
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
     }
 }
