@@ -44,6 +44,7 @@ TEST(BuilderTest, testBuildAndSerialize) {
   m->addSourceExtension("GL_ARB_shading_language_420pack");
   m->addSourceExtension("GL_GOOGLE_cpp_style_line_directive");
   m->addSourceExtension("GL_GOOGLE_include_directive");
+  m->addString("Foo Bar Baz");
 
   auto FloatTy = m->getFloatType(32);
   auto VF4Ty = m->getVectorType(FloatTy, 4);
@@ -178,6 +179,7 @@ TEST(BuilderTest, testBuildAndSerialize) {
   EXPECT_EQ(2, countEntity<TypeRuntimeArrayInst>(m));
   EXPECT_EQ(2, countEntity<TypeStructInst>(m));
   EXPECT_EQ(5, countEntity<TypePointerInst>(m));
+  EXPECT_EQ(1, countEntity<StringInst>(m));
 
   m->consolidateAnnotations();
 
