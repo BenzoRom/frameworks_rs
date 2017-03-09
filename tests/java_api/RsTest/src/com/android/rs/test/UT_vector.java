@@ -328,6 +328,7 @@ public class UT_vector extends UnitTest {
             pRS.finish();
             waitForMessage();
         }
+        s.destroy();
         pRS.destroy();
     }
 }

@@ -46,6 +46,11 @@ public class UT_array_alloc extends UnitTest {
         s.invoke_array_alloc_test();
         pRS.finish();
         waitForMessage();
+        for (int i = 0; i < dimX; i++) {
+            Arr[i].destroy();
+        }
+        T.destroy();
+        s.destroy();
         pRS.destroy();
         passTest();
     }

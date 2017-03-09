@@ -52,6 +52,7 @@ public class UT_unsigned extends UnitTest {
             pRS.finish();
             waitForMessage();
         }
+        s.destroy();
         pRS.destroy();
     }
 }

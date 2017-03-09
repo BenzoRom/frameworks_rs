@@ -47,6 +47,9 @@ public class UT_struct extends UnitTest {
         s.invoke_struct_test(val);
         pRS.finish();
         waitForMessage();
+        p.getAllocation().destroy();
+        p.getElement().destroy();
+        s.destroy();
         pRS.destroy();
     }
 }

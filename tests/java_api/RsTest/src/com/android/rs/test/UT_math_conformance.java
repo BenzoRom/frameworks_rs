@@ -33,6 +33,7 @@ public class UT_math_conformance extends UnitTest {
         s.invoke_math_conformance_test();
         pRS.finish();
         waitForMessage();
+        s.destroy();
         pRS.destroy();
         passTest();
     }
