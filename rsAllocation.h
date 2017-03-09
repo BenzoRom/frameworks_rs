@@ -20,7 +20,6 @@
 #include "rsType.h"
 
 #ifndef RS_COMPATIBILITY_LIB
-#include "rsGrallocConsumer.h"
 #include "gui/CpuConsumer.h"
 #include "gui/GLConsumer.h"
 #else
@@ -33,6 +32,7 @@ namespace android {
 namespace renderscript {
 
 class Program;
+class GrallocConsumer;
 
 /*****************************************************************************
  * CAUTION
@@ -220,21 +220,7 @@ protected:
     }
 
 #ifndef RS_COMPATIBILITY_LIB
-    class NewBufferListener : public android::ConsumerBase::FrameAvailableListener {
-    public:
-        explicit NewBufferListener(uint32_t numAlloc);
-        virtual ~NewBufferListener();
-        const android::renderscript::Context *rsc;
-        const android::renderscript::Allocation **alloc;
-
-        virtual void onFrameAvailable(const BufferItem& item);
-    private:
-        uint32_t mNumAlloc;
-    };
-
-    sp<NewBufferListener> mBufferListener;
-    sp< GrallocConsumer > mGrallocConsumer;
-    sp<IGraphicBufferProducer> mGraphicBufferProducer;
+    GrallocConsumer *mGrallocConsumer = nullptr;
     bool mBufferQueueInited = false;
     uint32_t mCurrentIdx;
 #endif
