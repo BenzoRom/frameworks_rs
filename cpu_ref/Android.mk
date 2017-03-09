@@ -1,8 +1,7 @@
 LOCAL_PATH:=$(call my-dir)
 
 rs_base_CFLAGS := -Werror -Wall -Wextra \
-				  -Wno-unused-parameter -Wno-unused-variable \
-				  -std=c++11
+				  -Wno-unused-parameter -Wno-unused-variable
 ifeq ($(TARGET_BUILD_PDK), true)
   rs_base_CFLAGS += -D__RS_PDK__
 endif
@@ -83,7 +82,7 @@ ifeq ($(ARCH_X86_HAVE_SSSE3),true)
     rsCpuIntrinsics_x86.cpp
 endif
 
-LOCAL_SHARED_LIBRARIES += libRS_internal libc++ liblog libutils libui libz
+LOCAL_SHARED_LIBRARIES += libRS_internal libc++ liblog libutils libui libgui libz
 LOCAL_SHARED_LIBRARIES += libbcinfo libblas
 LOCAL_STATIC_LIBRARIES := libbnnmlowp
 

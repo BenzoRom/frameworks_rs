@@ -35,6 +35,4 @@ struct RSoVHal {
   android::renderscript::RsdCpuReference *mCpuRef;
 };
 
-#define NELEM(x) (sizeof(x) / sizeof((x)[0]))
-
 #endif
