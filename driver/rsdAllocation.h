@@ -53,15 +53,14 @@ struct DrvAllocation {
     GLenum glType;
     GLenum glFormat;
 
-    ANativeWindowBuffer *wndBuffer;
     android::GLConsumer *surfaceTexture;
 #else
     int glTarget;
     int glType;
     int glFormat;
+#endif
 
     ANativeWindow_Buffer *wndBuffer;
-#endif
 
     bool useUserProvidedPtr;
     bool uploadDeferred;

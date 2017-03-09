@@ -501,12 +501,10 @@ sp<Surface> Allocation::getSurface() {
         mRS->throwError(RS_ERROR_INVALID_PARAMETER, "Can only get Surface if IO_INPUT usage specified.");
         return nullptr;
     }
-    IGraphicBufferProducer *v = (IGraphicBufferProducer *)RS::dispatch->AllocationGetSurface(mRS->getContext(),
-                                                                                             getID());
-    android::sp<IGraphicBufferProducer> bp = v;
-    v->decStrong(nullptr);
-
-    return new Surface(bp, true);;
+    ANativeWindow *anw = (ANativeWindow *)RS::dispatch->AllocationGetSurface(mRS->getContext(),
+                                                                             getID());
+    sp<Surface> surface(static_cast<Surface*>(anw));
+    return surface;
 }
 
 void Allocation::setSurface(const sp<Surface>& s) {
