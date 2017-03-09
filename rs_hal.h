@@ -36,7 +36,7 @@
  * !! Be very careful when merging or cherry picking between branches!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  */
-#define RS_HAL_VERSION 100
+#define RS_HAL_VERSION 200
 
 /**
  * The interface for loading RenderScript drivers
