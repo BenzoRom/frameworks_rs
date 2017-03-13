@@ -32,9 +32,9 @@ include:
  #define _RS_OBJECT_DECL \
  {\
    const long* const p;\
-   const long* const r;\
-   const long* const v1;\
-   const long* const v2;\
+   const long* const unused1;\
+   const long* const unused2;\
+   const long* const unused3;\
  }
  #endif
 end:
