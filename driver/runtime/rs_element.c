@@ -23,9 +23,6 @@ extern rs_element __attribute__((overloadable))
     rs_element returnElem = {
         element->mHal.state.fields[index]
 #ifdef __LP64__
-        // TODO(jeanluc) In 64 bits, rs_element has four fields.
-        // I'm not sure if we should initialize them to something else
-        // than 0.
         , 0, 0, 0
 #endif
     };
