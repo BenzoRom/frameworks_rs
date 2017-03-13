@@ -649,15 +649,9 @@ void rsovAllocationUpdateCachedObject(const Context *rsc,
                                       rs_allocation *obj) {
   obj->p = alloc;
 #ifdef __LP64__
-  if (alloc != nullptr) {
-    obj->r = alloc->mHal.drvState.lod[0].mallocPtr;
-    obj->v1 = alloc->mHal.drv;
-    obj->v2 = (void *)alloc->mHal.drvState.lod[0].stride;
-  } else {
-    obj->r = nullptr;
-    obj->v1 = nullptr;
-    obj->v2 = nullptr;
-  }
+  obj->unused1 = nullptr;
+  obj->unused2 = nullptr;
+  obj->unused3 = nullptr;
 #endif
 }
 
