@@ -21,9 +21,8 @@
 
 #include "rsgApiStructs.h"
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 #include "rsMesh.h"
-#include <gui/DisplayEventReceiver.h>
 #endif
 
 #include <sys/types.h>

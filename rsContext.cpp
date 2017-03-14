@@ -21,7 +21,7 @@
 
 #include "rsgApiStructs.h"
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 #include "rsMesh.h"
 #include <gui/DisplayEventReceiver.h>
 #endif
@@ -68,7 +68,7 @@ void Context::deinitEGL() {
 
 Context::PushState::PushState(Context *con) {
     mRsc = con;
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (con->mIsGraphicsContext) {
         mFragment.set(con->getProgramFragment());
         mVertex.set(con->getProgramVertex());
@@ -80,7 +80,7 @@ Context::PushState::PushState(Context *con) {
 }
 
 Context::PushState::~PushState() {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (mRsc->mIsGraphicsContext) {
         mRsc->setProgramFragment(mFragment.get());
         mRsc->setProgramVertex(mVertex.get());
@@ -101,7 +101,7 @@ uint32_t Context::runScript(Script *s) {
 
 uint32_t Context::runRootScript() {
     timerSet(RS_TIMER_SCRIPT);
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     mStateFragmentStore.mLast.clear();
 #endif
     watchdog.inRoot = true;
@@ -112,13 +112,9 @@ uint32_t Context::runRootScript() {
 }
 
 uint64_t Context::getTime() const {
-#ifndef ANDROID_RS_SERIALIZE
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
     return t.tv_nsec + ((uint64_t)t.tv_sec * 1000 * 1000 * 1000);
-#else
-    return 0;
-#endif //ANDROID_RS_SERIALIZE
 }
 
 void Context::timerReset() {
@@ -184,7 +180,7 @@ void Context::timerPrint() {
 }
 
 bool Context::setupCheck() {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     mFragmentStore->setup(this, &mStateFragmentStore);
     mFragment->setup(this, &mStateFragment);
     mRaster->setup(this, &mStateRaster);
@@ -194,7 +190,7 @@ bool Context::setupCheck() {
     return true;
 }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 void Context::setupProgramStore() {
     mFragmentStore->setup(this, &mStateFragmentStore);
 }
@@ -211,7 +207,7 @@ static uint32_t getProp(const char *str) {
 }
 
 void Context::displayDebugStats() {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     char buffer[128];
     snprintf(buffer, sizeof(buffer), "Avg fps %u, Frame %i ms, Script %i ms",
              mAverageFPS, mTimeMSLastFrame, mTimeMSLastScript);
@@ -236,10 +232,7 @@ void Context::displayDebugStats() {
 void * Context::threadProc(void *vrsc) {
     Context *rsc = static_cast<Context *>(vrsc);
 
-#ifndef ANDROID_RS_SERIALIZE
     rsc->mNativeThreadId = gettid();
-#endif //ANDROID_RS_SERIALIZE
-
     rsc->props.mLogTimes = getProp("debug.rs.profile") != 0;
     rsc->props.mLogScripts = getProp("debug.rs.script") != 0;
     rsc->props.mLogShaders = getProp("debug.rs.shader") != 0;
@@ -280,7 +273,7 @@ void * Context::threadProc(void *vrsc) {
         rsc->setPriority(RS_THREAD_PRIORITY_NORMAL_GRAPHICS);
     }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (rsc->mIsGraphicsContext) {
         if (!rsc->initGLThread()) {
             rsc->setError(RS_ERROR_OUT_OF_MEMORY, "Failed initializing GL");
@@ -312,12 +305,11 @@ void * Context::threadProc(void *vrsc) {
         while (!rsc->mExit) {
             rsc->mIO.playCoreCommands(rsc, -1);
         }
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     } else {
-#ifndef ANDROID_RS_SERIALIZE
         DisplayEventReceiver displayEvent;
         DisplayEventReceiver::Event eventBuffer[1];
-#endif
+
         int vsyncRate = 0;
         int targetRate = 0;
 
@@ -325,7 +317,6 @@ void * Context::threadProc(void *vrsc) {
         while (!rsc->mExit) {
             rsc->timerSet(RS_TIMER_IDLE);
 
-#ifndef ANDROID_RS_SERIALIZE
             if (!rsc->mRootScript.get() || !rsc->mHasSurface || rsc->mPaused) {
                 targetRate = 0;
             }
@@ -339,9 +330,7 @@ void * Context::threadProc(void *vrsc) {
                 while (displayEvent.getEvents(eventBuffer, 1) != 0) {
                     //ALOGE("vs2 time past %lld", (rsc->getTime() - eventBuffer[0].header.timestamp) / 1000000);
                 }
-            } else
-#endif
-            {
+            } else {
                 drawOnce |= rsc->mIO.playCoreCommands(rsc, -1);
             }
 
@@ -368,7 +357,7 @@ void * Context::threadProc(void *vrsc) {
 
     //ALOGV("%p RS Thread exiting", rsc);
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (rsc->mIsGraphicsContext) {
         pthread_mutex_lock(&gInitMutex);
         rsc->deinitEGL();
@@ -383,7 +372,7 @@ void * Context::threadProc(void *vrsc) {
 void Context::destroyWorkerThreadResources() {
     //ALOGV("destroyWorkerThreadResources 1");
     ObjectBase::zeroAllUserRef(this);
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (mIsGraphicsContext) {
          mRaster.clear();
          mFragment.clear();
@@ -583,7 +572,7 @@ Context::~Context() {
     }
 }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 void Context::setSurface(uint32_t w, uint32_t h, RsNativeWindow sur) {
     rsAssert(mIsGraphicsContext);
     mHal.funcs.setSurface(this, w, h, sur);
@@ -761,7 +750,7 @@ void rsi_ContextFinish(Context *rsc) {
 }
 
 void rsi_ContextBindRootScript(Context *rsc, RsScript vs) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     Script *s = static_cast<Script *>(vs);
     rsc->setRootScript(s);
 #endif
@@ -782,7 +771,7 @@ void rsi_ContextBindSampler(Context *rsc, uint32_t slot, RsSampler vs) {
     s->bindToContext(&rsc->mStateSampler, slot);
 }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 void rsi_ContextBindProgramStore(Context *rsc, RsProgramStore vpfs) {
     ProgramStore *pfs = static_cast<ProgramStore *>(vpfs);
     rsc->setProgramStore(pfs);
@@ -820,7 +809,7 @@ void rsi_ObjDestroy(Context *rsc, void *optr) {
     ob->decUserRef();
 }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 void rsi_ContextPause(Context *rsc) {
     rsc->pause();
 }
