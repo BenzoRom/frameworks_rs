@@ -47,7 +47,7 @@ void RsdVertexArray::Attrib::clear() {
     stride = 0;
     ptr = nullptr;
     normalized = false;
-    name.setTo("");
+    name.assign("");
 }
 
 void RsdVertexArray::Attrib::set(uint32_t type, uint32_t size, uint32_t stride,
@@ -59,7 +59,7 @@ void RsdVertexArray::Attrib::set(uint32_t type, uint32_t size, uint32_t stride,
     this->offset = offset;
     this->normalized = normalized;
     this->stride = stride;
-    this->name.setTo(name);
+    this->name.assign(name);
 }
 
 void RsdVertexArray::logAttrib(uint32_t idx, uint32_t slot) const {
@@ -68,7 +68,7 @@ void RsdVertexArray::logAttrib(uint32_t idx, uint32_t slot) const {
     }
     ALOGV("va %i: slot=%i name=%s buf=%i ptr=%p size=%i  type=0x%x  stride=0x%x  norm=%i  offset=0x%p",
           idx, slot,
-          mAttribs[idx].name.string(),
+          mAttribs[idx].name.c_str(),
           mAttribs[idx].buffer,
           mAttribs[idx].ptr,
           mAttribs[idx].size,
