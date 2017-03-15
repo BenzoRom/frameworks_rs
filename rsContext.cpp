@@ -202,7 +202,7 @@ void Context::setupProgramStore() {
 
 static uint32_t getProp(const char *str) {
 #ifdef __ANDROID__
-    char buf[PROPERTY_VALUE_MAX];
+    char buf[PROP_VALUE_MAX];
     property_get(str, buf, "0");
     return atoi(buf);
 #else
@@ -692,13 +692,13 @@ void Context::finish() {
 void Context::assignName(ObjectBase *obj, const char *name, uint32_t len) {
     rsAssert(!obj->getName());
     obj->setName(name, len);
-    mNames.add(obj);
+    mNames.push_back(obj);
 }
 
 void Context::removeName(ObjectBase *obj) {
     for (size_t ct=0; ct < mNames.size(); ct++) {
         if (obj == mNames[ct]) {
-            mNames.removeAt(ct);
+            mNames.erase(mNames.begin() + ct);
             return;
         }
     }

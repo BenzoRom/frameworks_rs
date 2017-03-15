@@ -19,6 +19,8 @@
 
 #include "rsAllocation.h"
 
+#include <vector>
+
 // ---------------------------------------------------------------------------
 namespace android {
 namespace renderscript {
@@ -96,7 +98,7 @@ public:
         }
     }
     // Cache of all existing raster programs.
-    Vector<Sampler *> mAllSamplers;
+    std::vector<Sampler *> mAllSamplers;
 };
 
 } // namespace renderscript
