@@ -165,7 +165,7 @@ void* SharedLibraryUtils::loadSharedLibrary(const char *cacheDir,
     return loaded;
 }
 
-String8 SharedLibraryUtils::getRandomString(size_t len) {
+std::string SharedLibraryUtils::getRandomString(size_t len) {
     char buf[len + 1];
     for (size_t i = 0; i < len; i++) {
         uint32_t r = arc4random() & 0xffff;
@@ -182,7 +182,7 @@ String8 SharedLibraryUtils::getRandomString(size_t len) {
         }
     }
     buf[len] = '\0';
-    return String8(buf);
+    return std::string(buf);
 }
 
 void* SharedLibraryUtils::loadSOHelper(const char *origName, const char *cacheDir,
@@ -237,7 +237,7 @@ void* SharedLibraryUtils::loadSOHelper(const char *origName, const char *cacheDi
     newName.append("librs.");
     newName.append(resName);
     newName.append("#");
-    newName.append(getRandomString(6).string());  // 62^6 potential filename variants.
+    newName.append(getRandomString(6).c_str());  // 62^6 potential filename variants.
     newName.append(".so");
 
     int r = copyFile(newName.c_str(), origName);

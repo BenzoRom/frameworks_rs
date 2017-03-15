@@ -20,8 +20,6 @@
 #include <string>
 #include <unistd.h>
 
-#include <sys/system_properties.h>
-
 #ifndef RS_COMPATIBILITY_LIB
 #include <sys/wait.h>
 #endif

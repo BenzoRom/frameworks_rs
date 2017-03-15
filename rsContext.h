@@ -40,6 +40,8 @@
 
 #endif
 
+#include <vector>
+
 // ---------------------------------------------------------------------------
 namespace android {
 
@@ -352,7 +354,7 @@ private:
     // allocate, copy, or free any memory here.
     const char* mDriverName;
 
-    Vector<ObjectBase *> mNames;
+    std::vector<ObjectBase *> mNames;
 
     uint64_t mTimers[_RS_TIMER_TOTAL];
     Timers mTimerActive;

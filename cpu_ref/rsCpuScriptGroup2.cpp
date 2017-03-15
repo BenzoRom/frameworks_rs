@@ -483,7 +483,7 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
 
             cloneName.append(resName);
             cloneName.append("#");
-            cloneName.append(SharedLibraryUtils::getRandomString(6).string());
+            cloneName.append(SharedLibraryUtils::getRandomString(6).c_str());
 
             // The last element in arguments is the output filename.
             arguments.pop_back();

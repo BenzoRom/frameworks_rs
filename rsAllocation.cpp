@@ -336,13 +336,13 @@ void Allocation::elementRead(Context *rsc, uint32_t x, uint32_t y, uint32_t z,
 }
 
 void Allocation::addProgramToDirty(const Program *p) {
-    mToDirtyList.push(p);
+    mToDirtyList.push_back(p);
 }
 
 void Allocation::removeProgramToDirty(const Program *p) {
     for (size_t ct=0; ct < mToDirtyList.size(); ct++) {
         if (mToDirtyList[ct] == p) {
-            mToDirtyList.removeAt(ct);
+            mToDirtyList.erase(mToDirtyList.begin() + ct);
             return;
         }
     }
