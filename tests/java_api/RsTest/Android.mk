@@ -25,5 +25,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-renderscript-fil
 LOCAL_RENDERSCRIPT_FLAGS := -target-api 0
 
 LOCAL_PACKAGE_NAME := RSTest
+LOCAL_COMPATIBILITY_SUITE := device-tests
 
 include $(BUILD_PACKAGE)
