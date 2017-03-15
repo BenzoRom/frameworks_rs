@@ -469,14 +469,12 @@ Context::Context() {
 }
 
 void Context::setCacheDir(const char * cacheDir_arg, uint32_t length) {
-    if (!hasSetCacheDir) {
-        if (length <= PATH_MAX) {
-            memcpy(mCacheDir, cacheDir_arg, length);
-            mCacheDir[length] = 0;
-            hasSetCacheDir = true;
-        } else {
-            setError(RS_ERROR_BAD_VALUE, "Invalid path");
-        }
+    if (length <= PATH_MAX) {
+        memcpy(mCacheDir, cacheDir_arg, length);
+        mCacheDir[length] = 0;
+        hasSetCacheDir = true;
+    } else {
+        setError(RS_ERROR_BAD_VALUE, "Invalid path");
     }
 }
 
