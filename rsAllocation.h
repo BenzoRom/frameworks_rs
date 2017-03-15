@@ -26,6 +26,8 @@
 struct ANativeWindowBuffer;
 #endif
 
+#include <vector>
+
 // ---------------------------------------------------------------------------
 namespace android {
 
@@ -212,7 +214,7 @@ public:
     bool hasSameDims(const Allocation *Other) const;
 
 protected:
-    Vector<const Program *> mToDirtyList;
+    std::vector<const Program *> mToDirtyList;
     ObjectBaseRef<const Type> mType;
     void setType(const Type *t) {
         mType.set(t);

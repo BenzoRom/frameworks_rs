@@ -19,6 +19,8 @@
 
 #include "rsUtils.h"
 
+#include <string>
+
 namespace android {
 namespace renderscript {
 
@@ -39,7 +41,7 @@ public:
         uint32_t size;
         uint32_t stride;
         bool normalized;
-        android::String8 name;
+        std::string name;
 
         Attrib();
         void clear();

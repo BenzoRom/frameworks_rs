@@ -58,7 +58,7 @@ static bool allocationLODIsNull(const android::renderscript::Allocation *alloc) 
 #ifndef RS_COMPATIBILITY_LIB
 
 static bool is_force_recompile() {
-  char buf[PROPERTY_VALUE_MAX];
+  char buf[PROP_VALUE_MAX];
 
   // Re-compile if floating point precision has been overridden.
   android::renderscript::property_get("debug.rs.precision", buf, "");
@@ -176,7 +176,7 @@ bool isChecksumNeeded(const char *cacheDir) {
     if ((::strcmp(SYSLIBPATH, cacheDir) == 0) ||
         (::strcmp(SYSLIBPATH_VENDOR, cacheDir) == 0))
         return false;
-    char buf[PROPERTY_VALUE_MAX];
+    char buf[PROP_VALUE_MAX];
     android::renderscript::property_get("ro.debuggable", buf, "");
     return (buf[0] == '1');
 }
@@ -422,7 +422,7 @@ bool RsdCpuScriptImpl::init(char const *resName, char const *cacheDir,
         }
     }
 
-    mBitcodeFilePath.setTo(bcFileName.c_str());
+    mBitcodeFilePath.assign(bcFileName.c_str());
 
 #else  // RS_COMPATIBILITY_LIB is defined
     const char *nativeLibDir = mCtx->getContext()->getNativeLibDir();

@@ -17,6 +17,9 @@
 #ifndef ANDROID_RSD_SHADER_CACHE_H
 #define ANDROID_RSD_SHADER_CACHE_H
 
+#include <string>
+#include <vector>
+
 namespace android {
 namespace renderscript {
 
@@ -52,7 +55,7 @@ public:
 
     void cleanupAll();
 
-    int32_t vtxAttribSlot(const android::String8 &attrName) const;
+    int32_t vtxAttribSlot(const std::string &attrName) const;
     int32_t vtxUniformSlot(uint32_t a) const {return mCurrent->vtxUniforms[a].slot;}
     uint32_t vtxUniformSize(uint32_t a) const {return mCurrent->vtxUniforms[a].arraySize;}
     int32_t fragUniformSlot(uint32_t a) const {return mCurrent->fragUniforms[a].slot;}
@@ -137,7 +140,7 @@ protected:
         UniformData *fragUniforms;
         bool *fragUniformIsSTO;
     };
-    android::Vector<ProgramEntry*> mEntries;
+    std::vector<ProgramEntry*> mEntries;
     ProgramEntry *mCurrent;
 
     bool hasArrayUniforms(RsdShader *vtx, RsdShader *frag);

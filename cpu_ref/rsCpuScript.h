@@ -26,6 +26,8 @@
 
 #include "rsCpuCore.h"
 
+#include <string>
+
 namespace bcinfo {
     class MetadataExtractor;
 } // namespace bcinfo
@@ -130,14 +132,14 @@ protected:
 
 public:
     static const char* BCC_EXE_PATH;
-    const char* getBitcodeFilePath() const { return mBitcodeFilePath.string(); }
+    const char* getBitcodeFilePath() const { return mBitcodeFilePath.c_str(); }
 
 private:
     bool setUpMtlsDimensions(MTLaunchStructCommon *mtls,
                              const RsLaunchDimensions &baseDim,
                              const RsScriptCall *sc);
 
-    String8 mBitcodeFilePath;
+    std::string mBitcodeFilePath;
     uint32_t mBuildChecksum;
     bool mChecksumNeeded;
 };
