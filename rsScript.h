@@ -26,7 +26,7 @@
 namespace android {
 namespace renderscript {
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 class ProgramVertex;
 class ProgramFragment;
 class ProgramRaster;
@@ -105,7 +105,7 @@ public:
         int64_t mStartTimeMillis;
         mutable int64_t mLastDtTime;
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         ObjectBaseRef<ProgramVertex> mVertex;
         ObjectBaseRef<ProgramFragment> mFragment;
         ObjectBaseRef<ProgramRaster> mRaster;

@@ -127,7 +127,7 @@ void ScriptC::setupScript(Context *rsc) {
 }
 
 void ScriptC::setupGLState(Context *rsc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (mEnviroment.mFragmentStore.get()) {
         rsc->setProgramStore(mEnviroment.mFragmentStore.get());
     }
@@ -258,7 +258,6 @@ void ScriptC::Invoke(Context *rsc, uint32_t slot, const void *data, size_t len) 
 static const bool kDebugBitcode = false;
 
 #ifndef RS_COMPATIBILITY_LIB
-#ifndef ANDROID_RS_SERIALIZE
 
 static bool dumpBitcodeFile(const char *cacheDir, const char *resName,
                             const char *suffix, const uint8_t *bitcode,
@@ -289,7 +288,6 @@ static bool dumpBitcodeFile(const char *cacheDir, const char *resName,
     return true;
 }
 
-#endif  // !ANDROID_RS_SERIALIZE
 #endif  // !RS_COMPATIBILITY_LIB
 
 
@@ -301,7 +299,6 @@ bool ScriptC::runCompiler(Context *rsc,
     ATRACE_CALL();
     //ALOGE("runCompiler %p %p %p %p %p %i", rsc, this, resName, cacheDir, bitcode, bitcodeLen);
 #ifndef RS_COMPATIBILITY_LIB
-#ifndef ANDROID_RS_SERIALIZE
     uint32_t sdkVersion = 0;
     bcinfo::BitcodeWrapper bcWrapper((const char *)bitcode, bitcodeLen);
     if (!bcWrapper.unwrap()) {
@@ -343,7 +340,6 @@ bool ScriptC::runCompiler(Context *rsc,
     // optimization level used to compile the bitcode.
     rsc->setOptLevel(bcWrapper.getOptimizationLevel());
 
-#endif
     if (!cacheDir) {
         // MUST BE FIXED BEFORE ANYTHING USING C++ API IS RELEASED
         cacheDir = getenv("EXTERNAL_STORAGE");
@@ -361,7 +357,7 @@ bool ScriptC::runCompiler(Context *rsc,
     }
 
     mInitialized = true;
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     mEnviroment.mFragment.set(rsc->getDefaultProgramFragment());
     mEnviroment.mVertex.set(rsc->getDefaultProgramVertex());
     mEnviroment.mFragmentStore.set(rsc->getDefaultProgramStore());
@@ -382,7 +378,7 @@ bool ScriptC::runCompiler(Context *rsc,
             return false;
         }
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         if (!strcmp(key, "stateVertex")) {
             if (!strcmp(value, "default")) {
                 continue;
