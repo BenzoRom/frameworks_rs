@@ -229,7 +229,7 @@ LOCAL_REQUIRED_MODULES := libRS_internal libRSDriver
 # Treble configuration
 LOCAL_SHARED_LIBRARIES += libhidlbase libhidltransport libhwbinder libutils android.hardware.renderscript@1.0
 
-LOCAL_SHARED_LIBRARIES += liblog libcutils
+LOCAL_SHARED_LIBRARIES += liblog libcutils libandroid_runtime
 
 LOCAL_STATIC_LIBRARIES := \
         libRSDispatch
