@@ -45,7 +45,7 @@ extern "C" void rsaContextSetNativeLibDir(RsContext con, char *libDir, size_t le
 // TODO: Figure out better naming schemes for all the rs* functions.
 // Currently they share the same names as the NDK counterparts, and that is
 // causing lots of confusion.
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 extern "C" RsContext rsContextCreateGL(RsDevice vdev, uint32_t version,
                                        uint32_t sdkVersion, RsSurfaceConfig sc,
                                        uint32_t dpi) {
