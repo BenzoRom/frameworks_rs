@@ -19,6 +19,8 @@
 #include "rsFallbackAdaptation.h"
 #include "cpp/rsDispatch.h"
 
+#include <android_runtime/AndroidRuntime.h>
+
 // TODO: Figure out how to use different declared types for the two interfaces
 //       to avoid the confusion. Currently, RsContext is used as the API type for
 //       both the client interface and the dispatch table interface, but at the
@@ -65,6 +67,10 @@ extern "C" int gDebuggerPresent = 0;
 
 // Context
 
+// Mutex for locking reflection operation.
+static std::mutex reflectionMutex;
+// The defaultCacheDir will be reused if set, instead of query JNI.
+static std::string defaultCacheDir;
 extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
                                      RsContextType ct, uint32_t flags)
 {
@@ -78,6 +84,41 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
     }
 
     RsContextWrapper *ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
+
+    std::unique_lock<std::mutex> lock(reflectionMutex);
+    if (defaultCacheDir.size() == 0) {
+        // Use reflection to query the default cache dir.
+        // First check if we have JavaVM running in this process.
+        if (android::AndroidRuntime::getJavaVM()) {
+            JNIEnv* env = android::AndroidRuntime::getJNIEnv();
+            if (env) {
+                jclass cacheDirClass = env->FindClass("android/renderscript/RenderScriptCacheDir");
+                jfieldID cacheDirID = env->GetStaticFieldID(cacheDirClass, "mCacheDir", "Ljava/io/File;");
+                jobject cache_dir = env->GetStaticObjectField(cacheDirClass, cacheDirID);
+
+                jclass fileClass = env->FindClass("java/io/File");
+                jmethodID getPath = env->GetMethodID(fileClass, "getPath", "()Ljava/lang/String;");
+                jstring path_string = (jstring)env->CallObjectMethod(cache_dir, getPath);
+                const char *path_chars = env->GetStringUTFChars(path_string, NULL);
+                jsize path_length = env->GetStringUTFLength(path_string);
+
+                ALOGD("Successfully queried cache dir: %s", path_chars);
+                defaultCacheDir = std::string(path_chars);
+                env->ReleaseStringUTFChars(path_string, path_chars);
+            } else {
+                ALOGE("Failed to set the default cache dir.");
+            }
+        } else {
+            ALOGD("Non JavaVM found in the process.");
+        }
+    }
+
+    if (defaultCacheDir.size() > 0) {
+        ALOGD("Setting cache dir: %s", defaultCacheDir.c_str());
+        rsContextSetCacheDir(ctxWrapper,
+                             defaultCacheDir.c_str(),
+                             defaultCacheDir.size());
+    }
     return (RsContext) ctxWrapper;
 }
 
