@@ -26,7 +26,7 @@
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 #include "gui/GLConsumer.h"
 #endif
 
@@ -48,7 +48,7 @@ struct DrvAllocation {
     // Is this a legal structure to be used as an FBO render target
     uint32_t renderTargetID;
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     GLenum glTarget;
     GLenum glType;
     GLenum glFormat;
@@ -65,7 +65,9 @@ struct DrvAllocation {
     bool useUserProvidedPtr;
     bool uploadDeferred;
 
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     RsdFrameBufferObj * readBackFBO;
+#endif
     ANativeWindow *wnd;
     ANativeWindow *wndSurface;
 };

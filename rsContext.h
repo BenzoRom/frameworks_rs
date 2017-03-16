@@ -96,7 +96,7 @@ public:
         ~PushState();
 
     private:
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         ObjectBaseRef<ProgramFragment> mFragment;
         ObjectBaseRef<ProgramVertex> mVertex;
         ObjectBaseRef<ProgramStore> mStore;
@@ -115,7 +115,7 @@ public:
     bool isSynchronous() {return mSynchronous;}
     bool setupCheck();
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     FBOCache mFBOCache;
     ProgramFragmentState mStateFragment;
     ProgramStoreState mStateFragmentStore;
@@ -162,7 +162,7 @@ public:
     void initToClient();
     void deinitToClient();
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     ProgramFragment * getDefaultProgramFragment() const {
         return mStateFragment.mDefault.get();
     }
@@ -319,7 +319,7 @@ protected:
     pid_t mNativeThreadId;
 
     ObjectBaseRef<Script> mRootScript;
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     ObjectBaseRef<ProgramFragment> mFragment;
     ObjectBaseRef<ProgramVertex> mVertex;
     ObjectBaseRef<ProgramStore> mFragmentStore;

@@ -21,7 +21,7 @@
 #include "rsdBcc.h"
 #include "rsdElement.h"
 #include "rsdType.h"
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     #include "rsdGL.h"
     #include "rsdProgramStore.h"
     #include "rsdProgramRaster.h"
@@ -208,7 +208,7 @@ extern "C" bool rsdHalQueryHal(RsHalInitEnums entry, void **fnPtr) {
     // Functions below this point are for the legacy graphics api,
     // vendor drivers are NOT expected to implement these.  They will never be called
     // for an external driver.
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     case RS_HAL_GRAPHICS_INIT:
         fnPtr[0] = (void *)rsdGLInit; break;
     case RS_HAL_GRAPHICS_SHUTDOWN:
@@ -353,7 +353,7 @@ void SetPriority(const Context *rsc, int32_t priority) {
 
     dc->mCpuRef->setPriority(priority);
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (dc->mHasGraphics) {
         rsdGLSetPriority(rsc, priority);
     }
