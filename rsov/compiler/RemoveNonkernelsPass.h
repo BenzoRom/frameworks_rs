@@ -21,14 +21,9 @@ namespace llvm {
 class ModulePass;
 } // namespace llvm
 
-namespace bcinfo {
-class MetadataExtractor;
-} // namespace bcinfo
-
 namespace rs2spirv {
 
-llvm::ModulePass *
-createRemoveNonkernelsPass(bcinfo::MetadataExtractor &Extractor);
+llvm::ModulePass *createRemoveNonkernelsPass();
 
 } // namespace rs2spirv
 

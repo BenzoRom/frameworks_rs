@@ -27,6 +27,7 @@
 #include "llvm/Transforms/Scalar.h"
 
 #include "Builtin.h"
+#include "Context.h"
 #include "GlobalAllocPass.h"
 #include "GlobalAllocSPIRITPass.h"
 #include "GlobalMergePass.h"
@@ -44,7 +45,9 @@ using namespace SPIRV;
 
 namespace rs2spirv {
 
-static void HandleTargetTriple(llvm::Module &M) {
+namespace {
+
+void HandleTargetTriple(llvm::Module &M) {
   Triple TT(M.getTargetTriple());
   auto Arch = TT.getArch();
 
@@ -68,11 +71,12 @@ static void HandleTargetTriple(llvm::Module &M) {
   M.setTargetTriple(NewTriple);
 }
 
-void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
-                          bcinfo::MetadataExtractor &Extractor) {
-  PassMgr.add(createInlinePreparationPass(Extractor));
+} // anonumous namespace
+
+void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr) {
+  PassMgr.add(createInlinePreparationPass());
   PassMgr.add(createAlwaysInlinerPass());
-  PassMgr.add(createRemoveNonkernelsPass(Extractor));
+  PassMgr.add(createRemoveNonkernelsPass());
   // Delete unreachable globals.
   PassMgr.add(createGlobalDCEPass());
   // Remove dead debug info.
@@ -97,26 +101,27 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr,
 }
 
 bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
-  std::unique_ptr<SPIRVModule> BM(SPIRVModule::createSPIRVModule());
-
   HandleTargetTriple(*M);
 
-  bcinfo::MetadataExtractor ME(M);
-  if (!ME.extract()) {
-    errs() << "Could not extract metadata\n";
+  Context &Ctxt = Context::getInstance();
+
+  if (!Ctxt.Initialize(M)) {
+    ErrMsg = "Failed to intialize rs2spirv";
     return false;
   }
-  DEBUG(dbgs() << "Metadata extracted\n");
 
   llvm::legacy::PassManager PassMgr;
-  addPassesForRS2SPIRV(PassMgr, ME);
+  addPassesForRS2SPIRV(PassMgr);
+
+  std::unique_ptr<SPIRVModule> BM(SPIRVModule::createSPIRVModule());
 
   PassMgr.add(createLLVMToSPIRV(BM.get()));
   PassMgr.run(*M);
   DEBUG(M->dump());
 
-  if (BM->getError(ErrMsg) != SPIRVEC_Success)
+  if (BM->getError(ErrMsg) != SPIRVEC_Success) {
     return false;
+  }
 
   llvm::SmallString<4096> O;
   llvm::raw_svector_ostream SVOS(O);
@@ -129,7 +134,7 @@ bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
   memcpy(words.data(), str.data(), str.size());
 
   android::spirit::PassQueue spiritPasses;
-  spiritPasses.append(CreateWrapperPass(ME, *M));
+  spiritPasses.append(CreateWrapperPass(*M));
   spiritPasses.append(CreateBuiltinPass());
   spiritPasses.append(CreateGAPass());
 
@@ -138,6 +143,7 @@ bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
 
   if (error != 0) {
     OS << *BM;
+    ErrMsg = "Failed to generate wrappers for kernels";
     return false;
   }
 

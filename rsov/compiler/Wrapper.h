@@ -19,10 +19,6 @@
 
 #include <stdint.h>
 
-namespace bcinfo {
-class MetadataExtractor;
-}
-
 namespace llvm {
 class Module;
 }
@@ -53,8 +49,7 @@ bool DecorateGlobalBuffer(llvm::Module &M, Builder &b, Module *m);
 
 namespace rs2spirv {
 
-android::spirit::Pass* CreateWrapperPass(const bcinfo::MetadataExtractor &metadata,
-                                         const llvm::Module &LLVMModule);
+android::spirit::Pass* CreateWrapperPass(const llvm::Module &LLVMModule);
 
 } // namespace rs2spirv
 

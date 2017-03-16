@@ -16,13 +16,12 @@
 
 #include "InlinePreparationPass.h"
 
-#include "llvm/ADT/StringSet.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "bcinfo/MetadataExtractor.h"
+#include "Context.h"
 
 #define DEBUG_TYPE "rs2spirv-inline"
 
@@ -33,53 +32,43 @@ namespace rs2spirv {
 namespace {
 
 class InlinePreparationPass : public ModulePass {
-  bcinfo::MetadataExtractor &ME;
-
 public:
   static char ID;
-  explicit InlinePreparationPass(bcinfo::MetadataExtractor &Extractor)
-      : ModulePass(ID), ME(Extractor) {}
+  explicit InlinePreparationPass() : ModulePass(ID) {}
 
   const char *getPassName() const override { return "InlinePreparationPass"; }
 
   bool runOnModule(Module &M) override {
     DEBUG(dbgs() << "InlinePreparationPass\n");
 
-    const size_t RSKernelNum = ME.getExportForEachSignatureCount();
-    const char **RSKernelNames = ME.getExportForEachNameList();
-    if (RSKernelNum == 0)
-      DEBUG(dbgs() << "InlinePreparationPass detected no kernel\n");
-
-    StringSet<> KNames;
-    for (size_t i = 0; i < RSKernelNum; ++i)
-      KNames.insert(RSKernelNames[i]);
+    rs2spirv::Context &Ctxt = rs2spirv::Context::getInstance();
 
     for (auto &F : M.functions()) {
-      if (F.isDeclaration())
+      if (F.isDeclaration()) {
         continue;
+      }
 
-      const auto FName = F.getName();
-
-      // TODO: Consider inlining kernels (i.e. kernels calling other kernels)
-      // when multi-kernel module support is ready.
-      if (KNames.count(FName) != 0)
+      if (Ctxt.isForEachKernel(F.getName())) {
         continue; // Skip kernels.
+      }
 
       F.addFnAttr(Attribute::AlwaysInline);
       F.setLinkage(GlobalValue::InternalLinkage);
-      DEBUG(dbgs() << "Marked as alwaysinline:\t" << FName << '\n');
+
+      DEBUG(dbgs() << "Marked as alwaysinline:\t" << F.getName() << '\n');
     }
 
-    // Return true, as the pass modifies module.
+    // Returns true, because this pass modifies the Module.
     return true;
   }
 };
+
 } // namespace
 
 char InlinePreparationPass::ID = 0;
 
-ModulePass *createInlinePreparationPass(bcinfo::MetadataExtractor &ME) {
-  return new InlinePreparationPass(ME);
+ModulePass *createInlinePreparationPass() {
+  return new InlinePreparationPass();
 }
 
 } // namespace rs2spirv
