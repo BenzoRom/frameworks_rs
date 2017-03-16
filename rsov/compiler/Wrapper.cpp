@@ -19,6 +19,7 @@
 #include "llvm/IR/Module.h"
 
 #include "Builtin.h"
+#include "Context.h"
 #include "GlobalAllocSPIRITPass.h"
 #include "RSAllocationUtils.h"
 #include "bcinfo/MetadataExtractor.h"
@@ -27,6 +28,7 @@
 #include "module.h"
 #include "pass.h"
 
+#include <sstream>
 #include <vector>
 
 using bcinfo::MetadataExtractor;
@@ -272,7 +274,6 @@ bool DecorateGlobalBuffer(llvm::Module &LM, Builder &b, Module *m) {
         std::cerr << "struct layout is null" << std::endl;
         return false;
       }
-
       for (uint32_t i = 0, e = LStructTy->getNumElements(); i != e; ++i) {
         auto decor = StructTy->memberDecorate(i, Decoration::Offset);
         if (!decor) {
@@ -280,7 +281,8 @@ bool DecorateGlobalBuffer(llvm::Module &LM, Builder &b, Module *m) {
                     << std::endl;
           return false;
         }
-        decor->addExtraOperand((uint32_t)SLayout->getElementOffset(i));
+        const uint32_t offset = (uint32_t)SLayout->getElementOffset(i);
+        decor->addExtraOperand(offset);
       }
     }
   }
@@ -352,9 +354,10 @@ void FixGlobalStorageClass(Module *m) {
 
 } // anonymous namespace
 
-bool AddWrappers(const bcinfo::MetadataExtractor &metadata,
-                 llvm::Module &LM,
+bool AddWrappers(llvm::Module &LM,
                  android::spirit::Module *m) {
+  rs2spirv::Context &Ctxt = rs2spirv::Context::getInstance();
+  const bcinfo::MetadataExtractor &metadata = Ctxt.getMetadata();
   android::spirit::Builder b;
 
   m->setBuilder(&b);
@@ -384,12 +387,10 @@ bool AddWrappers(const bcinfo::MetadataExtractor &metadata,
 
 class WrapperPass : public Pass {
 public:
-  WrapperPass(const bcinfo::MetadataExtractor &Metadata,
-              const llvm::Module &LM) : mLLVMMetadata(Metadata),
-                                        mLLVMModule(const_cast<llvm::Module&>(LM)) {}
+  WrapperPass(const llvm::Module &LM) : mLLVMModule(const_cast<llvm::Module&>(LM)) {}
 
   Module *run(Module *m, int *error) override {
-    bool success = AddWrappers(mLLVMMetadata, mLLVMModule, m);
+    bool success = AddWrappers(mLLVMModule, m);
     if (error) {
       *error = success ? 0 : -1;
     }
@@ -397,7 +398,6 @@ public:
   }
 
 private:
-  const bcinfo::MetadataExtractor &mLLVMMetadata;
   llvm::Module &mLLVMModule;
 };
 
@@ -406,9 +406,8 @@ private:
 
 namespace rs2spirv {
 
-android::spirit::Pass* CreateWrapperPass(const bcinfo::MetadataExtractor &metadata,
-                                         const llvm::Module &LLVMModule) {
-  return new android::spirit::WrapperPass(metadata, LLVMModule);
+android::spirit::Pass* CreateWrapperPass(const llvm::Module &LLVMModule) {
+  return new android::spirit::WrapperPass(LLVMModule);
 }
 
 } // namespace rs2spirv
