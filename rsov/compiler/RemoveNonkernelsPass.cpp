@@ -16,14 +16,13 @@
 
 #include "RemoveNonkernelsPass.h"
 
-#include "llvm/ADT/StringSet.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/raw_ostream.h"
 
-#include "bcinfo/MetadataExtractor.h"
+#include "Context.h"
 
 #define DEBUG_TYPE "rs2spirv-remove"
 
@@ -34,12 +33,9 @@ namespace rs2spirv {
 namespace {
 
 class RemoveNonkernelsPass : public ModulePass {
-  bcinfo::MetadataExtractor &ME;
-
 public:
   static char ID;
-  explicit RemoveNonkernelsPass(bcinfo::MetadataExtractor &Extractor)
-      : ModulePass(ID), ME(Extractor) {}
+  explicit RemoveNonkernelsPass() : ModulePass(ID) {}
 
   const char *getPassName() const override { return "RemoveNonkernelsPass"; }
 
@@ -47,14 +43,13 @@ public:
     DEBUG(dbgs() << "RemoveNonkernelsPass\n");
     DEBUG(M.dump());
 
-    const size_t RSKernelNum = ME.getExportForEachSignatureCount();
-    const char **RSKernelNames = ME.getExportForEachNameList();
-    if (RSKernelNum == 0)
-      DEBUG(dbgs() << "RemoveNonkernelsPass detected no kernel\n");
+    rs2spirv::Context &Ctxt = rs2spirv::Context::getInstance();
 
-    StringSet<> KNames;
-    for (size_t i = 0; i < RSKernelNum; ++i)
-      KNames.insert(RSKernelNames[i]);
+    if (Ctxt.getNumForEachKernel() == 0) {
+      DEBUG(dbgs() << "RemoveNonkernelsPass detected no kernel\n");
+      // Returns false, since no modification is made to the Module.
+      return false;
+    }
 
     std::vector<Function *> Functions;
     for (auto &F : M.functions()) {
@@ -65,30 +60,30 @@ public:
       if (F->isDeclaration())
         continue;
 
-      const StringRef FName = F->getName();
-
-      if (KNames.count(FName) != 0)
+      if (Ctxt.isForEachKernel(F->getName())) {
         continue; // Skip kernels.
+      }
 
       F->replaceAllUsesWith(UndefValue::get((Type *)F->getType()));
       F->eraseFromParent();
 
-      DEBUG(dbgs() << "Removed:\t" << FName << '\n');
+      DEBUG(dbgs() << "Removed:\t" << F->getName() << '\n');
     }
 
-    // Return true, as the pass modifies module.
     DEBUG(M.dump());
     DEBUG(dbgs() << "Done removal\n");
 
+    // Returns true, because the pass modifies the Module.
     return true;
   }
 };
+
 } // namespace
 
 char RemoveNonkernelsPass::ID = 0;
 
-ModulePass *createRemoveNonkernelsPass(bcinfo::MetadataExtractor &ME) {
-  return new RemoveNonkernelsPass(ME);
+ModulePass *createRemoveNonkernelsPass() {
+  return new RemoveNonkernelsPass();
 }
 
 } // namespace rs2spirv
