@@ -23,10 +23,6 @@
 #include "rsCompatibilityLib.h"
 #else
 #include "rsdFrameBufferObj.h"
-#include "gui/GLConsumer.h"
-#include "gui/CpuConsumer.h"
-#include "gui/Surface.h"
-#include "hardware/gralloc.h"
 
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
@@ -99,7 +95,7 @@ uint8_t *GetOffsetPtr(const android::renderscript::Allocation *alloc,
 static void Update2DTexture(const Context *rsc, const Allocation *alloc, const void *ptr,
                             uint32_t xoff, uint32_t yoff, uint32_t lod,
                             RsAllocationCubemapFace face, uint32_t w, uint32_t h) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
     rsAssert(drv->textureID);
@@ -114,7 +110,7 @@ static void Update2DTexture(const Context *rsc, const Allocation *alloc, const v
 }
 
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 static void Upload2DTexture(const Context *rsc, const Allocation *alloc, bool isFirstUpload) {
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
@@ -158,7 +154,7 @@ static void Upload2DTexture(const Context *rsc, const Allocation *alloc, bool is
 #endif
 
 static void UploadToTexture(const Context *rsc, const Allocation *alloc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
     if (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_IO_INPUT) {
@@ -196,7 +192,7 @@ static void UploadToTexture(const Context *rsc, const Allocation *alloc) {
 }
 
 static void AllocateRenderTarget(const Context *rsc, const Allocation *alloc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
     if (!drv->glFormat) {
@@ -221,7 +217,7 @@ static void AllocateRenderTarget(const Context *rsc, const Allocation *alloc) {
 }
 
 static void UploadToBufferObject(const Context *rsc, const Allocation *alloc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
     rsAssert(!alloc->mHal.state.type->getDimY());
@@ -252,7 +248,7 @@ static size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
     // For the flexible YCbCr format, layout is initialized during call to
     // Allocation::ioReceive.  Return early and avoid clobberring any
     // pre-existing layout.
-    if (yuv == HAL_PIXEL_FORMAT_YCbCr_420_888) {
+    if (yuv == RS_YUV_420_888) {
         return 0;
     }
 #endif
@@ -269,7 +265,7 @@ static size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
     state->lodCount = 3;
 
     switch(yuv) {
-    case HAL_PIXEL_FORMAT_YV12:
+    case RS_YUV_YV12:
         state->lod[2].stride = rsRound(state->lod[0].stride >> 1, 16);
         state->lod[2].mallocPtr = ((uint8_t *)state->lod[0].mallocPtr) +
                 (state->lod[0].stride * state->lod[0].dimY);
@@ -280,7 +276,7 @@ static size_t DeriveYUVLayout(int yuv, Allocation::Hal::DrvState *state) {
                 (state->lod[2].stride * state->lod[2].dimY);
         uvSize += state->lod[1].stride * state->lod[2].dimY;
         break;
-    case HAL_PIXEL_FORMAT_YCrCb_420_SP:  // NV21
+    case RS_YUV_NV21:
         //state->lod[1].dimX = state->lod[0].dimX;
         state->lod[1].stride = state->lod[0].stride;
         state->lod[2].stride = state->lod[0].stride;
@@ -473,8 +469,9 @@ bool rsdAllocationInitStrided(const Context *rsc, Allocation *alloc, bool forceZ
         drv->uploadDeferred = true;
     }
 
-
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     drv->readBackFBO = nullptr;
+#endif
 
     // fill out the initial state of the buffer if we couldn't use the user-provided ptr and USAGE_SHARED was accepted
     if ((alloc->mHal.state.userProvidedPtr != 0) && (drv->useUserProvidedPtr == false)) {
@@ -535,7 +532,7 @@ void rsdAllocationDestroy(const Context *rsc, Allocation *alloc) {
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
 
     if (alloc->mHal.state.baseAlloc == nullptr) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         if (drv->bufferID) {
             // Causes a SW crash....
             //ALOGV(" mBufferID %i", mBufferID);
@@ -563,11 +560,12 @@ void rsdAllocationDestroy(const Context *rsc, Allocation *alloc) {
         }
 
 #ifndef RS_COMPATIBILITY_LIB
+#ifndef RS_VENDOR_LIB
         if (drv->readBackFBO != nullptr) {
             delete drv->readBackFBO;
             drv->readBackFBO = nullptr;
         }
-
+#endif
         if ((alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_IO_OUTPUT) &&
             (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT)) {
             ANativeWindow *nw = drv->wndSurface;
@@ -615,7 +613,7 @@ void rsdAllocationResize(const Context *rsc, const Allocation *alloc,
 }
 
 static void rsdAllocationSyncFromFBO(const Context *rsc, const Allocation *alloc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     if (!alloc->getIsScript()) {
         return; // nothing to sync
     }
@@ -754,11 +752,13 @@ void rsdAllocationIoSend(const Context *rsc, Allocation *alloc) {
 #ifndef RS_COMPATIBILITY_LIB
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
     ANativeWindow *nw = drv->wndSurface;
+#ifndef RS_VENDOR_LIB
     if (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_GRAPHICS_RENDER_TARGET) {
         RsdHal *dc = (RsdHal *)rsc->mHal.drv;
         RSD_CALL_GL(eglSwapBuffers, dc->gl.egl.display, dc->gl.egl.surface);
         return;
     }
+#endif
     if (nw) {
         if (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT) {
             int32_t r = ANativeWindow_unlockAndPost(nw);
@@ -776,7 +776,7 @@ void rsdAllocationIoSend(const Context *rsc, Allocation *alloc) {
 }
 
 void rsdAllocationIoReceive(const Context *rsc, Allocation *alloc) {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
     if (!(alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT)) {
         drv->surfaceTexture->updateTexImage();
@@ -842,10 +842,10 @@ void rsdAllocationData2D(const Context *rsc, const Allocation *alloc,
             size_t clineSize = lineSize;
             int lod = 1;
             int maxLod = 2;
-            if (alloc->mHal.state.yuv == HAL_PIXEL_FORMAT_YV12) {
+            if (alloc->mHal.state.yuv == RS_YUV_YV12) {
                 maxLod = 3;
                 clineSize >>= 1;
-            } else if (alloc->mHal.state.yuv == HAL_PIXEL_FORMAT_YCrCb_420_SP) {
+            } else if (alloc->mHal.state.yuv == RS_YUV_NV21) {
                 lod = 2;
                 maxLod = 3;
             }

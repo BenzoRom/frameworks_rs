@@ -19,6 +19,7 @@
 
 #include "rsStream.h"
 #include <utils/KeyedVector.h>
+#include <utils/Unicode.h>
 
 struct FT_LibraryRec_;
 struct FT_FaceRec_;

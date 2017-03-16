@@ -20,7 +20,7 @@
 #include "rsUtils.h"
 #include "rsInternalDefines.h"
 
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 #include <utils/CallStack.h>
 #endif
 
@@ -31,20 +31,20 @@ namespace renderscript {
 class DebugHelper {
 public:
     DebugHelper() {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         mStack.update(2);
 #endif
     }
 
     void dump() {
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
         ALOGV("%s", mStack.toString().string());
         //mStack.dump();
 #endif
     }
 
 private:
-#ifndef RS_COMPATIBILITY_LIB
+#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     CallStack mStack;
 #endif
 };
