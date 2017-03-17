@@ -22,6 +22,10 @@ rs-prebuilts-full: \
     host_cross_bcc_compat
 endif
 
+# Not building RenderScript modules in PDK builds, as libmediandk
+# is not available in PDK.
+ifneq ($(TARGET_BUILD_PDK), true)
+
 rs_base_CFLAGS := -Werror -Wall -Wextra \
 	-Wno-unused-parameter -Wno-unused-variable
 
@@ -240,4 +244,7 @@ LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
 
 include $(BUILD_SHARED_LIBRARY)
 
+endif # TARGET_BUILD_PDK
+
 include $(call all-makefiles-under,$(LOCAL_PATH))
+

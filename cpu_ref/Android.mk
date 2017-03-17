@@ -1,10 +1,11 @@
 LOCAL_PATH:=$(call my-dir)
 
+# Not building RenderScript modules in PDK builds, as libmediandk
+# is not available in PDK.
+ifneq ($(TARGET_BUILD_PDK), true)
+
 rs_base_CFLAGS := -Werror -Wall -Wextra \
 				  -Wno-unused-parameter -Wno-unused-variable
-ifeq ($(TARGET_BUILD_PDK), true)
-  rs_base_CFLAGS += -D__RS_PDK__
-endif
 
 ifneq ($(OVERRIDE_RS_DRIVER),)
   rs_base_CFLAGS += -DOVERRIDE_RS_DRIVER=$(OVERRIDE_RS_DRIVER)
@@ -97,3 +98,5 @@ include frameworks/compile/libbcc/libbcc-targets.mk
 LOCAL_CFLAGS += $(rs_base_CFLAGS)
 
 include $(BUILD_SHARED_LIBRARY)
+
+endif # TARGET_BUILD_PDK
