@@ -21,6 +21,9 @@
 
 #include <android_runtime/AndroidRuntime.h>
 
+#undef LOG_TAG
+#define LOG_TAG "RenderScript"
+
 // TODO: Figure out how to use different declared types for the two interfaces
 //       to avoid the confusion. Currently, RsContext is used as the API type for
 //       both the client interface and the dispatch table interface, but at the
@@ -96,17 +99,20 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
                 jfieldID cacheDirID = env->GetStaticFieldID(cacheDirClass, "mCacheDir", "Ljava/io/File;");
                 jobject cache_dir = env->GetStaticObjectField(cacheDirClass, cacheDirID);
 
-                jclass fileClass = env->FindClass("java/io/File");
-                jmethodID getPath = env->GetMethodID(fileClass, "getPath", "()Ljava/lang/String;");
-                jstring path_string = (jstring)env->CallObjectMethod(cache_dir, getPath);
-                const char *path_chars = env->GetStringUTFChars(path_string, NULL);
-                jsize path_length = env->GetStringUTFLength(path_string);
+                if (cache_dir) {
+                    jclass fileClass = env->FindClass("java/io/File");
+                    jmethodID getPath = env->GetMethodID(fileClass, "getPath", "()Ljava/lang/String;");
+                    jstring path_string = (jstring)env->CallObjectMethod(cache_dir, getPath);
+                    const char *path_chars = env->GetStringUTFChars(path_string, NULL);
 
-                ALOGD("Successfully queried cache dir: %s", path_chars);
-                defaultCacheDir = std::string(path_chars);
-                env->ReleaseStringUTFChars(path_string, path_chars);
+                    ALOGD("Successfully queried cache dir: %s", path_chars);
+                    defaultCacheDir = std::string(path_chars);
+                    env->ReleaseStringUTFChars(path_string, path_chars);
+                } else {
+                    ALOGD("Cache dir not initialized");
+                }
             } else {
-                ALOGE("Failed to set the default cache dir.");
+                ALOGD("Failed to query the default cache dir.");
             }
         } else {
             ALOGD("Non JavaVM found in the process.");
