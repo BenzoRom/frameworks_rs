@@ -1349,11 +1349,13 @@ static bool test_rs_alloc_api() {
     _RS_ASSERT(rsAllocationGetDimZ(a) == z);
     _RS_ASSERT(rsAllocationGetDimLOD(a) == 0);
     _RS_ASSERT(rsAllocationGetDimFaces(a) == 0);
-
     rsSetElementAt_char(a, 5, 1, 0);
-    rsAllocationCopy1DRange(allocDst, 0, 0, x, a, 0, 0);
+    if (y > 0)
+        rsAllocationCopy2DRange(allocDst, 0, 0, 0, RS_ALLOCATION_CUBEMAP_FACE_POSITIVE_X,
+                                x, 1, a, 0, 0, 0, RS_ALLOCATION_CUBEMAP_FACE_POSITIVE_X);
+    else
+        rsAllocationCopy1DRange(allocDst, 0, 0, x, a, 0, 0);
     _RS_ASSERT(rsGetElementAt_char(allocDst, 1, 0) == 5);
-
     if (failed) {
         rsDebug("test_obj_api FAILED", -1);
     }
