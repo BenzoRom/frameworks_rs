@@ -17,13 +17,13 @@
 #ifndef RS2SPIRV_CONTEXT_H
 #define RS2SPIRV_CONTEXT_H
 
+#include "RSAllocationUtils.h"
 #include "bcinfo/MetadataExtractor.h"
 
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 
 #include <stdint.h>
-
 #include <limits>
 #include <vector>
 
@@ -104,6 +104,10 @@ public:
     return *mMetadata;
   }
 
+  llvm::SmallVectorImpl<RSAllocationInfo> &getGlobalAllocs() {
+    return mGlobalAllocs;
+  }
+
 private:
   uint32_t getSlotForExportVar(const char *varName) {
     const llvm::StringRef strVarName(varName);
@@ -123,6 +127,9 @@ private:
   llvm::StringMap<uint32_t> mForEachNameToSlot;
   // These are the indices for each exported variable in the global buffer
   std::vector<uint32_t> mExportVarIndices;
+  // For Global Allocations; carries global variable -> metadata offset
+  // mapping from an LLVM pass to a SPIRIT pass
+  llvm::SmallVector<RSAllocationInfo, 8> mGlobalAllocs;
 };
 
 } // namespace rs2spirv

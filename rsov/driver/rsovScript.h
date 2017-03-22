@@ -19,6 +19,7 @@
 
 #include <vulkan/vulkan.h>
 
+#include <map>
 #include <vector>
 
 #include "bcinfo/MetadataExtractor.h"
@@ -38,15 +39,18 @@ class ScriptC;
 namespace rsov {
 
 class RSoVAllocation;
+class RSoVBuffer;
 class RSoVContext;
 
 // TODO: CpuScript is a bad name for the base class. Fix with a refactoring.
 class RSoVScript : RsdCpuReference::CpuScript {
  public:
   RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
-             bcinfo::MetadataExtractor *ME);
+             bcinfo::MetadataExtractor *ME,
+             std::map<std::string, int> *GAMapping);
   RSoVScript(RSoVContext *context, const std::vector<uint32_t> &spvWords,
-             bcinfo::MetadataExtractor *ME) = delete;
+             bcinfo::MetadataExtractor *ME,
+             std::map<std::string, int> *GAMapping) = delete;
 
   virtual ~RSoVScript();
 
@@ -106,6 +110,7 @@ class RSoVScript : RsdCpuReference::CpuScript {
                          RSoVAllocation *outputAllocation);
   void InitPipelineCache();
   void InitPipeline();
+  void MarshalTypeInfo();
   void runForEach(uint32_t slot, uint32_t inLen,
                   const std::vector<RSoVAllocation *> &input,
                   RSoVAllocation *output);
@@ -127,6 +132,10 @@ class RSoVScript : RsdCpuReference::CpuScript {
   std::vector<VkDescriptorSet> mDescSet;
   // For kernel names
   const bcinfo::MetadataExtractor *mME;
+  // Metadata of global allocations
+  std::unique_ptr<RSoVBuffer> mGlobalAllocationMetadata;
+  // Mapping of global allocation to rsov-assigned ID
+  std::unique_ptr<std::map<std::string, int> > mGAMapping;
 };
 
 }  // namespace rsov

@@ -16,16 +16,6 @@
 
 #include "RSSPIRVWriter.h"
 
-#include "llvm/ADT/Triple.h"
-#include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/Module.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/Support/Debug.h"
-#include "llvm/Support/SPIRV.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Transforms/IPO.h"
-#include "llvm/Transforms/Scalar.h"
-
 #include "Builtin.h"
 #include "Context.h"
 #include "GlobalAllocPass.h"
@@ -37,6 +27,16 @@
 #include "Wrapper.h"
 #include "bcinfo/MetadataExtractor.h"
 #include "pass_queue.h"
+
+#include "llvm/ADT/Triple.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Debug.h"
+#include "llvm/Support/SPIRV.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/Scalar.h"
 
 #define DEBUG_TYPE "rs2spirv-writer"
 
@@ -71,7 +71,7 @@ void HandleTargetTriple(llvm::Module &M) {
   M.setTargetTriple(NewTriple);
 }
 
-} // anonumous namespace
+} // namespace
 
 void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr) {
   PassMgr.add(createInlinePreparationPass());
@@ -147,7 +147,8 @@ bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
     return false;
   }
 
-  OS.write(reinterpret_cast<const char*>(wordsOut.data()), wordsOut.size() * 4);
+  OS.write(reinterpret_cast<const char *>(wordsOut.data()),
+           wordsOut.size() * 4);
 
   return true;
 }

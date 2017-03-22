@@ -16,8 +16,11 @@
 
 #include "GlobalAllocSPIRITPass.h"
 
+#include "Context.h"
 #include "spirit.h"
 #include "transformer.h"
+
+#include <sstream>
 
 namespace android {
 namespace spirit {
@@ -29,21 +32,17 @@ namespace {
 //  uint32_t element_size;
 //  uint32_t x_size;
 //  uint32_t y_size;
-//  uint32_t ??
+//  uint32_t unused
 // };
+
 VariableInst *AddGAMetadata(Builder &b, Module *m) {
   TypeIntInst *UInt32Ty = m->getUnsignedIntType(32);
-  std::vector<Instruction *> metadata{
-    UInt32Ty,
-    UInt32Ty,
-    UInt32Ty,
-    UInt32Ty
-  };
+  std::vector<Instruction *> metadata{UInt32Ty, UInt32Ty, UInt32Ty, UInt32Ty};
   auto MetadataStructTy = m->getStructType(metadata.data(), metadata.size());
   // FIXME: workaround on a weird OpAccessChain member offset problem. Somehow
-  // when given constant indices, OpAccessChain returns pointers that are 4 bytes
-  // less than what are supposed to be (at runtime).
-  // For now workaround this with +4 the member offsets.
+  // when given constant indices, OpAccessChain returns pointers that are 4
+  // bytes less than what are supposed to be (at runtime). For now workaround
+  // this with +4 the member offsets.
   MetadataStructTy->memberDecorate(0, Decoration::Offset)->addExtraOperand(4);
   MetadataStructTy->memberDecorate(1, Decoration::Offset)->addExtraOperand(8);
   MetadataStructTy->memberDecorate(2, Decoration::Offset)->addExtraOperand(12);
@@ -52,14 +51,14 @@ VariableInst *AddGAMetadata(Builder &b, Module *m) {
   // cannot use PushConstant underneath
   auto MetadataBufSTy = m->getRuntimeArrayType(MetadataStructTy);
   // Stride of metadata.
-  MetadataBufSTy->decorate(Decoration::ArrayStride)->addExtraOperand(
-      metadata.size()*sizeof(uint32_t));
+  MetadataBufSTy->decorate(Decoration::ArrayStride)
+      ->addExtraOperand(metadata.size() * sizeof(uint32_t));
   auto MetadataSSBO = m->getStructType(MetadataBufSTy);
   MetadataSSBO->decorate(Decoration::BufferBlock);
   auto MetadataPtrTy = m->getPointerType(StorageClass::Uniform, MetadataSSBO);
 
-
-  VariableInst *MetadataVar = b.MakeVariable(MetadataPtrTy, StorageClass::Uniform);
+  VariableInst *MetadataVar =
+      b.MakeVariable(MetadataPtrTy, StorageClass::Uniform);
   MetadataVar->decorate(Decoration::DescriptorSet)->addExtraOperand(0);
   MetadataVar->decorate(Decoration::Binding)->addExtraOperand(0);
   m->addVariable(MetadataVar);
@@ -67,6 +66,31 @@ VariableInst *AddGAMetadata(Builder &b, Module *m) {
   return MetadataVar;
 }
 
+std::string CreateGAIDMetadata(
+    const llvm::SmallVectorImpl<rs2spirv::RSAllocationInfo> &Allocs) {
+
+  std::stringstream mapping;
+  bool printed = false;
+
+  mapping << "{\"__RSoV_GA\": {";
+  for (auto &A : Allocs) {
+    // Skip unused GAs
+    if (!A.hasID()) {
+      continue;
+    }
+    if (printed)
+      mapping << ", ";
+    // "GA name" to the ID of the GA
+    mapping << "\"" << A.VarName.substr(1) << "\":" << A.ID;
+    printed = true;
+  }
+  mapping << "}}";
+
+  if (printed)
+    return mapping.str().c_str();
+  else
+    return "";
+}
 } // anonymous namespace
 
 // Replacing calls to lowered accessors, e.g., __rsov_rsAllocationGetDimX
@@ -101,7 +125,15 @@ VariableInst *AddGAMetadata(Builder &b, Module *m) {
 
 class GAAccessorTransformer : public Transformer {
 public:
+  GAAccessorTransformer()
+      : mBuilder(), mMetadata(nullptr),
+        mAllocs(rs2spirv::Context::getInstance().getGlobalAllocs()) {}
+
   std::vector<uint32_t> runAndSerialize(Module *module, int *error) override {
+    std::string GAMD = CreateGAIDMetadata(mAllocs);
+    if (GAMD.size() > 0) {
+      module->addString(GAMD.c_str());
+    }
     mMetadata = AddGAMetadata(mBuilder, module);
     return Transformer::runAndSerialize(module, error);
   }
@@ -141,6 +173,7 @@ public:
 private:
   Builder mBuilder;
   VariableInst *mMetadata;
+  llvm::SmallVectorImpl<rs2spirv::RSAllocationInfo> &mAllocs;
 };
 
 } // namespace spirit
@@ -148,7 +181,7 @@ private:
 
 namespace rs2spirv {
 
-android::spirit::Pass *CreateGAPass() {
+android::spirit::Pass *CreateGAPass(void) {
   return new android::spirit::GAAccessorTransformer();
 }
 
