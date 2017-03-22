@@ -7,6 +7,7 @@
 target datalayout = "e-m:e-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128"
 target triple = "aarch64-none-linux-gnueabi"
 
+; CHECK: OpString "{\"__RSoV_GA\": {\"g\":0}}"
 ; CHECK: OpMemberDecorate [[MetadataS:%[a-zA-Z_0-9]*]] 0 Offset 4
 ; CHECK: OpMemberDecorate [[MetadataS]] 1 Offset 8
 ; CHECK: OpMemberDecorate [[MetadataS]] 2 Offset 12
