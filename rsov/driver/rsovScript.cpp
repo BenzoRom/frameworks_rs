@@ -18,19 +18,31 @@
 
 #include "bcinfo/MetadataExtractor.h"
 #include "rsContext.h"
+#include "rsDefines.h"
 #include "rsType.h"
 #include "rsUtils.h"
 #include "rsovAllocation.h"
 #include "rsovContext.h"
 #include "rsovCore.h"
+#include "spirit/instructions.h"
+#include "spirit/module.h"
 
 #include <fstream>
+#include <functional>
 
 namespace android {
 namespace renderscript {
 namespace rsov {
 
 namespace {
+// Layout of this struct has to be the same as the struct in generated SPIR-V
+// TODO: generate this file from some spec that is shared with the compiler
+struct rsovTypeInfo {
+  uint32_t element_size;  // TODO: not implemented
+  uint32_t x_size;
+  uint32_t y_size;
+  uint32_t z_size;
+};
 
 const char *COMPILER_EXE_PATH = "/system/bin/bcc_rsov";
 
@@ -120,11 +132,14 @@ void RSoVScript::initScriptOnRSoV(Script *s, RSoVScript *rsovScript) {
 }
 
 RSoVScript::RSoVScript(RSoVContext *context, std::vector<uint32_t> &&spvWords,
-                       bcinfo::MetadataExtractor *ME)
+                       bcinfo::MetadataExtractor *ME,
+                       std::map<std::string, int> *GA2ID)
     : mRSoV(context),
       mDevice(context->getDevice()),
       mSPIRVWords(std::move(spvWords)),
-      mME(ME) {}
+      mME(ME),
+      mGlobalAllocationMetadata(nullptr),
+      mGAMapping(GA2ID) {}
 
 RSoVScript::~RSoVScript() {
   delete mCpuScript;
@@ -174,10 +189,12 @@ void RSoVScript::invokeFreeChildren() {
 void RSoVScript::setGlobalVar(uint32_t slot, const void *data,
                               size_t dataLength) {
   // TODO: implement this
+  ALOGV("%s missing.", __FUNCTION__);
 }
 
 void RSoVScript::getGlobalVar(uint32_t slot, void *data, size_t dataLength) {
   // TODO: implement this
+  ALOGV("%s missing.", __FUNCTION__);
 }
 
 void RSoVScript::setGlobalVarWithElemDims(uint32_t slot, const void *data,
@@ -188,11 +205,13 @@ void RSoVScript::setGlobalVarWithElemDims(uint32_t slot, const void *data,
 }
 
 void RSoVScript::setGlobalBind(uint32_t slot, Allocation *data) {
+  ALOGV("%s succeeded.", __FUNCTION__);
   // TODO: implement this
 }
 
 void RSoVScript::setGlobalObj(uint32_t slot, ObjectBase *obj) {
-  // TODO: implement this
+  mCpuScript->setGlobalObj(slot, obj);
+  ALOGV("%s succeeded.", __FUNCTION__);
 }
 
 Allocation *RSoVScript::getAllocationForPointer(const void *ptr) const {
@@ -230,6 +249,14 @@ void RSoVScript::InitDescriptorAndPipelineLayouts(uint32_t inLen) {
   // TODO: kernels with zero output allocations
   std::vector<VkDescriptorSetLayoutBinding> layout_bindings{
       {
+          // for the global allocation metadata
+          .binding = 0,
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .descriptorCount = 1,
+          .stageFlags = VK_SHADER_STAGE_COMPUTE_BIT,
+          .pImmutableSamplers = nullptr,
+      },
+      {
           // for the output allocation
           .binding = 1,
           .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
@@ -254,7 +281,7 @@ void RSoVScript::InitDescriptorAndPipelineLayouts(uint32_t inLen) {
       .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
       .pNext = nullptr,
       .flags = 0,
-      .bindingCount = inLen + 1,
+      .bindingCount = inLen + 2,
       .pBindings = layout_bindings.data(),
   };
 
@@ -324,7 +351,8 @@ void RSoVScript::InitDescriptorPool(uint32_t inLen) {
   VkResult res;
   VkDescriptorPoolSize type_count[] = {
       {
-          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, .descriptorCount = 1 + inLen,
+          .type = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .descriptorCount = 2 + inLen,
       },
   };
 
@@ -340,6 +368,43 @@ void RSoVScript::InitDescriptorPool(uint32_t inLen) {
   rsAssert(res == VK_SUCCESS);
 
   ALOGV("%s succeeded.", __FUNCTION__);
+}
+
+// Iterate through a list of global allocations that are used inside the module
+// and marshal their type information to a dedicated Vulkan Buffer
+void RSoVScript::MarshalTypeInfo(void) {
+  // Marshal global allocation metadata to the device
+  auto *cs = getCpuScript();
+  int nr_globals = mGAMapping->size();
+  if (mGlobalAllocationMetadata == nullptr) {
+    mGlobalAllocationMetadata.reset(
+        new RSoVBuffer(mRSoV, sizeof(struct rsovTypeInfo) * nr_globals));
+  }
+  struct rsovTypeInfo *mappedMetadata =
+      (struct rsovTypeInfo *)mGlobalAllocationMetadata->getHostPtr();
+  for (int i = 0; i < nr_globals; ++i) {
+    if (getGlobalRsType(cs->getGlobalProperties(i)) ==
+        RsDataType::RS_TYPE_ALLOCATION) {
+      ALOGV("global variable %d is an allocation!", i);
+      const void *host_buf;
+      cs->getGlobalVar(i, (void *)&host_buf, sizeof(host_buf));
+      if (!host_buf) continue;
+      const android::renderscript::Allocation *GA =
+          static_cast<const android::renderscript::Allocation *>(host_buf);
+      const android::renderscript::Type *T = GA->getType();
+      rsAssert(T);
+
+      auto global_it = mGAMapping->find(cs->getGlobalName(i));
+      rsAssert(global_it != (*mGAMapping).end());
+      int id = global_it->second;
+      ALOGV("global allocation %s is mapped to ID %d", cs->getGlobalName(i),
+            id);
+      // TODO: marshal other properties
+      mappedMetadata[id].x_size = T->getDimX();
+      mappedMetadata[id].y_size = T->getDimY();
+      mappedMetadata[id].z_size = T->getDimZ();
+    }
+  }
 }
 
 void RSoVScript::InitDescriptorSet(
@@ -363,6 +428,17 @@ void RSoVScript::InitDescriptorSet(
   // TODO: support for set up the binding(s) of global variables
   uint32_t nBindings = inputAllocations.size() + 1;  // input + output.
   std::vector<VkWriteDescriptorSet> writes{
+      // Metadata for global allocations
+      {
+          .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+          .dstSet = mDescSet[0],
+          .dstBinding = 0,
+          .dstArrayElement = 0,
+          .descriptorCount = 1,
+          .descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,
+          .pBufferInfo = mGlobalAllocationMetadata->getBufferInfo(),
+      },
+
       {
           .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
           .dstSet = mDescSet[0],
@@ -420,6 +496,7 @@ void RSoVScript::runForEach(
   InitDescriptorAndPipelineLayouts(inLen);
   InitShader(slot);
   InitDescriptorPool(inLen);
+  MarshalTypeInfo();
   InitDescriptorSet(inputAllocations, outputAllocation);
   // InitPipelineCache();
   InitPipeline();
@@ -495,9 +572,10 @@ void RSoVScript::runForEach(
   for (int i = 0; i < NUM_DESCRIPTOR_SETS; i++)
     vkDestroyDescriptorSetLayout(mDevice, mDescLayout[i], nullptr);
   vkDestroyPipelineLayout(mDevice, mPipelineLayout, nullptr);
-  vkFreeDescriptorSets(mDevice, mDescPool, NUM_DESCRIPTOR_SETS, mDescSet.data());
+  vkFreeDescriptorSets(mDevice, mDescPool, NUM_DESCRIPTOR_SETS,
+                       mDescSet.data());
   vkDestroyDescriptorPool(mDevice, mDescPool, nullptr);
-  free((void*)mShaderStage.pName);
+  free((void *)mShaderStage.pName);
   vkDestroyShaderModule(mDevice, mShaderStage.module, nullptr);
 
   ALOGV("%s succeeded.", __FUNCTION__);
@@ -518,6 +596,91 @@ using android::renderscript::rs_script;
 using android::renderscript::rsov::RSoVContext;
 using android::renderscript::rsov::RSoVScript;
 using android::renderscript::rsov::compileBitcode;
+
+namespace {
+// A class to parse global allocation metadata; essentially a subset of JSON
+// it would look like {"__RSoV_GA": {"g":42}}
+// The result is stored in a refence to a map<string, int>
+class ParseMD {
+ public:
+  ParseMD(std::string s, std::map<std::string, int> &map)
+      : mString(s), mMapping(map) {}
+
+  bool parse(void) {
+    // remove outermose two pairs of braces
+    mString = removeBraces(mString);
+    mString = removeBraces(mString);
+    // Now we are supposed to have a comma-separated list that looks like:
+    // "foo":42, "bar":56
+    split<','>(mString, [&](auto s) {
+      split<':'>(s, nullptr, [&](auto pair) {
+        rsAssert(pair.size() == 2);
+        std::string ga_name = removeQuotes(pair[0]);
+        int id = atoi(pair[1].c_str());
+        ALOGV("ParseMD: global allocation %s has ID %d", ga_name.c_str(), id);
+        mMapping[ga_name] = id;
+      });
+    });
+    return true;
+  }
+
+ private:
+  template <char L, char R>
+  static std::string removeMatching(const std::string &s) {
+    auto leftCBrace = s.find(L);
+    rsAssert(leftCBrace != std::string::npos);
+    leftCBrace++;
+    return s.substr(leftCBrace, s.rfind(R) - leftCBrace);
+  }
+
+  static std::string removeBraces(const std::string &s) {
+    return removeMatching<'{', '}'>(s);
+  }
+
+  static std::string removeQuotes(const std::string &s) {
+    return removeMatching<'"', '"'>(s);
+  }
+
+  // Splitting a string, and call "each" and/or "all" with individal elements
+  // and a vector of all tokenized elements
+  template <char D>
+  static void split(const std::string &s,
+                    std::function<void(const std::string &)> each,
+                    std::function<void(const std::vector<const std::string> &)>
+                        all = nullptr) {
+    std::vector<const std::string> result;
+    for (std::string::size_type pos = 0; pos < s.size(); pos++) {
+      std::string::size_type begin = pos;
+
+      while (s[pos] != D && pos <= s.size()) pos++;
+      std::string found = s.substr(begin, pos - begin);
+      if (each) each(found);
+      if (all) result.push_back(found);
+    }
+    if (all) all(result);
+  }
+
+  std::string mString;
+  std::map<std::string, int> &mMapping;
+};
+
+}  // namespace
+
+class ExtractRSoVMD : public android::spirit::DoNothingVisitor {
+ public:
+  ExtractRSoVMD() : mGAMapping(new std::map<std::string, int>) {}
+
+  void visit(android::spirit::StringInst *s) {
+    ALOGV("ExtractRSoVMD: string = %s", s->mOperand1.c_str());
+    ParseMD p(s->mOperand1, *mGAMapping);
+    p.parse();
+  }
+
+  std::map<std::string, int> *takeMapping(void) { return mGAMapping.release(); }
+
+ private:
+  std::unique_ptr<std::map<std::string, int> > mGAMapping;
+};
 
 bool rsovScriptInit(const Context *rsc, ScriptC *script, char const *resName,
                     char const *cacheDir, uint8_t const *bitcode,
@@ -543,8 +706,15 @@ bool rsovScriptInit(const Context *rsc, ScriptC *script, char const *resName,
   auto spvWords =
       compileBitcode(resName, cacheDir, (const char *)bitcode, bitcodeSize);
   if (!spvWords.empty()) {
-    RSoVScript *rsovScript = new RSoVScript(hal->mRSoV, std::move(spvWords),
-                                            bitcodeMetadata.release());
+    // Extract compiler metadata on allocation->binding mapping
+    android::spirit::Module *module =
+        android::spirit::Deserialize<android::spirit::Module>(spvWords);
+    rsAssert(module);
+    ExtractRSoVMD ga_md;
+    module->accept(&ga_md);
+    RSoVScript *rsovScript =
+        new RSoVScript(hal->mRSoV, std::move(spvWords),
+                       bitcodeMetadata.release(), ga_md.takeMapping());
     if (rsovScript) {
       rsovScript->setCpuScript(cs.release());
       RSoVScript::initScriptOnRSoV(script, rsovScript);
