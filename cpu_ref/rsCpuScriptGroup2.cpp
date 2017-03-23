@@ -72,7 +72,6 @@ void groupRoot(const RsExpandKernelDriverInfo *kinfo, uint32_t xstart,
             ptr += out->mHal.drvState.lod[0].stride * kinfo->current.y;
         }
 
-        rsAssert(kinfo->outLen <= 1);
         mutable_kinfo->outPtr[0] = const_cast<uint8_t*>(ptr);
 
         // The implementation of an intrinsic relies on kinfo->usr being

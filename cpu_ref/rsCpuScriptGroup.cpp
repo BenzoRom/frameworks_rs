@@ -90,8 +90,6 @@ void CpuScriptGroupImpl::scriptGroupRoot(const RsExpandKernelDriverInfo *kinfo,
 
         uint32_t ostep;
         if (sl->outs[ct]) {
-            rsAssert(kinfo->outLen == 1);
-
             mkinfo->outPtr[0] =
               (uint8_t *)sl->outs[ct]->mHal.drvState.lod[0].mallocPtr;
 
@@ -108,8 +106,6 @@ void CpuScriptGroupImpl::scriptGroupRoot(const RsExpandKernelDriverInfo *kinfo,
                   sl->outs[ct]->mHal.drvState.lod[0].stride * kinfo->lid;
             }
         } else {
-            rsAssert(kinfo->outLen == 0);
-
             mkinfo->outPtr[0] = nullptr;
             ostep             = 0;
         }
