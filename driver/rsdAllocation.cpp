@@ -23,6 +23,7 @@
 #include "rsCompatibilityLib.h"
 #else
 #include "rsdFrameBufferObj.h"
+#include <vndk/window.h>
 
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
@@ -571,10 +572,13 @@ void rsdAllocationDestroy(const Context *rsc, Allocation *alloc) {
             ANativeWindow *nw = drv->wndSurface;
             if (nw) {
                 //If we have an attached surface, need to release it.
-                ANativeWindow_unlockAndPost(nw);
+                AHardwareBuffer* ahwb = ANativeWindowBuffer_getHardwareBuffer(drv->wndBuffer);
+                int fenceID = -1;
+                AHardwareBuffer_unlock(ahwb, &fenceID);
+                ANativeWindow_cancelBuffer(nw, drv->wndBuffer, fenceID);
                 ANativeWindow_release(nw);
                 drv->wndSurface = nullptr;
-                delete drv->wndBuffer;
+                drv->wndBuffer = nullptr;
             }
         }
 #endif
@@ -700,16 +704,22 @@ void rsdAllocationMarkDirty(const Context *rsc, const Allocation *alloc) {
 static bool IoGetBuffer(const Context *rsc, Allocation *alloc, ANativeWindow *nw) {
     DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
     // Must lock the whole surface
-    if(drv->wndBuffer == nullptr) {
-        drv->wndBuffer = new ANativeWindow_Buffer;
+    int fenceID = -1;
+    int r = ANativeWindow_dequeueBuffer(nw, &drv->wndBuffer, &fenceID);
+    if (r) {
+        rsc->setError(RS_ERROR_DRIVER, "Error dequeueing IO output buffer.");
+        close(fenceID);
+        return false;
     }
-    int32_t r = ANativeWindow_lock(nw, drv->wndBuffer, NULL);
+
+    void *dst = nullptr;
+    AHardwareBuffer* ahwb = ANativeWindowBuffer_getHardwareBuffer(drv->wndBuffer);
+    r = AHardwareBuffer_lock(ahwb, AHARDWAREBUFFER_USAGE0_CPU_WRITE_OFTEN,
+                             fenceID, NULL, &dst);
     if (r) {
         rsc->setError(RS_ERROR_DRIVER, "Error Locking IO output buffer.");
         return false;
     }
-
-    void *dst = drv->wndBuffer->bits;
     alloc->mHal.drvState.lod[0].mallocPtr = dst;
     alloc->mHal.drvState.lod[0].stride = drv->wndBuffer->stride * alloc->mHal.state.elementSizeBytes;
     rsAssert((alloc->mHal.drvState.lod[0].stride & 0xf) == 0);
@@ -725,14 +735,26 @@ void rsdAllocationSetSurface(const Context *rsc, Allocation *alloc, ANativeWindo
     // Cleanup old surface if there is one.
     if (drv->wndSurface) {
         ANativeWindow *old = drv->wndSurface;
-        ANativeWindow_unlockAndPost(old);
+        AHardwareBuffer* ahwb = ANativeWindowBuffer_getHardwareBuffer(drv->wndBuffer);
+        int fenceID = -1;
+        int32_t r = AHardwareBuffer_unlock(ahwb, &fenceID);
+        if (r) {
+            rsc->setError(RS_ERROR_DRIVER, "Error unlocking output buffer.");
+            close(fenceID);
+            return;
+        }
+        r = ANativeWindow_cancelBuffer(old, drv->wndBuffer, fenceID);
+        if (r) {
+            rsc->setError(RS_ERROR_DRIVER, "Error canceling output buffer.");
+            return;
+        }
         ANativeWindow_release(old);
         drv->wndSurface = nullptr;
+        drv->wndBuffer = nullptr;
     }
 
     if (nw) {
-        int32_t r;
-        r = ANativeWindow_setBuffersGeometry(nw, alloc->mHal.drvState.lod[0].dimX,
+        int32_t r = ANativeWindow_setBuffersGeometry(nw, alloc->mHal.drvState.lod[0].dimX,
                                                  alloc->mHal.drvState.lod[0].dimY,
                                                  WINDOW_FORMAT_RGBA_8888);
         if (r) {
@@ -761,11 +783,20 @@ void rsdAllocationIoSend(const Context *rsc, Allocation *alloc) {
 #endif
     if (nw) {
         if (alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT) {
-            int32_t r = ANativeWindow_unlockAndPost(nw);
+            AHardwareBuffer* ahwb = ANativeWindowBuffer_getHardwareBuffer(drv->wndBuffer);
+            int fenceID = -1;
+            int32_t r = AHardwareBuffer_unlock(ahwb, &fenceID);
+            if (r) {
+                rsc->setError(RS_ERROR_DRIVER, "Error unlock output buffer.");
+                close(fenceID);
+                return;
+            }
+            r = ANativeWindow_queueBuffer(nw, drv->wndBuffer, fenceID);
             if (r) {
                 rsc->setError(RS_ERROR_DRIVER, "Error sending IO output buffer.");
                 return;
             }
+            drv->wndBuffer = nullptr;
             IoGetBuffer(rsc, alloc, nw);
         }
     } else {
