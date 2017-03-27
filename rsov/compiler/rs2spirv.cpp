@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+#include "RSSPIRVWriter.h"
+#include "bcinfo/MetadataExtractor.h"
+#include "spirit/file_utils.h"
+
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
@@ -25,8 +29,6 @@
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Support/raw_ostream.h"
-
-#include "RSSPIRVWriter.h"
 
 #define DEBUG_TYPE "rs2spirv"
 
@@ -59,7 +61,6 @@ static int convertLLVMToSPIRV() {
     errs() << "Fails to open input file: " << Err;
     return -1;
   }
-
   ErrorOr<std::unique_ptr<Module>> MOrErr =
       getStreamedBitcodeModule(InputFile, std::move(DS), Context);
 
@@ -85,7 +86,12 @@ static int convertLLVMToSPIRV() {
   llvm::StringRef outFile(OutputFile);
   std::error_code EC;
   llvm::raw_fd_ostream OFS(outFile, EC, llvm::sys::fs::F_None);
-  if (!rs2spirv::WriteSPIRV(M.get(), OFS, Err)) {
+
+  std::vector<char> bitcode = android::spirit::readFile<char>(InputFile);
+  std::unique_ptr<bcinfo::MetadataExtractor> ME(
+      new bcinfo::MetadataExtractor(bitcode.data(), bitcode.size()));
+
+  if (!rs2spirv::WriteSPIRV(M.get(), std::move(ME), OFS, Err)) {
     errs() << "compiler error: " << Err << '\n';
     return -1;
   }
