@@ -21,30 +21,30 @@ import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
-// Same as UT_small_struct_2.java except for names of classes and of test.
+// Same as UT_small_struct.java except for names of classes and of test.
 
-public class UT_small_struct extends UnitTest {
+public class UT_small_struct_2 extends UnitTest {
     private Allocation A;
     private Allocation B;
     private static final int dimX = 3;
     private static final int dimY = 2;
 
-    protected UT_small_struct(RSTestCore rstc, Context ctx) {
-        super(rstc, "Small Structs", ctx);
+    protected UT_small_struct_2(RSTestCore rstc, Context ctx) {
+        super(rstc, "Small Structs 2", ctx);
     }
 
-    private void initializeGlobals(RenderScript RS, ScriptC_small_struct s) {
+    private void initializeGlobals(RenderScript RS, ScriptC_small_struct_2 s) {
         s.set_gDimX(dimX);
         s.set_gDimY(dimY);
 
-        Type.Builder builderA = new Type.Builder(RS, ScriptField_small_struct.createElement(RS));
+        Type.Builder builderA = new Type.Builder(RS, ScriptField_small_struct_2.createElement(RS));
         builderA.setX(dimX);
         builderA.setY(dimY);
 
         A = Allocation.createTyped(RS, builderA.create());
         s.set_A(A);
 
-        Type.Builder builderB = new Type.Builder(RS, ScriptField_struct_of_struct.createElement(RS));
+        Type.Builder builderB = new Type.Builder(RS, ScriptField_struct_of_struct_2.createElement(RS));
         builderB.setX(dimX);
         builderB.setY(dimY);
 
@@ -55,7 +55,7 @@ public class UT_small_struct extends UnitTest {
 
     public void run() {
         RenderScript pRS = RenderScript.create(mCtx);
-        ScriptC_small_struct s = new ScriptC_small_struct(pRS);
+        ScriptC_small_struct_2 s = new ScriptC_small_struct_2(pRS);
         pRS.setMessageHandler(mRsMessage);
 
         initializeGlobals(pRS, s);
