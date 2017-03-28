@@ -23,19 +23,19 @@
 #include "llvm/ADT/StringMap.h"
 #include "llvm/ADT/StringRef.h"
 
-#include <stdint.h>
 #include <limits>
+#include <stdint.h>
 #include <vector>
 
 // Declare a friend relationship in a class with a test. Used rather that
 // FRIEND_TEST to avoid globally importing gtest/gtest.h into the main
 // RSoV header files.
 #ifdef __HOST__
-#define RSOV_FRIEND_TEST(test_set_name, individual_test)\
-friend class test_set_name##_##individual_test##_Test
+#define RSOV_FRIEND_TEST(test_set_name, individual_test)                       \
+  friend class test_set_name##_##individual_test##_Test
 #else
 #define RSOV_FRIEND_TEST(test_set_name, individual_test)
-#endif  // __HOST__
+#endif // __HOST__
 
 namespace bcinfo {
 class MetadataExtractor;
@@ -60,12 +60,10 @@ public:
 
   // Initialize the internal data struture such as the slot number lookup table,
   // etc.
-  bool Initialize(llvm::Module *M);
+  bool Initialize(std::unique_ptr<bcinfo::MetadataExtractor> ME);
 
   // Returns the total number of exported variables
-  uint32_t getNumExportVar() const {
-    return mExportVarIndices.size();
-  }
+  uint32_t getNumExportVar() const { return mExportVarIndices.size(); }
 
   // Adds the mapping from the slot number of an exported variable to the index
   // of its field in the global buffer
@@ -91,18 +89,14 @@ public:
   }
 
   // Returns the total number of foreach kernels
-  uint32_t getNumForEachKernel() const {
-    return mForEachNameToSlot.size();
-  }
+  uint32_t getNumForEachKernel() const { return mForEachNameToSlot.size(); }
 
   // Checks if a name refers to a foreach kernel function
   bool isForEachKernel(llvm::StringRef name) const {
     return mForEachNameToSlot.count(name) != 0;
   }
 
-  const bcinfo::MetadataExtractor &getMetadata() const {
-    return *mMetadata;
-  }
+  const bcinfo::MetadataExtractor &getMetadata() const { return *mMetadata; }
 
   llvm::SmallVectorImpl<RSAllocationInfo> &getGlobalAllocs() {
     return mGlobalAllocs;
