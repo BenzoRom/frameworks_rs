@@ -27,19 +27,18 @@ Context &Context::getInstance() {
   return c;
 }
 
-Context::Context() : mInitialized(false) {
-}
+Context::Context() : mInitialized(false) {}
 
-bool Context::Initialize(llvm::Module *M) {
+bool Context::Initialize(std::unique_ptr<bcinfo::MetadataExtractor> ME) {
   if (mInitialized) {
     return true;
   }
 
-  mMetadata.reset(new bcinfo::MetadataExtractor(M));
+  mMetadata = std::move(ME);
 
   if (!mMetadata->extract()) {
     llvm::errs() << "cannot extract metadata\n";
-    return false;;
+    return false;
   }
 
   const char **varNames = mMetadata->getExportVarNameList();
