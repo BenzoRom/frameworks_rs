@@ -24,9 +24,14 @@ class Module;
 class raw_ostream;
 } // namespace llvm
 
+namespace bcinfo {
+class MetadataExtractor;
+} // namespace bcinfo
+
 namespace rs2spirv {
 
-bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg);
+bool WriteSPIRV(llvm::Module *M, std::unique_ptr<bcinfo::MetadataExtractor> ME,
+                llvm::raw_ostream &OS, std::string &ErrMsg);
 
 } // namespace rs2spirv
 

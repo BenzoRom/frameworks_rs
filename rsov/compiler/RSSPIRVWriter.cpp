@@ -100,12 +100,13 @@ void addPassesForRS2SPIRV(llvm::legacy::PassManager &PassMgr) {
   PassMgr.add(createSPIRVLowerBool());
 }
 
-bool WriteSPIRV(llvm::Module *M, llvm::raw_ostream &OS, std::string &ErrMsg) {
+bool WriteSPIRV(llvm::Module *M, std::unique_ptr<bcinfo::MetadataExtractor> ME,
+                llvm::raw_ostream &OS, std::string &ErrMsg) {
   HandleTargetTriple(*M);
 
   Context &Ctxt = Context::getInstance();
 
-  if (!Ctxt.Initialize(M)) {
+  if (!Ctxt.Initialize(std::move(ME))) {
     ErrMsg = "Failed to intialize rs2spirv";
     return false;
   }
