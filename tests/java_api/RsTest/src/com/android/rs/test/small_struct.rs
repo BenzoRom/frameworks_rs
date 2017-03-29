@@ -1,5 +1,3 @@
-// Same as small_struct_2.rs except for location of padding in struct small_struct[_2].
-
 #include "shared.rsh"
 
 int gDimX;
@@ -13,7 +11,6 @@ static long gLongStart = 0x12345678abcdef12;
 
 typedef struct small_struct {
     int i;
-    // expect 4 bytes of padding here
     long l;
 } small_struct;
 
