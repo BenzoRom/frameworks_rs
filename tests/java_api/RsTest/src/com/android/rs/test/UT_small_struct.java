@@ -21,8 +21,6 @@ import android.renderscript.Allocation;
 import android.renderscript.RenderScript;
 import android.renderscript.Type;
 
-// Same as UT_small_struct_2.java except for names of classes and of test.
-
 public class UT_small_struct extends UnitTest {
     private Allocation A;
     private Allocation B;
