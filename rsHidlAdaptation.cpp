@@ -909,7 +909,7 @@ void RsHidlAdaptation::ScriptSetVarVE (RsContext context, RsScript script, uint3
     uint64_t _ve = (uint64_t)(uintptr_t)ve;
 
     hidl_vec<uint32_t> _dims;
-    _dims.setToExternal(const_cast<uint32_t *>(dims), len);
+    _dims.setToExternal(const_cast<uint32_t *>(dims), dimLen / sizeof(uint32_t));
 
     GetIContextHandle(context)->scriptSetVarVE(_script, slot, _data, _ve, _dims);
 }
@@ -965,26 +965,26 @@ RsScriptGroup RsHidlAdaptation::ScriptGroupCreate (RsContext context, RsScriptKe
                                                    RsScriptFieldID * dstF, size_t dstFSize,
                                                    const RsType * type, size_t typeSize)
 {
-    std::vector<ScriptKernelID> _kernels(kernelsSize);
-    std::vector<ScriptKernelID> _src(srcSize);
-    std::vector<ScriptKernelID> _dstK(dstKSize);
-    std::vector<ScriptFieldID> _dstF(dstFSize);
-    std::vector<Type> _type(typeSize);
+    std::vector<ScriptKernelID> _kernels(kernelsSize / sizeof(RsScriptKernelID));
+    std::vector<ScriptKernelID> _src(srcSize / sizeof(RsScriptKernelID));
+    std::vector<ScriptKernelID> _dstK(dstKSize / sizeof(RsScriptKernelID));
+    std::vector<ScriptFieldID> _dstF(dstFSize / sizeof(RsScriptFieldID));
+    std::vector<Type> _type(typeSize / sizeof(RsType));
 
-    for (size_t i = 0; i < kernelsSize; i++) {
+    for (size_t i = 0; i < _kernels.size(); i++) {
         _kernels[i] = (ScriptKernelID)(uintptr_t)kernels[i];
     }
-    for (size_t i = 0; i < srcSize; i++) {
+    for (size_t i = 0; i < _src.size(); i++) {
         _src[i] = (ScriptKernelID)(uintptr_t)src[i];
     }
-    for (size_t i = 0; i < dstKSize; i++) {
+    for (size_t i = 0; i < _dstK.size(); i++) {
         _dstK[i] = (ScriptKernelID)(uintptr_t)dstK[i];
     }
-    for (size_t i = 0; i < dstFSize; i++) {
-        _dstF[i] = (ScriptKernelID)(uintptr_t)dstF[i];
+    for (size_t i = 0; i < _dstF.size(); i++) {
+        _dstF[i] = (ScriptFieldID)(uintptr_t)dstF[i];
     }
-    for (size_t i = 0; i < typeSize; i++) {
-        _type[i] = (ScriptKernelID)(uintptr_t)type[i];
+    for (size_t i = 0; i < _type.size(); i++) {
+        _type[i] = (Type)(uintptr_t)type[i];
     }
 
     uint64_t scriptGroup = GetIContextHandle(context)->scriptGroupCreate(_kernels, _src, _dstK, _dstF, _type);
@@ -1091,7 +1091,7 @@ void RsHidlAdaptation::AllocationAdapterOffset (RsContext context, RsAllocation 
     uint64_t _alloc = (uint64_t)(uintptr_t)alloc;
 
     hidl_vec<uint32_t> _offsets;
-    _offsets.setToExternal(const_cast<uint32_t *>(offsets), offsets_length);
+    _offsets.setToExternal(const_cast<uint32_t *>(offsets), offsets_length / sizeof(uint32_t));
 
     GetIContextHandle(context)->allocationAdapterOffset(_alloc, _offsets);
 }
