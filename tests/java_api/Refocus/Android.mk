@@ -26,7 +26,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-renderscript-fil
 
 LOCAL_PACKAGE_NAME := Refocus
 
-LOCAL_SDK_VERSION := 21
+LOCAL_SDK_VERSION := current
 LOCAL_RENDERSCRIPT_TARGET_API := 21
 LOCAL_RENDERSCRIPT_COMPATIBILITY := 21
 

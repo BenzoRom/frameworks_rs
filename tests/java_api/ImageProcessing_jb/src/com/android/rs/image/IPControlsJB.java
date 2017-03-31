@@ -147,7 +147,7 @@ public class IPControlsJB extends Activity {
             mTestList.add(IPTestListJB.TestName.values()[i].toString());
         }
 
-        mTestListView = (ListView) findViewById(R.id.test_list);
+        mTestListView = findViewById(R.id.test_list);
         mTestListAdapter = new ArrayAdapter(this,
                 android.R.layout.simple_list_item_activated_1,
                 mTestList);
@@ -156,7 +156,7 @@ public class IPControlsJB extends Activity {
         mTestListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         mTestListAdapter.notifyDataSetChanged();
 
-        mResultView = (TextView) findViewById(R.id.results);
+        mResultView = findViewById(R.id.results);
 
         mTestListView.setOnItemLongClickListener(new ListView.OnItemLongClickListener() {
                 public boolean onItemLongClick(AdapterView<?> arg0, View arg1,

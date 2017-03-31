@@ -27,7 +27,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
 LOCAL_CFLAGS := -Werror -Wall -Wextra
 
 LOCAL_PACKAGE_NAME := HelloComputeNDK
-LOCAL_SDK_VERSION := 14
+LOCAL_SDK_VERSION := current
 
 LOCAL_JNI_SHARED_LIBRARIES := libhellocomputendk
 

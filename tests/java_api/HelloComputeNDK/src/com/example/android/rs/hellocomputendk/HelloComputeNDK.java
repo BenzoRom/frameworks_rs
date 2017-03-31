@@ -41,10 +41,10 @@ public class HelloComputeNDK extends Activity {
         mBitmapOut = Bitmap.createBitmap(mBitmapIn.getWidth(), mBitmapIn.getHeight(),
                                          mBitmapIn.getConfig());
 
-        ImageView in = (ImageView) findViewById(R.id.displayin);
+        ImageView in = findViewById(R.id.displayin);
         in.setImageBitmap(mBitmapIn);
 
-        ImageView out = (ImageView) findViewById(R.id.displayout);
+        ImageView out = findViewById(R.id.displayout);
         out.setImageBitmap(mBitmapOut);
 
         nativeMono(this.getCacheDir().toString(),

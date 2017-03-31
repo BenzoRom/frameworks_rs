@@ -30,7 +30,7 @@ LOCAL_LDFLAGS := -Wl,-Bsymbolic
 LOCAL_SHARED_LIBRARIES := libdl liblog libjnigraphics
 LOCAL_STATIC_LIBRARIES := libRScpp_static
 
-LOCAL_SDK_VERSION := 21
+LOCAL_SDK_VERSION := current
 
 LOCAL_NDK_STL_VARIANT := stlport_static
 
