@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+#define LOG_TAG "RenderScript HIDL Adaptation"
+
 #include "cpp/rsDispatch.h"
 #include "rsHidlAdaptation.h"
 #include "rsFallbackAdaptation.h"
 
 #include <cutils/properties.h>
+#include <log/log.h>
 
 using ::android::hardware::renderscript::V1_0::IDevice;
 using ::android::hardware::renderscript::V1_0::IContext;
@@ -50,9 +53,6 @@ using ::android::hardware::hidl_vec;
 using ::android::hardware::Return;
 using ::android::hardware::Void;
 using ::android::sp;
-
-#undef LOG_TAG
-#define LOG_TAG "RenderScript HIDL Adaptation"
 
 dispatchTable RsHidlAdaptation::mEntryFuncs;
 sp<IDevice> RsHidlAdaptation::mHidl;
