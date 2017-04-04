@@ -60,7 +60,11 @@ struct DrvAllocation {
     int glFormat;
 #endif
 
+#if !defined(RS_COMPATIBILITY_LIB)
+    ANativeWindowBuffer *wndBuffer;
+#else
     ANativeWindow_Buffer *wndBuffer;
+#endif
 
     bool useUserProvidedPtr;
     bool uploadDeferred;

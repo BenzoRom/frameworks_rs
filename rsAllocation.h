@@ -21,6 +21,8 @@
 
 #include <vector>
 
+struct AHardwareBuffer;
+
 // ---------------------------------------------------------------------------
 namespace android {
 
@@ -65,9 +67,7 @@ public:
             bool hasReferences;
             void * userProvidedPtr;
             int32_t surfaceTextureID;
-            // nativeBuffer is not used anymore, keeping it here
-            // as a void* to keep the structure of Allocation the same.
-            void *nativeBuffer;
+            AHardwareBuffer *nativeBuffer;
             int64_t timestamp;
 
             // Allocation adapter state
