@@ -145,10 +145,19 @@ media_status_t GrallocConsumer::lockNextBuffer(uint32_t idx) {
         return ret;
     }
 
+    AHardwareBuffer *hardwareBuffer = nullptr;
+    ret =  AImage_getHardwareBuffer(img, &hardwareBuffer);
+    if (ret != AMEDIA_OK || hardwareBuffer == nullptr) {
+        ALOGE("%s: get hardware buffer for image %p failed! ret: %d",
+                __FUNCTION__, img, ret);
+        return ret;
+    }
+
     mAcquiredBuffer[idx].mBufferPointer = data;
 
     mAlloc[idx]->mHal.drvState.lod[0].mallocPtr = data;
     mAlloc[idx]->mHal.drvState.lod[0].stride = rowstride;
+    mAlloc[idx]->mHal.state.nativeBuffer = hardwareBuffer;
     mAlloc[idx]->mHal.state.timestamp = timestamp;
 
     if (format == AIMAGE_FORMAT_YUV_420_888) {
