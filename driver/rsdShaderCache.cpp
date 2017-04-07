@@ -27,7 +27,6 @@
 using android::renderscript::Context;
 
 RsdShaderCache::RsdShaderCache() {
-    mEntries.resize(16);
     mVertexDirty = true;
     mFragmentDirty = true;
 }
@@ -124,7 +123,6 @@ bool RsdShaderCache::link(const Context *rsc) {
     uint32_t entryCount = mEntries.size();
     for (uint32_t ct = 0; ct < entryCount; ct ++) {
         if ((mEntries[ct]->vtx == vID) && (mEntries[ct]->frag == fID)) {
-
             //ALOGV("SC using program %i", mEntries[ct]->program);
             glUseProgram(mEntries[ct]->program);
             mCurrent = mEntries[ct];

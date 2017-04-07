@@ -139,7 +139,7 @@ typedef void *(*RsHalSymbolLookupFunc)(void *usrptr, char const *symbolName);
  * Script management functions
  */
 typedef struct {
-    bool (*initGraphics)(const Context *);
+    int (*initGraphics)(const Context *);
     void (*shutdownGraphics)(const Context *);
     bool (*setSurface)(const Context *, uint32_t w, uint32_t h, RsNativeWindow);
     void (*swap)(const Context *);

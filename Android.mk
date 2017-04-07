@@ -68,7 +68,7 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_SHARED_LIBRARIES += libRS_internal libRSCpuRef
 LOCAL_SHARED_LIBRARIES += liblog libEGL libGLESv1_CM libGLESv2
-LOCAL_SHARED_LIBRARIES += libui libgui libnativewindow
+LOCAL_SHARED_LIBRARIES += libnativewindow
 
 LOCAL_SHARED_LIBRARIES += libbcinfo
 
@@ -189,7 +189,7 @@ LOCAL_SRC_FILES:= \
 	rsType.cpp
 
 LOCAL_SHARED_LIBRARIES += liblog libutils libEGL libGLESv1_CM libGLESv2
-LOCAL_SHARED_LIBRARIES += libdl libgui libui libnativewindow
+LOCAL_SHARED_LIBRARIES += libdl libnativewindow
 LOCAL_SHARED_LIBRARIES += libft2 libpng
 
 LOCAL_SHARED_LIBRARIES += libbcinfo libmediandk
