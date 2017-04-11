@@ -292,7 +292,6 @@ public:
         }
     }
 
-
 protected:
 
     uint32_t mTargetSdkVersion;
@@ -356,6 +355,8 @@ private:
 
     std::vector<ObjectBase *> mNames;
 
+    // Sync fence id for Graphic API, default value -1.
+    int32_t mSyncFd = -1;
     uint64_t mTimers[_RS_TIMER_TOTAL];
     Timers mTimerActive;
     uint64_t mTimeLast;

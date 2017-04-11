@@ -23,7 +23,6 @@
 
 #if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
 #include "rsMesh.h"
-#include <gui/DisplayEventReceiver.h>
 #endif
 
 #include <sys/types.h>
@@ -50,12 +49,14 @@ pthread_mutex_t Context::gLibMutex = PTHREAD_MUTEX_INITIALIZER;
 bool Context::initGLThread() {
     pthread_mutex_lock(&gInitMutex);
 
-    if (!mHal.funcs.initGraphics(this)) {
+    int32_t ret = mHal.funcs.initGraphics(this);
+    if (ret < 0) {
         pthread_mutex_unlock(&gInitMutex);
         ALOGE("%p initGraphics failed", this);
         return false;
     }
 
+    mSyncFd = ret;
     pthread_mutex_unlock(&gInitMutex);
     return true;
 }
@@ -307,43 +308,34 @@ void * Context::threadProc(void *vrsc) {
         }
 #if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
     } else {
-        DisplayEventReceiver displayEvent;
-        DisplayEventReceiver::Event eventBuffer[1];
+        // The number of millisecond to wait between successive calls to the
+        // root function.  The special value 0 means that root should not be
+        // called again until something external changes.
+        // See compile/slang/README.rst and search for "The function **root**"
+        // for more details.
+        int whenToCallAgain = 0;
 
-        int vsyncRate = 0;
-        int targetRate = 0;
-
-        bool drawOnce = false;
         while (!rsc->mExit) {
             rsc->timerSet(RS_TIMER_IDLE);
-
-            if (!rsc->mRootScript.get() || !rsc->mHasSurface || rsc->mPaused) {
-                targetRate = 0;
+            // While it's tempting to simply have if(whenToCallAgain > 0)
+            // usleep(whentoCallAgain * 1000), doing it this way emulates
+            // more closely what the original code did.
+            if (whenToCallAgain > 16) {
+                usleep((whenToCallAgain - 16) * 1000);
             }
 
-            if (vsyncRate != targetRate) {
-                displayEvent.setVsyncRate(targetRate);
-                vsyncRate = targetRate;
-            }
-            if (targetRate) {
-                drawOnce |= rsc->mIO.playCoreCommands(rsc, displayEvent.getFd());
-                while (displayEvent.getEvents(eventBuffer, 1) != 0) {
-                    //ALOGE("vs2 time past %lld", (rsc->getTime() - eventBuffer[0].header.timestamp) / 1000000);
-                }
+            if (!rsc->mRootScript.get() || !rsc->mHasSurface || rsc->mPaused || whenToCallAgain == 0) {
+                rsc->mIO.playCoreCommands(rsc, -1);
             } else {
-                drawOnce |= rsc->mIO.playCoreCommands(rsc, -1);
+                rsc->mIO.playCoreCommands(rsc, rsc->mSyncFd);
             }
 
-            if ((rsc->mRootScript.get() != nullptr) && rsc->mHasSurface &&
-                (targetRate || drawOnce) && !rsc->mPaused) {
-
-                drawOnce = false;
-                targetRate = ((rsc->runRootScript() + 15) / 16);
+            if (rsc->mRootScript.get() && rsc->mHasSurface && !rsc->mPaused) {
+                whenToCallAgain = rsc->runRootScript();
 
                 if (rsc->props.mLogVisual) {
                     rsc->displayDebugStats();
                 }
-
                 rsc->timerSet(RS_TIMER_CLEAR_SWAP);
                 rsc->mHal.funcs.swap(rsc);
                 rsc->timerFrame();
