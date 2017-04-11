@@ -683,7 +683,7 @@ def _suite_post_run(state):
     assert passes + failures == total, 'Invalid test results status'
     if failures:
         log.log_and_print(
-            'The following failures occurred: %s\n' %
+            'The following failures occurred:\n%s\n' %
             '\n'.join('failed: %s:%s' % test_spec
                 for test_spec, result in state.results.items() if result != 'pass'
         ))
