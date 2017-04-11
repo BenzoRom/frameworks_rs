@@ -26,9 +26,6 @@
 #include <GLES/gl.h>
 #include <GLES2/gl2.h>
 
-#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
-#include "gui/GLConsumer.h"
-#endif
 
 class RsdFrameBufferObj;
 struct ANativeWindow;
@@ -52,8 +49,6 @@ struct DrvAllocation {
     GLenum glTarget;
     GLenum glType;
     GLenum glFormat;
-
-    android::GLConsumer *surfaceTexture;
 #else
     int glTarget;
     int glType;

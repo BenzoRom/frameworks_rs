@@ -807,12 +807,6 @@ void rsdAllocationIoSend(const Context *rsc, Allocation *alloc) {
 }
 
 void rsdAllocationIoReceive(const Context *rsc, Allocation *alloc) {
-#if !defined(RS_VENDOR_LIB) && !defined(RS_COMPATIBILITY_LIB)
-    DrvAllocation *drv = (DrvAllocation *)alloc->mHal.drv;
-    if (!(alloc->mHal.state.usageFlags & RS_ALLOCATION_USAGE_SCRIPT)) {
-        drv->surfaceTexture->updateTexImage();
-    }
-#endif
     if (alloc->mHal.state.yuv) {
         DeriveYUVLayout(alloc->mHal.state.yuv, &alloc->mHal.drvState);
     }
