@@ -139,12 +139,6 @@ class UtilBundle(object):
             if 'Success' not in output:
                 raise TestSuiteException('unable to uninstall app ' + app)
 
-            output = self._android.shell('rm /system/lib/lib%s.so'
-                                         % app.lower())
-            if 'No such file or directory' in output:
-                self._log.warning(
-                    'unable to remove library file for app ' + app)
-
     def _delete_all_ndk(self):
         '''Delete all ndk binaries that were pushed to the device.
 
@@ -261,14 +255,6 @@ class UtilBundle(object):
 
         for app, package in self._tests_jni.items():
             self._install_apk(app, package)
-            output = self._android.adb('push %s/lib%s.so /system/lib' %
-                                       (app_folder, app.lower()), False, True,
-                                       util_constants.PUSH_TIMEOUT)
-            if ("error" in output or
-                "failed to copy" in output):
-                raise TestSuiteException(
-                    'unable to copy %s/lib%s.so to /system/lib: %s'
-                    % (app_folder, app.lower(), output))
 
     def delete_ndk_cache(self):
         '''Deletes NDK cached scripts from the device.
