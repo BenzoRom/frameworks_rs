@@ -57,49 +57,49 @@ class TestSourceStep(TestBaseRemote):
                          ['Runtime Library discovered',
                           'Runtime Driver discovered'])
 
-        self.try_command('b -f scalars.rs -l 47',
+        self.try_command('b -f scalars.rs -l 63',
                          ['(pending)'])
 
         self.try_command('process continue',
                          ['stopped',
                           'stop reason = breakpoint',
-                          'scalars.rs:47'])
+                          'scalars.rs:63'])
 
         # set the source mapping
         self.set_src_map('scalars.rs', self.script_dir())
 
         self.try_command('process status',
-                         ['-> 47',
+                         ['-> 63',
                           'int i = in;'])
 
-        #47     int i = in;
+        #63     int i = in;
         self.try_command('thread step-in',
-                         ['-> 48'])
-        #48     float f = (float) i;
+                         ['-> 64'])
+        #64     float f = (float) i;
         self.try_command('thread step-in',
-                         ['-> 49'])
+                         ['-> 65'])
         #49     modify_f(&f);
         self.try_command('thread step-over',
-                         ['-> 50'])
+                         ['-> 66'])
         #50  	modify_i(&i);
         self.try_command('thread step-in',
-                         ['-> 33'])
-        #33         int j = *i;
-        self.try_command('b -f scalars.rs -l 38',
+                         ['-> 49'])
+        #49         int j = *i;
+        self.try_command('b -f scalars.rs -l 54',
                          ['librs.scalars.so`modify_i',
-                          'scalars.rs:38'])
+                          'scalars.rs:54'])
         self.try_command('c',
                          ['stop reason = breakpoint',
-                          'scalars.rs:38',
-                          '-> 38'])
-        #38    set_i(i, 0);
-        # For the line number anything between #20 and #22 is fine
+                          'scalars.rs:54',
+                          '-> 54'])
+        #54    set_i(i, 0);
+        # For the line number anything between #37 and #38 is fine
         self.try_command('thread step-in',
                          [],
-                         [r'-> 2[012]'])
-        #22    int tmp = b;
+                         [r'-> 3[678]'])
+        #38    int tmp = b;
         self.try_command('thread step-out',
-                         ['-> 38'])
+                         ['-> 54'])
 
     @cpp_only_test()
     @ordered_test('last')

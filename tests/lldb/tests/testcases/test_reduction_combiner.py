@@ -93,7 +93,7 @@ class TestReduceCombinerMultithreaded(
             'process continue',
             expected_regex=[
                 r'Process \d+ stopped',
-                r'frame #0: 0x[0-9a-fA-F]+ librs.reduce_auto_comb.so`'
+                r'frame #0: (0x[0-9a-fA-F]+ )?librs.reduce_auto_comb.so`'
             ]
         )
 
