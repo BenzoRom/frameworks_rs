@@ -43,7 +43,7 @@ class TestBreakpointKernel2(TestBaseRemote):
                           'frame #0:',
                           'librs.infiniteloop.so',
                           'simple_kernel'],
-                         [r'infiniteloop\.rs:2[78]'])
+                         [r'infiniteloop\.rs:4[34]'])
 
         self.try_command('breakpoint list',
                          ['simple_kernel',
