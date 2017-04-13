@@ -38,7 +38,7 @@ class TestBreakpointFileLine(TestBaseRemote):
                          ['Runtime Library discovered',
                           'Runtime Driver discovered'])
 
-        self.try_command('breakpoint set --file simple.rs --line 12',
+        self.try_command('breakpoint set --file simple.rs --line 28',
                          ['(pending)'])
 
         self.try_command('process continue',

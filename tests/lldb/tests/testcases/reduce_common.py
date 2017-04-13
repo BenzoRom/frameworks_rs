@@ -52,7 +52,7 @@ class ReductionMixin(object):
                     expected_regex=[
                         r'resuming',
                         r'Process \d+ stopped',
-                        r'frame #0: 0x[0-9a-fA-F]+ librs.reduce.so`%s' % funcs_match
+                        r'frame #0: (0x[0-9a-fA-F]+ )?librs.reduce.so`%s' % funcs_match
                     ]
                 )
                 for line in output.splitlines():
@@ -96,7 +96,7 @@ class ReductionMixin(object):
                 expected_regex=[
                     r'resuming',
                     r'Process \d+ stopped',
-                    r'frame #0: 0x[0-9a-fA-F]+ librs.%s.so`%s' % (
+                    r'frame #0: (0x[0-9a-fA-F]+ )?librs.%s.so`%s' % (
                         script_soname, func)
                 ]
             )
