@@ -66,7 +66,7 @@ class TestReadLocal(TestBaseRemote):
                          ['Runtime Library discovered',
                           'Runtime Driver discovered'])
 
-        self.try_command('breakpoint set --file simple.rs --line 129', [])
+        self.try_command('breakpoint set --file simple.rs --line 145', [])
 
         self.try_command('process continue',
                          ['resuming',
