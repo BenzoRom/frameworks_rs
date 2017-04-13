@@ -45,27 +45,27 @@ class TestBreakpointFileLineMultipleRSFiles(TestBaseRemote):
                          ['Runtime Library discovered',
                           'Runtime Driver discovered'])
 
-        self.try_command('breakpoint set --file first.rs --line 12',
+        self.try_command('breakpoint set --file first.rs --line 28',
                          ['(pending)'])
 
         self.try_command('process continue',
                          ['stopped',
                           'librs.first.so`first_kernel',
-                          'at first.rs:12',
+                          'at first.rs:28',
                           "name = '%s'" % self._binary_name(),
                           'stop reason = breakpoint 1'])
 
-        self.try_command('breakpoint set --file second.rs --line 7',
+        self.try_command('breakpoint set --file second.rs --line 23',
                          ['Breakpoint 2',
                           'librs.second.so`second_kernel',
-                          'second.rs:7'])
+                          'second.rs:23'])
 
         self.try_command('breakpoint list',
                          ['first.rs',
                           'second.rs',
                           'resolved = 1',
-                          'first.rs:12',
-                          'second.rs:7'])
+                          'first.rs:28',
+                          'second.rs:23'])
 
         self.try_command('breakpoint delete 1',
                          ['1 breakpoints deleted'])
@@ -73,7 +73,7 @@ class TestBreakpointFileLineMultipleRSFiles(TestBaseRemote):
         self.try_command('process continue',
                          ['stopped',
                           'librs.second.so`second_kernel',
-                          'at second.rs:7',
+                          'at second.rs:23',
                           "name = '%s'" % self._binary_name(),
                           'stop reason = breakpoint 2'])
 

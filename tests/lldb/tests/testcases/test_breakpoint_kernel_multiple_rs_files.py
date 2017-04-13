@@ -53,7 +53,7 @@ class TestBreakpointKernelMultipleRSFiles(TestBaseRemote):
                           'librs.first.so`first_kernel',
                           "name = '%s'" % self._binary_name(),
                           'stop reason = breakpoint 1'],
-                          [r'at first\.rs:1[012]'])
+                          [r'at first\.rs:2[678]'])
 
         self.try_command('breakpoint list',
                          ["'first_kernel', locations = 1, resolved = 1"])
@@ -62,7 +62,7 @@ class TestBreakpointKernelMultipleRSFiles(TestBaseRemote):
                          ['Breakpoint(s) created',
                           'Breakpoint 2',
                           'Breakpoint(s) created'],
-                          [r"librs\.second\.so`second_kernel at second\.rs:[56]",])
+                          [r"librs\.second\.so`second_kernel at second\.rs:2[012]",])
 
         self.try_command('breakpoint list',
                          ["'first_kernel', locations = 1, resolved = 1",
@@ -79,7 +79,7 @@ class TestBreakpointKernelMultipleRSFiles(TestBaseRemote):
                           'stopped',
                           'stop reason = breakpoint',
                           "librs.second.so`second_kernel"],
-                          [r'second\.rs:[56]'])
+                          [r'second\.rs:2[012]'])
 
         self.try_command('breakpoint delete 2',
                          ['1 breakpoints deleted'])

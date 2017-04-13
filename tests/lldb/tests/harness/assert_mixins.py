@@ -82,19 +82,19 @@ class CoordinateAssertionsMixin(object):
                     r'resuming',
                     r'Process \d+ stopped',
                     r'stop reason = breakpoint',
-                    r'frame #0: 0x[0-9a-fA-F]+ librs.%s.so`%s' % (
+                    r'frame #0: (0x[0-9a-fA-F]+ )?librs.%s.so`%s' % (
                         soname, func_name)
                 ]
             )
         else:
             self.try_command(
-            'bt',
-            [
-                'stop reason = breakpoint',
-                'frame #0:',
-                'librs.allocs.so`%s' % kernel
-            ]
-        )
+                'bt',
+                expected_regex=[
+                    'stop reason = breakpoint',
+                    'frame #0:',
+                    'librs.*\.so`%s' % kernel
+                ]
+            )
 
         self.try_command(
             'language renderscript kernel coordinate',
