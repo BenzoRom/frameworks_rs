@@ -42,7 +42,7 @@ public class MainActivity extends Activity {
         mBitmapOut = Bitmap.createBitmap(mBitmapIn.getWidth(),
                     mBitmapIn.getHeight(), mBitmapIn.getConfig());
 
-        mImageView = (ImageView) findViewById(R.id.imageView);
+        mImageView = findViewById(R.id.imageView);
         mImageView.setImageBitmap(mBitmapOut);
 
         createScript();

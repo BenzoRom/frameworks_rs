@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mLayout = (LinearLayout) findViewById(R.id.layoutTopMost);
+        mLayout = findViewById(R.id.layoutTopMost);
 
         Intent intent = getIntent();
         if (intent != null) {

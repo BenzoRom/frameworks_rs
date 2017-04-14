@@ -95,7 +95,7 @@ public class SampleRSActivity extends Activity {
         mBitmapTwoByTwo = loadBitmap(R.drawable.twobytwo);
         mBitmapCity = loadBitmap(R.drawable.city);
 
-        mBenchmarkResult = (TextView) findViewById(R.id.benchmarkText);
+        mBenchmarkResult = findViewById(R.id.benchmarkText);
         mBenchmarkResult.setText("Result: not run");
 
         mRS = RenderScript.create(this);
@@ -117,25 +117,25 @@ public class SampleRSActivity extends Activity {
         // Wrap Linear
         Allocation outAlloc = Allocation.createTyped(mRS, b.setX(outX).setY(outY).create(), usage);
         TextureViewUpdater updater = new TextureViewUpdater(outAlloc, Sampler.WRAP_LINEAR(mRS));
-        TextureView displayView = (TextureView) findViewById(R.id.display);
+        TextureView displayView = findViewById(R.id.display);
         displayView.setSurfaceTextureListener(updater);
 
         // Clamp Linear
         outAlloc = Allocation.createTyped(mRS, b.setX(outX).setY(outY).create(), usage);
         updater = new TextureViewUpdater(outAlloc, Sampler.CLAMP_LINEAR(mRS));
-        displayView = (TextureView) findViewById(R.id.display2);
+        displayView = findViewById(R.id.display2);
         displayView.setSurfaceTextureListener(updater);
 
         // Wrap Nearest
         outAlloc = Allocation.createTyped(mRS, b.setX(outX).setY(outY).create(), usage);
         updater = new TextureViewUpdater(outAlloc, Sampler.WRAP_NEAREST(mRS));
-        displayView = (TextureView) findViewById(R.id.display3);
+        displayView = findViewById(R.id.display3);
         displayView.setSurfaceTextureListener(updater);
 
         // Clamp Nearest
         outAlloc = Allocation.createTyped(mRS, b.setX(outX).setY(outY).create(), usage);
         updater = new TextureViewUpdater(outAlloc, Sampler.CLAMP_NEAREST(mRS));
-        displayView = (TextureView) findViewById(R.id.display4);
+        displayView = findViewById(R.id.display4);
         displayView.setSurfaceTextureListener(updater);
 
         mScript = new ScriptC_sample(mRS);

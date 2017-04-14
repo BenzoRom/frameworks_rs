@@ -57,7 +57,7 @@ public class VrActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vr);
 
-        mVrView = (VrView) findViewById(R.id.view);
+        mVrView = findViewById(R.id.view);
         mRs = RenderScript.create(VrActivity.this);
 
         String dir = "/sdcard/Download/volumes";
@@ -65,7 +65,7 @@ public class VrActivity extends Activity {
         VrSetupTask setup = new VrSetupTask();
         String [] names = mLoader.getNames();
         setup.execute(names[0]);
-        TextView tv = (TextView) findViewById(R.id.title);
+        TextView tv = findViewById(R.id.title);
         tv.setText(names[0]);
     }
 
@@ -185,7 +185,7 @@ public class VrActivity extends Activity {
 
                 VrSetupTask setup = new VrSetupTask();
                 String title = item.getTitle().toString();
-                TextView tv = (TextView) findViewById(R.id.title);
+                TextView tv = findViewById(R.id.title);
                 tv.setText(title);
                 setup.execute(title);
                 return true;
