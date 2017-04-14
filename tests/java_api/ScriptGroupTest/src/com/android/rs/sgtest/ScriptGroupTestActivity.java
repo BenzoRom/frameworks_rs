@@ -195,17 +195,17 @@ public class ScriptGroupTestActivity extends Activity
                                          Bitmap.Config.ARGB_8888);
         mOutPixelsAllocation = Allocation.createFromBitmap(mRS, mBitmapOut);
 
-        mDisplayView = (ImageView) findViewById(R.id.display);
+        mDisplayView = findViewById(R.id.display);
         mDisplayView.setImageBitmap(mBitmapOut);
 
-        mModeSpinner = (Spinner) findViewById(R.id.modeselection);
+        mModeSpinner = findViewById(R.id.modeselection);
         mModeSpinner.setOnItemSelectedListener(mModeSpinnerListener);
-        mTestSpinner1 = (Spinner) findViewById(R.id.filterselection);
+        mTestSpinner1 = findViewById(R.id.filterselection);
         mTestSpinner1.setOnItemSelectedListener(mTestSpinner1Listener);
-        mTestSpinner2 = (Spinner) findViewById(R.id.filter2selection);
+        mTestSpinner2 = findViewById(R.id.filter2selection);
         mTestSpinner2.setOnItemSelectedListener(mTestSpinner2Listener);
 
-        mBenchmarkResult = (TextView) findViewById(R.id.benchmarkText);
+        mBenchmarkResult = findViewById(R.id.benchmarkText);
         mBenchmarkResult.setText("Result: not run");
 
         setupTests();

@@ -65,8 +65,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mImgView = (ImageView) findViewById(R.id.imageview);
-        mDrawView = (DrawView) findViewById(R.id.overlay);
+        mImgView = findViewById(R.id.imageview);
+        mDrawView = findViewById(R.id.overlay);
         mDrawView.setImageView(mImgView);
         mRs = RenderScript.create(this.getBaseContext());
         mHealingScript = new ScriptC_healing(mRs);

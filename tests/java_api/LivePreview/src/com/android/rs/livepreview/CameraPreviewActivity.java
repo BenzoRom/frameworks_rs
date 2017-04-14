@@ -97,8 +97,8 @@ public class CameraPreviewActivity extends Activity
 
         setContentView(R.layout.cf_main);
 
-        mPreviewView = (TextureView) findViewById(R.id.preview_view);
-        mOutputView = (TextureView) findViewById(R.id.format_view);
+        mPreviewView = findViewById(R.id.preview_view);
+        mOutputView = findViewById(R.id.format_view);
 
         mPreviewView.setSurfaceTextureListener(this);
 
@@ -107,13 +107,13 @@ public class CameraPreviewActivity extends Activity
         for (int i = 0; i < numCameras; i++) {
             cameraNames[i] = "Camera " + i;
         }
-        mCameraSpinner = (Spinner) findViewById(R.id.cameras_selection);
+        mCameraSpinner = findViewById(R.id.cameras_selection);
         mCameraSpinner.setAdapter(
             new ArrayAdapter<String>(
                 this, R.layout.cf_format_list_item, cameraNames));
         mCameraSpinner.setOnItemSelectedListener(mCameraSpinnerListener);
 
-        mResolutionSpinner = (Spinner) findViewById(R.id.resolution_selection);
+        mResolutionSpinner = findViewById(R.id.resolution_selection);
         mResolutionSpinner.setOnItemSelectedListener(mResolutionSelectedListener);
 
         mRS = RenderScript.create(this);

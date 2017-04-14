@@ -21,7 +21,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libgemmdata
 LOCAL_MODULE_TAGS := tests
 LOCAL_SRC_FILES := test_data.cpp
-LOCAL_SDK_VERSION := 14
+LOCAL_SDK_VERSION := current
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 

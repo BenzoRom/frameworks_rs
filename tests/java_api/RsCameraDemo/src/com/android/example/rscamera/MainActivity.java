@@ -46,12 +46,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mSpeedButton = (Button) findViewById(R.id.speed);
-        mISOButton = (Button) findViewById(R.id.iso);
-        mFocusButton = (Button) findViewById(R.id.focus);
-        mPreviewView = (CameraView) findViewById(R.id.preview);
-        mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper);
-        SeekBar seekBar = (SeekBar) findViewById(R.id.focusbar);
+        mSpeedButton = findViewById(R.id.speed);
+        mISOButton = findViewById(R.id.iso);
+        mFocusButton = findViewById(R.id.focus);
+        mPreviewView = findViewById(R.id.preview);
+        mViewFlipper = findViewById(R.id.viewFlipper);
+        SeekBar seekBar = findViewById(R.id.focusbar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {

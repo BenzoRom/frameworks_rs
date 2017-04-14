@@ -415,16 +415,16 @@ public class ImageProcessingActivity extends Activity
         mBitmapOut.setHasAlpha(false);
         mOutPixelsAllocation = Allocation.createFromBitmap(mRS, mBitmapOut);
 
-        mDisplayView = (ImageView) findViewById(R.id.display);
+        mDisplayView = findViewById(R.id.display);
         mDisplayView.setImageBitmap(mBitmapOut);
 
-        mSpinner = (Spinner) findViewById(R.id.spinner1);
+        mSpinner = findViewById(R.id.spinner1);
 
-        mBar1 = (SeekBar) findViewById(R.id.slider1);
-        mBar2 = (SeekBar) findViewById(R.id.slider2);
-        mBar3 = (SeekBar) findViewById(R.id.slider3);
-        mBar4 = (SeekBar) findViewById(R.id.slider4);
-        mBar5 = (SeekBar) findViewById(R.id.slider5);
+        mBar1 = findViewById(R.id.slider1);
+        mBar2 = findViewById(R.id.slider2);
+        mBar3 = findViewById(R.id.slider3);
+        mBar4 = findViewById(R.id.slider4);
+        mBar5 = findViewById(R.id.slider5);
 
         mBar1.setOnSeekBarChangeListener(this);
         mBar2.setOnSeekBarChangeListener(this);
@@ -432,16 +432,16 @@ public class ImageProcessingActivity extends Activity
         mBar4.setOnSeekBarChangeListener(this);
         mBar5.setOnSeekBarChangeListener(this);
 
-        mText1 = (TextView) findViewById(R.id.slider1Text);
-        mText2 = (TextView) findViewById(R.id.slider2Text);
-        mText3 = (TextView) findViewById(R.id.slider3Text);
-        mText4 = (TextView) findViewById(R.id.slider4Text);
-        mText5 = (TextView) findViewById(R.id.slider5Text);
+        mText1 = findViewById(R.id.slider1Text);
+        mText2 = findViewById(R.id.slider2Text);
+        mText3 = findViewById(R.id.slider3Text);
+        mText4 = findViewById(R.id.slider4Text);
+        mText5 = findViewById(R.id.slider5Text);
 
-        mTestSpinner = (Spinner) findViewById(R.id.filterselection);
+        mTestSpinner = findViewById(R.id.filterselection);
         mTestSpinner.setOnItemSelectedListener(mTestSpinnerListener);
 
-        mBenchmarkResult = (TextView) findViewById(R.id.benchmarkText);
+        mBenchmarkResult = findViewById(R.id.benchmarkText);
         mBenchmarkResult.setText("Result: not run");
 
         setupTests();

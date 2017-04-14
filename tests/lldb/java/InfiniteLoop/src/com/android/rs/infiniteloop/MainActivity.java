@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
                     mBitmapIn.getHeight(), mBitmapIn.getConfig());
         }
 
-        mImageView = (ImageView) findViewById(R.id.imageView);
+        mImageView = findViewById(R.id.imageView);
         mImageView.setImageBitmap(mBitmapsOut[mCurrentBitmap]);
         mCurrentBitmap += (mCurrentBitmap + 1) % NUM_BITMAPS;
 
