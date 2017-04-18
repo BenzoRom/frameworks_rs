@@ -36,7 +36,6 @@ FifoSocket::~FifoSocket() {
 }
 
 bool FifoSocket::init(bool supportNonBlocking, bool supportReturnValues, size_t maxDataSize) {
-    // TODO: (b/27870945) Handle socketpair errors.
     int ret = socketpair(AF_UNIX, SOCK_STREAM, 0, sv);
     return (ret == 0);
 }
