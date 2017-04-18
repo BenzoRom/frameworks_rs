@@ -69,6 +69,7 @@ public class RSTestCore {
         unitTests.add(new UT_alloc_copyPadded(this, mRes, mCtx));
         unitTests.add(new UT_kernel(this, mRes, mCtx));
         unitTests.add(new UT_kernel_struct(this, mRes, mCtx));
+        unitTests.add(new UT_blur_validation(this, mRes, mCtx));
         unitTests.add(new UT_bug_char(this, mRes, mCtx));
         unitTests.add(new UT_clamp(this, mRes, mCtx));
         unitTests.add(new UT_clamp_relaxed(this, mRes, mCtx));
