@@ -330,7 +330,22 @@ void generateSourceSlot(RsdCpuReferenceImpl* ctxt,
 
 }  // anonymous namespace
 
-extern __attribute__((noinline))
+// This function is used by the debugger to inspect ScriptGroup
+// compilations.
+//
+// "__attribute__((noinline))" and "__asm__" are used to prevent the
+// function call from being eliminated as a no-op (see the "noinline"
+// attribute in gcc documentation).
+//
+// "__attribute__((weak))" is used to prevent callers from recognizing
+// that this is guaranteed to be the function definition, recognizing
+// that certain arguments are unused, and optimizing away the passing
+// of those arguments (see the LLVM optimization
+// DeadArgumentElimination).  Theoretically, the compiler could get
+// aggressive enough with link-time optimization that even marking the
+// entry point as a weak definition wouldn't solve the problem.
+//
+extern __attribute__((noinline)) __attribute__((weak))
 void debugHintScriptGroup2(const char* groupName,
                            const uint32_t groupNameSize,
                            const ExpandFuncTy* kernel,
@@ -338,6 +353,7 @@ void debugHintScriptGroup2(const char* groupName,
     ALOGV("group name: %d:%s\n", groupNameSize, groupName);
     for (uint32_t i=0; i < kernelCount; ++i) {
         const char* f1 = (const char*)(kernel[i]);
+        __asm__ __volatile__("");
         ALOGV("  closure: %p\n", (const void*)f1);
     }
     // do nothing, this is just a hook point for the debugger.
