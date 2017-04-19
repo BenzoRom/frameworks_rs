@@ -21,6 +21,8 @@ import android.renderscript.RenderScript;
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.util.Log;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -127,6 +129,13 @@ public abstract class UnitTest {
                         "listening for pass/fail message", toString()));
             }
         }
+        switch (mResult) {
+            case UT_NOT_STARTED:
+            case UT_RUNNING:
+                Log.w(TAG, String.format("unexpected unit test result for test %s: %s",
+                        this.toString(), mResult.toString()));
+                break;
+        }
     }
 
     abstract protected void run();
@@ -134,6 +143,21 @@ public abstract class UnitTest {
     @Override
     public String toString() {
         return mName;
+    }
+
+
+    /**
+     * Throws RuntimeException if any tests have the same name.
+     */
+    public static void checkDuplicateNames(Iterable<UnitTest> tests) {
+        Set<String> names = new HashSet<>();
+        for (UnitTest test : tests) {
+            String name = test.toString();
+            if (names.contains(name)) {
+                throw new RuntimeException("duplicate name: " + name);
+            }
+            names.add(name);
+        }
     }
 }
 

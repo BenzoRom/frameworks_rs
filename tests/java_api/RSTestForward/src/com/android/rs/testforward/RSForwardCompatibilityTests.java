@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.rs.testbackward;
+package com.android.rs.testforward;
 
-import com.android.rs.unittest.*;
+import com.android.rs.unittest.UnitTest;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -34,34 +34,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * RSTestBackward, functional test for platform RenderScript APIs.
+ * RSTestForward, functional test for platform RenderScript APIs.
  * To run the test, please use command
  *
- * adb shell am instrument -w com.android.rs.testbackward/android.support.test.runner.AndroidJUnitRunner
+ * adb shell am instrument -w com.android.rs.testforward/android.support.test.runner.AndroidJUnitRunner
  */
 @RunWith(Parameterized.class)
-public class RSBackwardCompatibilityTests {
-    private static final String TAG = "RSBackwardCompatibilityTests";
+public class RSForwardCompatibilityTests {
+    private static final String TAG = "RSForwardCompatibilityTests";
 
     /**
      * Returns the list of subclasses of UnitTest to run.
      */
     @Parameters(name = "{0}")
     public static Iterable<?> getParams() throws Exception {
-        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-
-        int minApiVersion = 21;
-        if (thisApiVersion < minApiVersion) {
-            Log.w(TAG,
-                String.format("API version is less than %d, no tests running", minApiVersion));
-        }
-
         Context ctx = InstrumentationRegistry.getTargetContext();
 
         List<UnitTest> validUnitTests = new ArrayList<>();
 
         Iterable<Class<? extends UnitTest>> testClasses =
-            RSTests.getTestClassesForCurrentAPIVersion();
+            RSUtils.getProperSubclasses(UnitTest.class);
         for (Class<? extends UnitTest> testClass : testClasses) {
             UnitTest test = testClass.getDeclaredConstructor(Context.class).newInstance(ctx);
             validUnitTests.add(test);
@@ -72,7 +64,6 @@ public class RSBackwardCompatibilityTests {
         return validUnitTests;
     }
 
-
     @Parameter(0)
     public UnitTest mTest;
 
@@ -81,7 +72,7 @@ public class RSBackwardCompatibilityTests {
     public void testRSUnitTest() throws Exception {
         String thisDeviceName = android.os.Build.DEVICE;
         int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-        Log.i(TAG, String.format("RenderScript backward compatibility testing (%s) "
+        Log.i(TAG, String.format("RenderScript forward compatibility testing (%s) "
                 + "on device %s, API version %d",
                 mTest.toString(), thisDeviceName, thisApiVersion));
         mTest.runTest();
