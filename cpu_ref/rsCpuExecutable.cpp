@@ -273,6 +273,7 @@ void* SharedLibraryUtils::loadSOHelper(const char *origName, const char *cacheDi
 #define PRAGMA_STR "pragmaCount: "
 #define THREADABLE_STR "isThreadable: "
 #define CHECKSUM_STR "buildChecksum: "
+#define VERSIONINFO_STR "versionInfo: "
 
 // Copy up to a newline or size chars from str -> s, updating str
 // Returns s when successful and nullptr when '\0' is finally reached.
@@ -665,6 +666,26 @@ ScriptExecutable* ScriptExecutable::createFromSharedObject(
         ALOGE("Found invalid checksum.  Expected %08x, got %08x\n",
               expectedChecksum, checksum);
         goto error;
+    }
+
+    {
+      // Parse the version info string, but ignore its contents as it's only
+      // used by the debugger
+      size_t nLines = 0;
+      if (strgets(line, MAXLINE, &rsInfo) != nullptr) {
+        if (sscanf(line, VERSIONINFO_STR "%zu", &nLines) != 1) {
+          ALOGE("invalid versionInfo count");
+          goto error;
+        } else {
+          // skip the versionInfo packet as libRs doesn't use it
+          while (nLines--) {
+            if (strgets(line, MAXLINE, &rsInfo) == nullptr)
+              goto error;
+          }
+        }
+      } else {
+        ALOGE(".rs.info is missing versionInfo section");
+      }
     }
 
 #endif  // RS_COMPATIBILITY_LIB

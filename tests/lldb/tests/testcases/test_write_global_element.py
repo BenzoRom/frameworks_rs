@@ -80,7 +80,7 @@ class TestWriteGlobalElement(TestBaseRemote):
                          ['Runtime Library discovered',
                           'Runtime Driver discovered'])
 
-        self.try_command('b -f simple.rs -l 129', [])
+        self.try_command('b -f simple.rs -l 145', [])
 
         self.try_command('process continue',
                          ['resuming',
