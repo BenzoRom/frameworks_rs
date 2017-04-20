@@ -37,9 +37,8 @@ ThreadIO::ThreadIO() {
 ThreadIO::~ThreadIO() {
 }
 
-void ThreadIO::init() {
-    mToClient.init();
-    mToCore.init();
+bool ThreadIO::init() {
+    return mToClient.init() && mToCore.init();
 }
 
 void ThreadIO::shutdown() {
