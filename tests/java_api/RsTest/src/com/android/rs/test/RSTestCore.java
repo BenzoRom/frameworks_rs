@@ -66,6 +66,7 @@ public class RSTestCore {
         unitTests.add(new UT_kernel3d(this, mCtx));
         unitTests.add(new UT_kernel2d_oldstyle(this, mCtx));
         unitTests.add(new UT_ctxt_default(this, mCtx));
+        unitTests.add(new UT_blur_validation(this, mCtx));
         unitTests.add(new UT_bug_char(this, mCtx));
         unitTests.add(new UT_clamp(this, mCtx));
         unitTests.add(new UT_clamp_relaxed(this, mCtx));
