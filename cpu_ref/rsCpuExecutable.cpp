@@ -299,6 +299,18 @@ static char* strgets(char *s, int size, const char **ppstr) {
     return s;
 }
 
+// Creates a duplicate of a string. The new string is as small as possible,
+// only including characters up to and including the first null-terminator;
+// otherwise, the new string will be the same size as the input string.
+// The code that calls duplicateString is responsible for the new string's
+// lifetime, and is responsible for freeing it when it is no longer needed.
+static char* duplicateString(const char *str, size_t length) {
+    const size_t newLen = strnlen(str, length-1) + 1;
+    char *newStr = new char[newLen];
+    strlcpy(newStr, str, newLen);
+    return newStr;
+}
+
 ScriptExecutable* ScriptExecutable::createFromSharedObject(
     void* sharedObj, uint32_t expectedChecksum) {
     char line[MAXLINE];
@@ -369,8 +381,7 @@ ScriptExecutable* ScriptExecutable::createFromSharedObject(
         }
         fieldAddress[i] = addr;
         fieldIsObject[i] = false;
-        fieldName[i] = new char[strlen(line)+1];
-        strcpy(fieldName[i], line);
+        fieldName[i] = duplicateString(line, sizeof(line));
     }
 
     if (strgets(line, MAXLINE, &rsInfo) == nullptr) {
@@ -623,13 +634,8 @@ ScriptExecutable* ScriptExecutable::createFromSharedObject(
             goto error;
         }
 
-        char *pKey = new char[strlen(key)+1];
-        strcpy(pKey, key);
-        pragmaKeys[i] = pKey;
-
-        char *pValue = new char[strlen(value)+1];
-        strcpy(pValue, value);
-        pragmaValues[i] = pValue;
+        pragmaKeys[i] = duplicateString(key, sizeof(key));
+        pragmaValues[i] = duplicateString(value, sizeof(value));
         //ALOGE("Pragma %zu: Key: '%s' Value: '%s'", i, pKey, pValue);
     }
 
