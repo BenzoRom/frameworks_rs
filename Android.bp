@@ -1,1 +1,7 @@
 subdirs = ["cpp"]
+
+cc_library_headers {
+    name: "rs-headers",
+    export_include_dirs: ["."],
+    sdk_version: "9",
+}
