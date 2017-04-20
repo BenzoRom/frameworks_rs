@@ -483,7 +483,7 @@ static const int kFormatInBytesMax = 16;
 // ": " + 2 digits per byte + 1 separator between bytes + "..." + null
 typedef char FormatBuf[2 + kFormatInBytesMax*2 + (kFormatInBytesMax - 1) + 3 + 1];
 static const char *format_bytes(FormatBuf *outBuf, const uint8_t *inBuf, const int inBytes) {
-  strcpy(*outBuf, ": ");
+  strlcpy(*outBuf, ": ", sizeof(FormatBuf));
   int pos = 2;
   const int lim = std::min(kFormatInBytesMax, inBytes);
   for (int i = 0; i < lim; ++i) {
@@ -495,7 +495,7 @@ static const char *format_bytes(FormatBuf *outBuf, const uint8_t *inBuf, const i
     pos += 2;
   }
   if (kFormatInBytesMax < inBytes)
-    strcpy(*outBuf + pos, "...");
+    strlcpy(*outBuf + pos, "...", sizeof(FormatBuf) - pos);
   return *outBuf;
 }
 
