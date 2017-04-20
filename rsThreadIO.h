@@ -31,7 +31,7 @@ public:
     ThreadIO();
     ~ThreadIO();
 
-    void init();
+    bool init();
     void shutdown();
 
     size_t getMaxInlineSize() {
