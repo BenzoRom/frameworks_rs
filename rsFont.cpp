@@ -26,6 +26,7 @@
 #include FT_FREETYPE_H
 #include FT_BITMAP_H
 #endif //ANDROID_RS_SERIALIZE
+#include <string.h>
 
 namespace android {
 namespace renderscript {
@@ -754,8 +755,8 @@ void FontState::renderText(const char *text, uint32_t len, int32_t x, int32_t y,
             char fullPath[1024];
             const char * root = getenv("ANDROID_ROOT");
             rsAssert(strlen(root) < 256);
-            strcpy(fullPath, root);
-            strcat(fullPath, "/fonts/Roboto-Regular.ttf");
+            strlcpy(fullPath, root, sizeof(fullPath));
+            strlcat(fullPath, "/fonts/Roboto-Regular.ttf", sizeof(fullPath));
             mDefault.set(Font::create(mRSC, fullPath, 8, mRSC->getDPI()));
         }
         currentFont = mDefault.get();
