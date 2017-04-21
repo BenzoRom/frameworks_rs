@@ -17,8 +17,12 @@
 package com.android.rs.unittest;
 
 import android.content.Context;
+import android.renderscript.RenderScript;
 import android.renderscript.RenderScript.RSMessageHandler;
 import android.util.Log;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public abstract class UnitTest {
     public enum UnitTestResult {
@@ -30,18 +34,21 @@ public abstract class UnitTest {
 
     private final static String TAG = "RSUnitTest";
 
-    public String name;
-    private UnitTestResult result;
-    protected Context mCtx;
+    private String mName;
+    private UnitTestResult mResult;
+    private Context mCtx;
+    /* Necessary to avoid race condition on pass/fail message. */
+    private CountDownLatch mCountDownLatch;
 
     /* These constants must match those in shared.rsh */
     public static final int RS_MSG_TEST_PASSED = 100;
     public static final int RS_MSG_TEST_FAILED = 101;
 
     public UnitTest(String n, Context ctx) {
-        name = n;
+        mName = n;
         mCtx = ctx;
-        result = UnitTestResult.UT_NOT_STARTED;
+        mResult = UnitTestResult.UT_NOT_STARTED;
+        mCountDownLatch = null;
     }
 
     protected void _RS_ASSERT(String message, boolean b) {
@@ -51,57 +58,81 @@ public abstract class UnitTest {
         }
     }
 
-    protected RSMessageHandler mRsMessage =
-            new RSMessageHandler() {
+    /**
+     * Returns a RenderScript instance created from mCtx.
+     *
+     * @param enableMessages
+     * true if expecting exactly one pass/fail message from the RenderScript instance.
+     * false if no messages expected.
+     * Any other messages are not supported.
+     */
+    protected RenderScript createRenderScript(boolean enableMessages) {
+        RenderScript rs = RenderScript.create(mCtx);
+        if (enableMessages) {
+            RSMessageHandler handler = new RSMessageHandler() {
                 public void run() {
-                    if (result == UnitTestResult.UT_RUNNING) {
-                        switch (mID) {
-                            case RS_MSG_TEST_PASSED:
-                                result = UnitTestResult.UT_SUCCESS;
-                                break;
-                            case RS_MSG_TEST_FAILED:
-                                result = UnitTestResult.UT_FAIL;
-                                break;
-                            default:
-                                Log.v(TAG, "Unit test got unexpected message");
-                                break;
-                        }
+                    switch (mID) {
+                        case RS_MSG_TEST_PASSED:
+                            passTest();
+                            break;
+                        case RS_MSG_TEST_FAILED:
+                            failTest();
+                            break;
+                        default:
+                            Log.w(TAG, String.format("Unit test %s got unexpected message %d",
+                                    UnitTest.this.toString(), mID));
+                            break;
                     }
+                    mCountDownLatch.countDown();
                 }
             };
-
-    protected void failTest() {
-        result = UnitTestResult.UT_FAIL;
+            rs.setMessageHandler(handler);
+            mCountDownLatch = new CountDownLatch(1);
+        }
+        return rs;
     }
 
-    protected void passTest() {
-        if (result != UnitTestResult.UT_FAIL) {
-            result = UnitTestResult.UT_SUCCESS;
-        }
+    protected synchronized void failTest() {
+        mResult = UnitTestResult.UT_FAIL;
     }
 
-    public String toString() {
-        String out = name;
-        if (result == UnitTestResult.UT_SUCCESS) {
-            out += " - PASSED";
-        } else if (result == UnitTestResult.UT_FAIL) {
-            out += " - FAILED";
+    protected synchronized void passTest() {
+        if (mResult != UnitTestResult.UT_FAIL) {
+            mResult = UnitTestResult.UT_SUCCESS;
         }
-        return out;
     }
 
     public UnitTestResult getResult() {
-        return result;
+        return mResult;
     }
 
     public boolean getSuccess() {
-        return result == UnitTestResult.UT_SUCCESS;
+        return mResult == UnitTestResult.UT_SUCCESS;
     }
 
     public void runTest() {
-        result = UnitTestResult.UT_RUNNING;
+        mResult = UnitTestResult.UT_RUNNING;
         run();
+        if (mCountDownLatch != null) {
+            try {
+                boolean success = mCountDownLatch.await(5 * 60, TimeUnit.SECONDS);
+                if (!success) {
+                    failTest();
+                    Log.e("Unit test %s waited too long for pass/fail message", toString());
+                }
+            } catch (InterruptedException e) {
+                failTest();
+                Log.e(TAG, String.format("Unit test %s raised InterruptedException when " +
+                        "listening for pass/fail message", toString()));
+            }
+        }
     }
 
     abstract protected void run();
+
+    @Override
+    public String toString() {
+        return mName;
+    }
 }
+

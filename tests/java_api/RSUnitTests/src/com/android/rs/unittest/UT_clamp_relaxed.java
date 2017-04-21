@@ -26,10 +26,9 @@ public class UT_clamp_relaxed extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_clamp_relaxed s =
                 new ScriptC_clamp_relaxed(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_clamp_test();
         pRS.finish();
         s.destroy();

@@ -26,9 +26,8 @@ public class UT_bitfield extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_bitfield s = new ScriptC_bitfield(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         final long L = 0x76543210fedcba98L;
         final int I = 0x12345678;

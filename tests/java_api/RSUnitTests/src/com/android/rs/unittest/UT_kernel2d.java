@@ -49,9 +49,8 @@ public class UT_kernel2d extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_kernel2d s = new ScriptC_kernel2d(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.forEach_init_vars(A);
         s.forEach_root(A, B);

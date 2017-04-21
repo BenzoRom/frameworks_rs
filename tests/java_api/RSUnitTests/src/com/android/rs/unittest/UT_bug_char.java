@@ -76,9 +76,8 @@ public class UT_bug_char extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_bug_char s = new ScriptC_bug_char(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeValues(s);
         s.invoke_bug_char_test();
         pRS.finish();
