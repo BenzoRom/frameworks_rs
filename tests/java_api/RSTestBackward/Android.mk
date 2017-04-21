@@ -33,3 +33,7 @@ LOCAL_RENDERSCRIPT_COMPATIBILITY := 19
 LOCAL_MIN_SDK_VERSION := 19
 
 include $(BUILD_PACKAGE)
+
+# Allows RSTestBackward.apk to be added to DIST_DIR when "m dist RSTestBackward"
+$(call dist-for-goals,$(LOCAL_PACKAGE_NAME),\
+    $(LOCAL_BUILT_MODULE):$(LOCAL_PACKAGE_NAME).apk)
