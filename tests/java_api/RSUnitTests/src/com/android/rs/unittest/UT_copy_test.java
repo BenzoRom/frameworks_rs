@@ -102,9 +102,8 @@ public class UT_copy_test extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_copy_test s = new ScriptC_copy_test(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         testFloat2(pRS, s);
         testFloat3(pRS, s);

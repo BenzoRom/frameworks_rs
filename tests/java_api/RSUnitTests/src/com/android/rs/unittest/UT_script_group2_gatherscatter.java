@@ -60,9 +60,8 @@ public class UT_script_group2_gatherscatter extends UnitTest {
     // This test verifies an ScriptGroup2 implementation correctly handles such
     // a case.
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(false);
         ScriptC_addup s = new ScriptC_addup(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
 
         Allocation input = Allocation.createSized(pRS, Element.I32_4(pRS), ARRAY_SIZE);

@@ -85,9 +85,8 @@ public class UT_primitives extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_primitives s = new ScriptC_primitives(pRS);
-        pRS.setMessageHandler(mRsMessage);
         if (!initializeGlobals(s)) {
             failTest();
         } else {
