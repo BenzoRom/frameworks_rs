@@ -1475,7 +1475,7 @@ public class UT_reduce extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(false);
         ScriptC_reduce s = new ScriptC_reduce(pRS);
         s.set_negInf(Float.NEGATIVE_INFINITY);
         s.set_posInf(Float.POSITIVE_INFINITY);

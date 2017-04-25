@@ -43,9 +43,8 @@ public class UT_noroot extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_noroot s = new ScriptC_noroot(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.forEach_foo(A, A);
         s.invoke_verify_foo();

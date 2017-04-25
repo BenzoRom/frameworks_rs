@@ -87,10 +87,9 @@ public class UT_foreach_multi extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_foreach_multi s = new ScriptC_foreach_multi(pRS);
 
-        pRS.setMessageHandler(mRsMessage);
 
         initializeGlobals(pRS, s);
 

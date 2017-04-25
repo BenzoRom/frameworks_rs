@@ -29,9 +29,8 @@ public class UT_array_alloc extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_array_alloc s = new ScriptC_array_alloc(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         int dimX = s.get_dimX();
         Allocation[] Arr = new Allocation[dimX];

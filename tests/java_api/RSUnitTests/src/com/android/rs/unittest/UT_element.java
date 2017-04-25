@@ -81,7 +81,6 @@ public class UT_element extends UnitTest {
 
     private void testScriptSide(RenderScript pRS) {
         ScriptC_element s = new ScriptC_element(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.invoke_element_test();
         pRS.finish();
@@ -119,7 +118,7 @@ public class UT_element extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         testScriptSide(pRS);
         testJavaSide(pRS);
         passTest();

@@ -54,9 +54,8 @@ public class UT_small_struct extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_small_struct s = new ScriptC_small_struct(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         initializeGlobals(pRS, s);
         s.forEach_setStruct(A);
