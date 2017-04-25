@@ -71,14 +71,13 @@ public class UT_sampler extends UnitTest {
 
     private void testScriptSide(RenderScript pRS) {
         ScriptC_sampler s = new ScriptC_sampler(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.invoke_sampler_test();
         pRS.finish();
         s.destroy();
     }
 
-    private void testJavaSide(RenderScript RS) {
+    private void testJavaSide(RenderScript pRS) {
         _RS_ASSERT("minification.getMagnification() == Sampler.Value.NEAREST",
                 minification.getMagnification() == Sampler.Value.NEAREST);
         _RS_ASSERT("minification.getMinification() == Sampler.Value.LINEAR_MIP_LINEAR",
@@ -136,7 +135,7 @@ public class UT_sampler extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         testScriptSide(pRS);
         testJavaSide(pRS);
         passTest();

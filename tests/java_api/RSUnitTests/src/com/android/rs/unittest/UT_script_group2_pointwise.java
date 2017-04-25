@@ -32,10 +32,9 @@ public class UT_script_group2_pointwise extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(false);
         ScriptC_increment s_inc = new ScriptC_increment(pRS);
         ScriptC_double s_double = new ScriptC_double(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         int[] array = new int[ARRAY_SIZE * 4];
 

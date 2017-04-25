@@ -45,9 +45,8 @@ public class UT_struct_field extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_struct_field s = new ScriptC_struct_field(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         ScriptField_Outer.Item outer = new ScriptField_Outer.Item();
         outer.innerOneA = makeInnerOne();

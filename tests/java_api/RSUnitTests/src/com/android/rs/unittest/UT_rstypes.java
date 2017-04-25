@@ -26,9 +26,8 @@ public class UT_rstypes extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_rstypes s = new ScriptC_rstypes(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_test_rstypes(0, 0);
         pRS.finish();
         s.destroy();

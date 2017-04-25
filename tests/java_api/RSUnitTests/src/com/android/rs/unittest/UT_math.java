@@ -26,9 +26,8 @@ public class UT_math extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_math s = new ScriptC_math(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_math_test(0, 0);
         pRS.finish();
         s.destroy();

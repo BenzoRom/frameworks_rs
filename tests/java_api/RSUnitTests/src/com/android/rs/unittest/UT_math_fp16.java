@@ -29,9 +29,8 @@ public class UT_math_fp16 extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_math_fp16 s = new ScriptC_math_fp16(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         s.invoke_testFp16Math();
 

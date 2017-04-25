@@ -60,9 +60,8 @@ public class UT_foreach_bounds extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_foreach_bounds s = new ScriptC_foreach_bounds(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.invoke_verify_root();
         s.invoke_foreach_bounds_test();

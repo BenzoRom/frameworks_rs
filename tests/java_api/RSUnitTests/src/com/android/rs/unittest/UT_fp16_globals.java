@@ -33,8 +33,7 @@ public class UT_fp16_globals extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
-        pRS.setMessageHandler(mRsMessage);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_fp16_globals s = new ScriptC_fp16_globals(pRS);
 
         Short2 half2Value = new Short2(mHalfConst0, mHalfConst1);

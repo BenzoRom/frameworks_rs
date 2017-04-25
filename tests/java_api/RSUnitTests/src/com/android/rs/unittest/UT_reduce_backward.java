@@ -303,7 +303,7 @@ public class UT_reduce_backward extends UnitTest {
     ///////////////////////////////////////////////////////////////////
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(false);
         ScriptC_reduce_backward s = new ScriptC_reduce_backward(pRS);
         s.set_negInf(Float.NEGATIVE_INFINITY);
         s.set_posInf(Float.POSITIVE_INFINITY);
