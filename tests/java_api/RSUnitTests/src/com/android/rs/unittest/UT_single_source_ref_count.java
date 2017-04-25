@@ -26,9 +26,8 @@ public class UT_single_source_ref_count extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_single_source_ref_count s = new ScriptC_single_source_ref_count(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         s.invoke_entrypoint();
 

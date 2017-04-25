@@ -26,9 +26,8 @@ public class UT_convert extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_convert s = new ScriptC_convert(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_convert_test();
         pRS.finish();
         s.destroy();

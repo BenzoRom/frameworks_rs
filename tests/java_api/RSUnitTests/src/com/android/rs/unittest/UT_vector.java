@@ -318,9 +318,8 @@ public class UT_vector extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_vector s = new ScriptC_vector(pRS);
-        pRS.setMessageHandler(mRsMessage);
         if (!initializeGlobals(s)) {
             failTest();
         } else {

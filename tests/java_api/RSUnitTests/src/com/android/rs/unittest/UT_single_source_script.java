@@ -41,9 +41,8 @@ public class UT_single_source_script extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_single_source_script s = new ScriptC_single_source_script(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
 
         s.invoke_entrypoint(testAllocation1, testAllocation2);

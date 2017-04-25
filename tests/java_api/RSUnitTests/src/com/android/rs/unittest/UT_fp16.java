@@ -141,8 +141,7 @@ public class UT_fp16 extends UnitTest {
 
     public void run() {
         Allocation A;
-        RenderScript pRS = RenderScript.create(mCtx);
-        pRS.setMessageHandler(mRsMessage);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_fp16 s = new ScriptC_fp16(pRS);
 
         for (int nDims = 1; nDims <= 3; nDims++) {

@@ -43,9 +43,8 @@ public class UT_kernel_struct extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_kernel_struct s = new ScriptC_kernel_struct(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.forEach_init_vars(A);
         s.forEach_root(A, B);

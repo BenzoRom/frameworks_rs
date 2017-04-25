@@ -26,9 +26,8 @@ public class UT_int4 extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_int4 s = new ScriptC_int4(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_int4_test();
         pRS.finish();
         s.destroy();

@@ -26,9 +26,8 @@ public class UT_rsdebug_24 extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_rsdebug_24 s = new ScriptC_rsdebug_24(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_test_rsdebug_24(0, 0);
         pRS.finish();
         s.destroy();
