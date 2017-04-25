@@ -29,9 +29,8 @@ public class UT_static_globals extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_static_globals s = new ScriptC_static_globals(pRS);
-        pRS.setMessageHandler(mRsMessage);
         Type.Builder typeBuilder = new Type.Builder(pRS, Element.I32(pRS));
         Type t = typeBuilder.setX(1).create();
         Allocation A = Allocation.createTyped(pRS, t);

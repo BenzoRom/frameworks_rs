@@ -32,8 +32,7 @@ public class UT_script_group2_float extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
-        pRS.setMessageHandler(mRsMessage);
+        RenderScript pRS = createRenderScript(false);
 
         ScriptC_float_test s_float = new ScriptC_float_test(pRS);
 

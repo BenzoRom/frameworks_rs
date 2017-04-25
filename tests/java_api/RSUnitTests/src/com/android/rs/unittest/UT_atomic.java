@@ -26,9 +26,8 @@ public class UT_atomic extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_atomic s = new ScriptC_atomic(pRS);
-        pRS.setMessageHandler(mRsMessage);
         s.invoke_atomic_test();
         pRS.finish();
         s.destroy();

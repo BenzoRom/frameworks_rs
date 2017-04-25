@@ -26,9 +26,8 @@ public class UT_struct_field_simple extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_struct_field_simple s = new ScriptC_struct_field_simple(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         ScriptField_Simple.Item simple = new ScriptField_Simple.Item();
         final int I = 0x12345678;

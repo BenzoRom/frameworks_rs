@@ -41,8 +41,7 @@ public class UT_refcount extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
-        pRS.setMessageHandler(mRsMessage);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_refcount s = new ScriptC_refcount(pRS);
         initializeGlobals(pRS, s);
         s.invoke_refcount_test();

@@ -43,9 +43,8 @@ public class UT_single_source_alloc extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_single_source_alloc s = new ScriptC_single_source_alloc(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         // Test 1-D, 2-D and 3-D Allocations of basic RenderScript types by creating Allocations and
         // invoking a kernel on them.

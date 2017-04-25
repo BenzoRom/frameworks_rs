@@ -60,9 +60,8 @@ public class UT_check_dims extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_check_dims s = new ScriptC_check_dims(pRS);
-        pRS.setMessageHandler(mRsMessage);
         initializeGlobals(pRS, s);
         s.forEach_root(mA);
         s.invoke_check_dims_test();

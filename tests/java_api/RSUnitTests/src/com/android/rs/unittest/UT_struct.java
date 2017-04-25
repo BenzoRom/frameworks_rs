@@ -26,9 +26,8 @@ public class UT_struct extends UnitTest {
     }
 
     public void run() {
-        RenderScript pRS = RenderScript.create(mCtx);
+        RenderScript pRS = createRenderScript(true);
         ScriptC_struct s = new ScriptC_struct(pRS);
-        pRS.setMessageHandler(mRsMessage);
 
         ScriptField_Point2 p = new ScriptField_Point2(pRS, 1);
         ScriptField_Point2.Item i = new ScriptField_Point2.Item();
