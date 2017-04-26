@@ -120,7 +120,8 @@ void printFuncDecl(FILE *f, const ApiEntry *api, const char *prefix, int addCont
     printVarTypeAndName(f, &api->ret);
     if (isFnPtr) {
         char t[1024];
-        strcpy(t, api->name);
+        strncpy(t, api->name, sizeof(t)-1);
+        t[sizeof(t)-1] = '\0';
         if (strlen(prefix) == 0) {
             if (t[0] > 'A' && t[0] < 'Z') {
                 t[0] -= 'A' - 'a';
