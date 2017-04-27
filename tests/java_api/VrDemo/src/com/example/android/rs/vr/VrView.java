@@ -115,7 +115,6 @@ public class VrView extends TextureView {
     }
 
     private void setup(Context context) {
-        setBackgroundColor(Color.BLACK);
         if (isInEditMode()) {
             return;
         }
