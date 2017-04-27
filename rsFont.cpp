@@ -757,6 +757,7 @@ void FontState::renderText(const char *text, uint32_t len, int32_t x, int32_t y,
             rsAssert(strlen(root) < 256);
             strlcpy(fullPath, root, sizeof(fullPath));
             strlcat(fullPath, "/fonts/Roboto-Regular.ttf", sizeof(fullPath));
+            fullPath[sizeof(fullPath)-1] = '\0';
             mDefault.set(Font::create(mRSC, fullPath, 8, mRSC->getDPI()));
         }
         currentFont = mDefault.get();
