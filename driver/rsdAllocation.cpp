@@ -714,7 +714,7 @@ static bool IoGetBuffer(const Context *rsc, Allocation *alloc, ANativeWindow *nw
 
     void *dst = nullptr;
     AHardwareBuffer* ahwb = ANativeWindowBuffer_getHardwareBuffer(drv->wndBuffer);
-    r = AHardwareBuffer_lock(ahwb, AHARDWAREBUFFER_USAGE0_CPU_WRITE_OFTEN,
+    r = AHardwareBuffer_lock(ahwb, AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN,
                              fenceID, NULL, &dst);
     if (r) {
         rsc->setError(RS_ERROR_DRIVER, "Error Locking IO output buffer.");
