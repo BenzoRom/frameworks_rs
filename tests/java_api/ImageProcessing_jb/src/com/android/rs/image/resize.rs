@@ -51,15 +51,15 @@ uchar4 __attribute__((kernel)) bicubic(uint32_t x, uint32_t y) {
     int maxx = gWidthIn - 1;
     int maxy = gHeightIn - 1;
 
-    uint32_t xs0 = (uint32_t) max(0, startx + 0);
-    uint32_t xs1 = (uint32_t) max(0, startx + 1);
-    uint32_t xs2 = (uint32_t) min(maxx, startx + 2);
-    uint32_t xs3 = (uint32_t) min(maxx, startx + 3);
+    uint32_t xs0 = (uint32_t) clamp(startx + 0, 0, maxx);
+    uint32_t xs1 = (uint32_t) clamp(startx + 1, 0, maxx);
+    uint32_t xs2 = (uint32_t) clamp(startx + 2, 0, maxx);
+    uint32_t xs3 = (uint32_t) clamp(startx + 3, 0, maxx);
 
-    uint32_t ys0 = (uint32_t) max(0, starty + 0);
-    uint32_t ys1 = (uint32_t) max(0, starty + 1);
-    uint32_t ys2 = (uint32_t) min(maxy, starty + 2);
-    uint32_t ys3 = (uint32_t) min(maxy, starty + 3);
+    uint32_t ys0 = (uint32_t) clamp(starty + 0, 0 , maxy);
+    uint32_t ys1 = (uint32_t) clamp(starty + 1, 0 , maxy);
+    uint32_t ys2 = (uint32_t) clamp(starty + 2, 0 , maxy);
+    uint32_t ys3 = (uint32_t) clamp(starty + 3, 0 , maxy);
 
     float4 p00 = convert_float4(rsGetElementAt_uchar4(gIn, xs0, ys0));
     float4 p01 = convert_float4(rsGetElementAt_uchar4(gIn, xs1, ys0));
