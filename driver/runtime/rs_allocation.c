@@ -52,8 +52,6 @@ extern rs_element __attribute__((overloadable))
     return rs_retval;
 }
 
-#if defined(RS_G_RUNTIME) || !defined(RS_DEBUG_RUNTIME)
-
 // TODO: this needs to be optimized, obviously
 static void local_memcpy(void* dst, const void* src, size_t size) {
     char* dst_c = (char*) dst;
@@ -62,7 +60,6 @@ static void local_memcpy(void* dst, const void* src, size_t size) {
         *dst_c++ = *src_c++;
     }
 }
-#endif
 
 #ifdef RS_DEBUG_RUNTIME
 #define ELEMENT_AT(T)                                                   \
@@ -249,6 +246,7 @@ ELEMENT_AT_IMPL_TYPE(double)
     SET_ELEMENT_AT(T)                           \
     GET_ELEMENT_AT(T)
 
+#endif // RS_DEBUG_RUNTIME
 
 extern const void * __attribute__((overloadable))
         rsGetElementAt(rs_allocation a, uint32_t x) {
@@ -302,7 +300,6 @@ extern void __attribute__((overloadable))
     const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
     local_memcpy((void*)&p[(eSize * x) + (y * stride) + (z * stride * dimY)], ptr, eSize);
 }
-#endif // RS_DEBUG_RUNTIME
 
 ELEMENT_AT(char)
 ELEMENT_AT(char2)
