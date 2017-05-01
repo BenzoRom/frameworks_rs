@@ -171,4 +171,26 @@ uint32_t constructBuildChecksum(uint8_t const *bitcode, size_t bitcodeSize,
 
 } // namespace android
 
+namespace {
+
+inline bool is_force_recompile() {
+  char buf[PROP_VALUE_MAX];
+
+  // Re-compile if floating point precision has been overridden.
+  android::renderscript::property_get("debug.rs.precision", buf, "");
+  if (buf[0] != '\0') {
+    return true;
+  }
+
+  // Re-compile if debug.rs.forcerecompile is set.
+  android::renderscript::property_get("debug.rs.forcerecompile", buf, "0");
+  if ((::strcmp(buf, "1") == 0) || (::strcmp(buf, "true") == 0)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+}  // anonymous namespace
+
 #endif  // RSD_CPU_SCRIPT_H
