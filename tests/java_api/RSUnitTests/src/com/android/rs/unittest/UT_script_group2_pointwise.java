@@ -25,7 +25,7 @@ import android.util.Log;
 public class UT_script_group2_pointwise extends UnitTest {
     private static final int ARRAY_SIZE = 256;
 
-    private static final String TAG = "ScritGroup2 (Pointwise)";
+    private static final String TAG = "ScriptGroup2 (Pointwise)";
 
     public UT_script_group2_pointwise(Context ctx) {
         super(TAG, ctx);
