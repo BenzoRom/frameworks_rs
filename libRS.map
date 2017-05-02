@@ -59,6 +59,7 @@ libRS {
     rsContextSetCacheDir;
     rsContextSetPriority;
     rsContextSetSurface;
+    rsDebugGetHighLevelContext;
     rsDeviceCreate;
     rsDeviceDestroy;
     rsDeviceSetConfig;
