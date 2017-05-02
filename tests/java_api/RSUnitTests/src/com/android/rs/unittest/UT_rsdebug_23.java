@@ -19,16 +19,16 @@ package com.android.rs.unittest;
 import android.content.Context;
 import android.renderscript.RenderScript;
 
-public class UT_math_24 extends UnitTest {
+public class UT_rsdebug_23 extends UnitTest {
 
-    public UT_math_24(Context ctx) {
-        super("Math_24", ctx);
+    public UT_rsdebug_23(Context ctx) {
+        super("rsDebug_23", ctx);
     }
 
     public void run() {
         RenderScript pRS = createRenderScript(true);
-        ScriptC_math_24 s = new ScriptC_math_24(pRS);
-        s.invoke_math_24_test(0, 0);
+        ScriptC_rsdebug_23 s = new ScriptC_rsdebug_23(pRS);
+        s.invoke_test_rsdebug_23(0, 0);
         pRS.finish();
         s.destroy();
         pRS.destroy();

@@ -25,7 +25,7 @@ import android.util.Log;
 public class UT_script_group2_nochain extends UnitTest {
     private static final int ARRAY_SIZE = 256;
 
-    private static final String TAG = "ScritGroup2 (nochain)";
+    private static final String TAG = "ScriptGroup2 (nochain)";
 
     public UT_script_group2_nochain(Context ctx) {
         super(TAG, ctx);
