@@ -31,8 +31,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -57,7 +58,11 @@ public class RSBackwardCompatibilityTests {
 
         int thisApiVersion = android.os.Build.VERSION.SDK_INT;
 
-        ArrayList<UnitTest> validUnitTests = new ArrayList<>();
+        if (thisApiVersion < 19) {
+            Log.w(TAG, "API version is less than 19, no tests running");
+        }
+
+        List<UnitTest> validUnitTests = new ArrayList<>();
 
         if (thisApiVersion >= 19) {
             validUnitTests.add(new UT_alloc(ctx));
@@ -105,6 +110,7 @@ public class RSBackwardCompatibilityTests {
             validUnitTests.add(new UT_kernel2d(ctx));
             validUnitTests.add(new UT_kernel2d_oldstyle(ctx));
             validUnitTests.add(new UT_kernel3d(ctx));
+            validUnitTests.add(new UT_rsdebug_23(ctx));
             validUnitTests.add(new UT_script_group2_gatherscatter(ctx));
             validUnitTests.add(new UT_script_group2_nochain(ctx));
             validUnitTests.add(new UT_script_group2_pointwise(ctx));
@@ -126,7 +132,27 @@ public class RSBackwardCompatibilityTests {
             validUnitTests.add(new UT_small_struct_2(ctx));
         }
 
+        if (thisApiVersion >= 26) {
+            validUnitTests.add(new UT_blur_validation(ctx));
+        }
+
+        checkDuplicateNames(validUnitTests);
+
         return validUnitTests;
+    }
+
+    /**
+      * Throws RuntimeException if any tests have the same name.
+      */
+    private static void checkDuplicateNames(List<UnitTest> tests) {
+        Set<String> names = new HashSet<>();
+        for (UnitTest test : tests) {
+            String name = test.toString();
+            if (names.contains(name)) {
+                throw new RuntimeException("duplicate name: " + name);
+            }
+            names.add(name);
+        }
     }
 
     @Parameter(0)
@@ -135,11 +161,17 @@ public class RSBackwardCompatibilityTests {
     @Test
     @MediumTest
     public void testRSUnitTest() throws Exception {
+        String thisDeviceName = android.os.Build.DEVICE;
+        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
+        Log.i(TAG, String.format("RenderScript backward compatibility testing (%s) "
+                + "on device %s, API version %d",
+                mTest.toString(), thisDeviceName, thisApiVersion));
         mTest.runTest();
         switch (mTest.getResult()) {
             case UT_NOT_STARTED:
             case UT_RUNNING:
-                Log.w(TAG, "unexpected unit test result: " + mTest.getResult().toString());
+                Log.w(TAG, String.format("unexpected unit test result for test %s: %s",
+                        mTest, mTest.getResult().toString()));
                 break;
         }
         Assert.assertTrue(mTest.getSuccess());

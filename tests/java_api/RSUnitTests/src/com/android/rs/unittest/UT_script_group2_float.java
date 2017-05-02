@@ -25,7 +25,7 @@ import android.util.Log;
 public class UT_script_group2_float extends UnitTest {
     private static final int ARRAY_SIZE = 8;
 
-    private static final String TAG = "ScritGroup2 (Floating Point Test)";
+    private static final String TAG = "ScriptGroup2 (Floating Point Test)";
 
     public UT_script_group2_float(Context ctx) {
         super(TAG, ctx);
