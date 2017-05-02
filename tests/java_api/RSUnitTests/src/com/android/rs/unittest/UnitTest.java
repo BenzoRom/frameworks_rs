@@ -118,7 +118,8 @@ public abstract class UnitTest {
                 boolean success = mCountDownLatch.await(5 * 60, TimeUnit.SECONDS);
                 if (!success) {
                     failTest();
-                    Log.e("Unit test %s waited too long for pass/fail message", toString());
+                    Log.e(TAG, String.format("Unit test %s waited too long for pass/fail message",
+                          toString()));
                 }
             } catch (InterruptedException e) {
                 failTest();
