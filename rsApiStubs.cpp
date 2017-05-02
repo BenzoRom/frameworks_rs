@@ -21,6 +21,9 @@
 
 #include <android_runtime/AndroidRuntime.h>
 
+#include <mutex>
+#include <map>
+
 #undef LOG_TAG
 #define LOG_TAG "RenderScript"
 
@@ -44,6 +47,22 @@ struct RsContextWrapper {
       RsContext context = wrapper->context; \
       return wrapper->dispatch->func(context, ##__VA_ARGS__); \
     }()
+
+
+// contextMap maps RsContext to the corresponding RsContextWrapper pointer.
+static std::map<RsContext, RsContextWrapper* > contextMap;
+
+// contextMapMutex is used to protect concurrent access of the contextMap.
+// std::mutex is safe for pthreads on Android. Since other threading model
+// supported on Android are built on top of pthread, std::mutex is safe for them.
+static std::mutex contextMapMutex;
+
+// API to find high-level context (RsContextWrapper) given a low level context.
+// This API is only intended to be used by RenderScript debugger.
+extern "C" RsContext rsDebugGetHighLevelContext(RsContext context) {
+    std::unique_lock<std::mutex> lock(contextMapMutex);
+    return contextMap.at(context);
+}
 
 // Device
 // These API stubs are kept here to maintain backward compatibility,
@@ -87,6 +106,11 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
     }
 
     RsContextWrapper *ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
+    // Lock contextMap when adding new entries.
+    {
+        std::unique_lock<std::mutex> lock(contextMapMutex);
+        contextMap.insert(std::make_pair(context, ctxWrapper));
+    }
 
     std::unique_lock<std::mutex> lock(reflectionMutex);
     if (defaultCacheDir.size() == 0) {
@@ -125,12 +149,17 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
                              defaultCacheDir.c_str(),
                              defaultCacheDir.size());
     }
+
     return (RsContext) ctxWrapper;
 }
 
 extern "C" void rsContextDestroy (RsContext ctxWrapper)
 {
     RS_DISPATCH(ctxWrapper, ContextDestroy);
+
+    // Lock contextMap when deleting an existing entry.
+    std::unique_lock<std::mutex> lock(contextMapMutex);
+    contextMap.erase(reinterpret_cast< RsContextWrapper* >(ctxWrapper)->context);
 
     delete (RsContextWrapper *)ctxWrapper;
 }
@@ -658,6 +687,11 @@ RsContext rsContextCreateGL(RsDevice vdev, uint32_t version, uint32_t sdkVersion
     RsContext context = instance.GetEntryFuncs()->ContextCreateGL(vdev, version, sdkVersion, sc, dpi);
 
     RsContextWrapper *ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
+
+    // Lock contextMap when adding new entries.
+    std::unique_lock<std::mutex> lock(contextMapMutex);
+    contextMap.insert(std::make_pair(context, ctxWrapper));
+
     return (RsContext) ctxWrapper;
 }
 
