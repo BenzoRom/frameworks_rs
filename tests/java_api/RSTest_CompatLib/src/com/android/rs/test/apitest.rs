@@ -1357,10 +1357,10 @@ static bool test_rs_alloc_api() {
         rsAllocationCopy1DRange(allocDst, 0, 0, x, a, 0, 0);
     _RS_ASSERT(rsGetElementAt_char(allocDst, 1, 0) == 5);
     if (failed) {
-        rsDebug("test_obj_api FAILED", -1);
+        rsDebug("test_rs_alloc_api FAILED", -1);
     }
     else {
-        rsDebug("test_obj_api PASSED", 0);
+        rsDebug("test_rs_alloc_api PASSED", 0);
     }
 
     return failed;
