@@ -26,7 +26,7 @@ static uchar4 estimateWhite() {
     int sum_r =  0, sum_g =  0, sum_b =  0;
 
     for (int i = 1; i < 255; i++) {
-        int4 hv = rsGetElementAt_int4(histogramValues, i);
+        int3 hv = rsGetElementAt_int3(histogramValues, i);
         int r = hv.r;
         int g = hv.g;
         int b = hv.b;
@@ -53,7 +53,7 @@ static uchar4 estimateWhite() {
     int tmp_r = 0, tmp_g = 0, tmp_b = 0;
 
     for (int i = 254; i >0; i--) {
-        int4 hv = rsGetElementAt_int4(histogramValues, i);
+        int3 hv = rsGetElementAt_int3(histogramValues, i);
         int r = hv.r;
         int g = hv.g;
         int b = hv.b;
