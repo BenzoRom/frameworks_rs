@@ -5,3 +5,50 @@ cc_library_headers {
     export_include_dirs: ["."],
     sdk_version: "9",
 }
+
+cc_library_shared {
+    name: "libRS",
+
+    srcs: [
+        "rsApiStubs.cpp",
+        "rsHidlAdaptation.cpp",
+        "rsFallbackAdaptation.cpp",
+    ],
+
+    cflags: [
+        "-Werror",
+        "-Wall",
+        "-Wextra",
+        "-Wno-unused-parameter",
+        "-Wno-unused-variable",
+    ],
+
+    // Default CPU fallback
+    required: [
+        "libRS_internal",
+        "libRSDriver",
+    ],
+
+    // Treble configuration
+    shared_libs: [
+        "libhidlbase",
+        "libhidltransport",
+        "libhwbinder",
+        "libutils",
+        "android.hardware.renderscript@1.0",
+
+        "liblog",
+        "libcutils",
+        "libandroid_runtime",
+    ],
+
+    static_libs: ["libRSDispatch"],
+
+    version_script: "libRS.map",
+
+    product_variables: {
+        override_rs_driver: {
+            cflags: ["-DOVERRIDE_RS_DRIVER=%s"],
+        },
+    },
+}

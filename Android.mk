@@ -217,33 +217,6 @@ LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
 
-include $(CLEAR_VARS)
-LOCAL_MODULE := libRS
-
-LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-
-LOCAL_SRC_FILES:= \
-	rsApiStubs.cpp \
-	rsHidlAdaptation.cpp \
-	rsFallbackAdaptation.cpp
-
-# Default CPU fallback
-LOCAL_REQUIRED_MODULES := libRS_internal libRSDriver
-
-# Treble configuration
-LOCAL_SHARED_LIBRARIES += libhidlbase libhidltransport libhwbinder libutils android.hardware.renderscript@1.0
-
-LOCAL_SHARED_LIBRARIES += liblog libcutils libandroid_runtime
-
-LOCAL_STATIC_LIBRARIES := \
-        libRSDispatch
-
-LOCAL_CFLAGS += $(rs_base_CFLAGS)
-
-LOCAL_LDFLAGS += -Wl,--version-script,${LOCAL_PATH}/libRS.map
-
-include $(BUILD_SHARED_LIBRARY)
-
 endif # TARGET_BUILD_PDK
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
