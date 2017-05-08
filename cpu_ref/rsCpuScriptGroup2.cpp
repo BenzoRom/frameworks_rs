@@ -473,8 +473,13 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
     bool alreadyLoaded = false;
     std::string cloneName;
 
-    mScriptObj = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName, nullptr,
-                                                       &alreadyLoaded);
+    const bool useRSDebugContext =
+            (mCpuRefImpl->getContext()->getContextType() == RS_CONTEXT_TYPE_DEBUG);
+    const bool reuse = !is_force_recompile() && !useRSDebugContext;
+    if (reuse) {
+        mScriptObj = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName, nullptr,
+                                                           &alreadyLoaded);
+    }
     if (mScriptObj != nullptr) {
         // A shared library named resName is found in code cache directory
         // cacheDir, and loaded with the handle stored in mScriptObj.
@@ -528,8 +533,11 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
     // Create and load the shared lib
     //===--------------------------------------------------------------------===//
 
+    std::string SOPath;
+
     if (!SharedLibraryUtils::createSharedLibrary(
-            getCpuRefImpl()->getContext()->getDriverName(), cacheDir, resName)) {
+            getCpuRefImpl()->getContext()->getDriverName(), cacheDir, resName,
+            reuse, &SOPath)) {
         ALOGE("Failed to link object file '%s'", resName);
         unlink(objFilePath.c_str());
         return;
@@ -537,7 +545,11 @@ void CpuScriptGroup2Impl::compile(const char* cacheDir) {
 
     unlink(objFilePath.c_str());
 
-    mScriptObj = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName);
+    if (reuse) {
+        mScriptObj = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName);
+    } else {
+        mScriptObj = SharedLibraryUtils::loadAndDeleteSharedLibrary(SOPath.c_str());
+    }
     if (mScriptObj == nullptr) {
         ALOGE("Unable to load '%s'", resName);
         return;

@@ -31,9 +31,14 @@ class Context;
 class SharedLibraryUtils {
 public:
 #ifndef RS_COMPATIBILITY_LIB
+    // Creates a shared library in cacheDir for the bitcode named resName.
+    // If reuse is false and SOPath is not nullptr, saves the filename
+    // used for the shared library in SOPath.
     static bool createSharedLibrary(const char* driverName,
                                     const char* cacheDir,
-                                    const char* resName);
+                                    const char* resName,
+                                    const bool reuse = true,
+                                    std::string *SOPath = nullptr);
 #endif
 
     // Load the shared library referred to by cacheDir and resName. If we have
@@ -47,6 +52,13 @@ public:
     static void* loadSharedLibrary(const char *cacheDir, const char *resName,
                                    const char *nativeLibDir = nullptr,
                                    bool *alreadyLoaded = nullptr);
+
+    // Load the shared library referred to by fullPath, and delete it right
+    // after loading it. Files loaded by this function are only used once, e.g.,
+    // shared libraries generated for scripts in a debug context. Deleting them
+    // is OK in this case since the shared libraries have already been dlopened.
+    // Deletion is also required because such files are not intended for reuse.
+    static void* loadAndDeleteSharedLibrary(const char *fullPath);
 
     // Create a len length string containing random characters from [A-Za-z0-9].
     static std::string getRandomString(size_t len);

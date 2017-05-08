@@ -57,24 +57,6 @@ static bool allocationLODIsNull(const android::renderscript::Allocation *alloc) 
 
 #ifndef RS_COMPATIBILITY_LIB
 
-static bool is_force_recompile() {
-  char buf[PROP_VALUE_MAX];
-
-  // Re-compile if floating point precision has been overridden.
-  android::renderscript::property_get("debug.rs.precision", buf, "");
-  if (buf[0] != '\0') {
-    return true;
-  }
-
-  // Re-compile if debug.rs.forcerecompile is set.
-  android::renderscript::property_get("debug.rs.forcerecompile", buf, "0");
-  if ((::strcmp(buf, "1") == 0) || (::strcmp(buf, "true") == 0)) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
 static void setCompileArguments(std::vector<const char*>* args,
                                 const std::string& bcFileName,
                                 const char* cacheDir, const char* resName,
@@ -381,7 +363,8 @@ bool RsdCpuScriptImpl::init(char const *resName, char const *cacheDir,
     compileArguments.push_back(checksumStr.c_str());
     compileArguments.push_back(nullptr);
 
-    if (!is_force_recompile() && !useRSDebugContext) {
+    const bool reuse = !is_force_recompile() && !useRSDebugContext;
+    if (reuse) {
         mScriptSO = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName);
 
         // Read RS info from the shared object to detect checksum mismatch
@@ -391,8 +374,8 @@ bool RsdCpuScriptImpl::init(char const *resName, char const *cacheDir,
         }
     }
 
-    // If we can't, it's either not there or out of date.  We compile the bit code and try loading
-    // again.
+    // If reuse is desired and we can't, it's either not there or out of date.
+    // We compile the bit code and try loading again.
     if (mScriptSO == nullptr) {
         if (!compileBitcode(bcFileName, (const char*)bitcode, bitcodeSize,
                             compileArguments))
@@ -402,14 +385,21 @@ bool RsdCpuScriptImpl::init(char const *resName, char const *cacheDir,
             return false;
         }
 
-        if (!SharedLibraryUtils::createSharedLibrary(mCtx->getContext()->getDriverName(),
-                                                     cacheDir, resName)) {
+        std::string SOPath;
+
+        if (!SharedLibraryUtils::createSharedLibrary(
+                mCtx->getContext()->getDriverName(), cacheDir, resName, reuse,
+                &SOPath)) {
             ALOGE("Linker: Failed to link object file '%s'", resName);
             mCtx->unlockMutex();
             return false;
         }
 
-        mScriptSO = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName);
+        if (reuse) {
+            mScriptSO = SharedLibraryUtils::loadSharedLibrary(cacheDir, resName);
+        } else {
+            mScriptSO = SharedLibraryUtils::loadAndDeleteSharedLibrary(SOPath.c_str());
+        }
         if (mScriptSO == nullptr) {
             ALOGE("Unable to load '%s'", resName);
             mCtx->unlockMutex();
