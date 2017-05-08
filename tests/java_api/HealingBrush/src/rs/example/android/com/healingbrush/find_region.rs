@@ -87,12 +87,12 @@ void calcBounds(rs_allocation xy, rs_allocation rect) {
 }
 
 
-float3 __attribute__((kernel))extractBorder(uint2 in) {
+float3 __attribute__((kernel))extractBorder(int2 in) {
    return convert_float3(rsGetElementAt_uchar4(image, in.x, in.y).xyz);
 }
 
-uint2 __attribute__((kernel)) toInt(float2 in) {
-  uint2 out = {(int)in.x, (int) in.y};
+int2 __attribute__((kernel)) toInt(float2 in) {
+  int2 out = {(int)in.x, (int) in.y};
   return out;
 }
 
