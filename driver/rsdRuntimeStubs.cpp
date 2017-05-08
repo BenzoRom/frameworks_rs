@@ -589,7 +589,36 @@ ELEMENT_AT(uint, RS_TYPE_UNSIGNED_32, 1)
 ELEMENT_AT(uint2, RS_TYPE_UNSIGNED_32, 2)
 ELEMENT_AT(uint3, RS_TYPE_UNSIGNED_32, 3)
 ELEMENT_AT(uint4, RS_TYPE_UNSIGNED_32, 4)
+#ifdef __LP64__
 ELEMENT_AT(long, RS_TYPE_SIGNED_64, 1)
+#else
+/* the long versions need special treatment; the long * argument has to be
+ * kept so the signatures match, but the actual accesses have to be done in
+ * int64_t * to be consistent with the script ABI.
+ */
+void rsSetElementAt_long(::rs_allocation a, const long *val, uint32_t x, uint32_t y, uint32_t z) {
+    void *r = ElementAt((Allocation *)a.p, RS_TYPE_SIGNED_64, 1, x, y, z);
+    if (r != nullptr) ((int64_t *)r)[0] = *((int64_t *)val);
+    else ALOGE("Error from %s", __PRETTY_FUNCTION__);
+}
+void rsSetElementAt_long(::rs_allocation a, const long *val, uint32_t x, uint32_t y) {
+    rsSetElementAt_long(a, val, x, y, 0);
+}
+void rsSetElementAt_long(::rs_allocation a, const long *val, uint32_t x) {
+    rsSetElementAt_long(a, val, x, 0, 0);
+}
+void rsGetElementAt_long(::rs_allocation a, long *val, uint32_t x, uint32_t y, uint32_t z) { /*NOLINT*/
+    void *r = ElementAt((Allocation *)a.p, RS_TYPE_SIGNED_64, 1, x, y, z);
+    if (r != nullptr) *((int64_t*)val) = ((int64_t *)r)[0];
+    else ALOGE("Error from %s", __PRETTY_FUNCTION__);
+}
+void rsGetElementAt_long(::rs_allocation a, long *val, uint32_t x, uint32_t y) { /*NOLINT*/
+    rsGetElementAt_long(a, val, x, y, 0);
+}
+void rsGetElementAt_long(::rs_allocation a, long *val, uint32_t x) { /*NOLINT*/
+    rsGetElementAt_long(a, val, x, 0, 0);
+}
+#endif
 ELEMENT_AT(long2, RS_TYPE_SIGNED_64, 2)
 ELEMENT_AT(long3, RS_TYPE_SIGNED_64, 3)
 ELEMENT_AT(long4, RS_TYPE_SIGNED_64, 4)
