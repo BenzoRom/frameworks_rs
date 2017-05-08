@@ -919,8 +919,6 @@ RsScript RsHidlAdaptation::ScriptCCreate (RsContext context,
                                           const char *cacheDir, size_t cacheDir_length,
                                           const char *text, size_t text_length)
 {
-    ALOGD("resName: %s, cacheDir: %s, text: %s", resName, cacheDir, text);
-
     hidl_vec<uint8_t> _text;
     _text.setToExternal(reinterpret_cast<uint8_t *>(const_cast<char *>(text)), text_length);
     uint64_t scriptc = GetIContextHandle(context)->scriptCCreate(hidl_string(resName), hidl_string(cacheDir), _text);
