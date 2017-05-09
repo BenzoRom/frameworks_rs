@@ -1728,9 +1728,9 @@ nScriptForEachMulti(JNIEnv *_env, jobject _this, jlong con, jlong script, jint s
         sca = &sc;
     }
 
-    dispatchTabInc.ScriptForEachMulti((RsContext)con, (RsScript)script, slot,
-                                      in_allocs, in_len, (RsAllocation)aout,
-                                      param_ptr, param_len, sca, sc_size);
+    dispatchTab.ScriptForEachMulti((RsContext)con, (RsScript)script, slot,
+                                   in_allocs, in_len, (RsAllocation)aout,
+                                   param_ptr, param_len, sca, sc_size);
 
 exit:
 
