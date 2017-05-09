@@ -216,7 +216,6 @@ def WriteForwardMakefile(gen_file):
         'LOCAL_STATIC_JAVA_LIBRARIES := android-support-test\n'
         'LOCAL_COMPATIBILITY_SUITE := device-tests\n'
         'LOCAL_RENDERSCRIPT_TARGET_API := 0\n'
-        'LOCAL_RENDERSCRIPT_COMPATIBILITY := true\n'
         'LOCAL_PACKAGE_NAME := {}\n'
         'my_rs_path := $(TOP)/prebuilts/renderscript/host/linux-x86/{}\n'
         'LOCAL_RENDERSCRIPT_CC := $(my_rs_path)/bin/llvm-rs-cc\n'
