@@ -86,9 +86,9 @@ public class FindRegion {
         Allocation border_coords;
         Allocation border_values;
 
-        Type.Builder builderU32_2 = new Type.Builder(mRs, Element.U32_2(mRs));
-        builderU32_2.setX(mPointsXY.length / 2);
-        border_coords = Allocation.createTyped(mRs, builderU32_2.create());
+        Type.Builder builderI32_2 = new Type.Builder(mRs, Element.I32_2(mRs));
+        builderI32_2.setX(mPointsXY.length / 2);
+        border_coords = Allocation.createTyped(mRs, builderI32_2.create());
 
         Allocation border_coords_float;
         border_coords_float = Allocation.createSized(mRs, Element.F32_2(mRs), mPointsXY.length / 2);
