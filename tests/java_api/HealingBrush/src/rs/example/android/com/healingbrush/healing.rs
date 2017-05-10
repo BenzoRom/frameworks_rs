@@ -68,18 +68,14 @@
 
 typedef rs_allocation AllocationF32_3;
 
-static float3 getF32_3(AllocationF32_3 in,uint32_t x,uint32_t y) {
-  return rsGetElementAt_float3(in, x, y);
-}
-
 AllocationF32_3 src;
 
 float3 __attribute__((kernel)) laplacian( uint32_t x, uint32_t y) {
-  float3 out = 4 * getF32_3(src, x, y);
-  out -= getF32_3(src, x - 1, y);
-  out -= getF32_3(src, x + 1, y);
-  out -= getF32_3(src, x, y -1 );
-  out -= getF32_3(src, x, y + 1);
+  float3 out = 4 * rsGetElementAt_float3(src, x, y);
+  out -= rsGetElementAt_float3(src, x - 1, y);
+  out -= rsGetElementAt_float3(src, x + 1, y);
+  out -= rsGetElementAt_float3(src, x, y -1 );
+  out -= rsGetElementAt_float3(src, x, y + 1);
   return out;
 }
 
@@ -93,7 +89,7 @@ float3 __attribute__((kernel)) convert_to_f(uchar4 in) {
 }
 
 float3 __attribute__((kernel)) copyMasked(uchar in, uint32_t x, uint32_t y) {
-  return  getF32_3((in>0) ? src : dest1, x, y);
+  return  rsGetElementAt_float3((in>0) ? src : dest1, x, y);
 }
 
 uchar4 __attribute__((kernel)) convert_to_uc(float3 in) {
@@ -111,11 +107,11 @@ uchar4 __attribute__((kernel)) alphaMask(uchar4 in, uint32_t x, uint32_t y) {
 
 float3 __attribute__((kernel)) solve1(uchar in, uint32_t x, uint32_t y) {
   if (in > 0) {
-     float3 k = getF32_3(dest1, x - 1, y);
-     k += getF32_3(dest1, x + 1, y);
-     k += getF32_3(dest1, x, y - 1);
-     k += getF32_3(dest1, x, y + 1);
-     k += getF32_3(laplace, x, y);
+     float3 k = rsGetElementAt_float3(dest1, x - 1, y);
+     k += rsGetElementAt_float3(dest1, x + 1, y);
+     k += rsGetElementAt_float3(dest1, x, y - 1);
+     k += rsGetElementAt_float3(dest1, x, y + 1);
+     k += rsGetElementAt_float3(laplace, x, y);
      k /= 4;
      return k;
   }
@@ -125,15 +121,15 @@ float3 __attribute__((kernel)) solve1(uchar in, uint32_t x, uint32_t y) {
 
 float3 __attribute__((kernel)) solve2(uchar in, uint32_t x, uint32_t y) {
   if (in > 0) {
-    float3 k = getF32_3(dest2, x - 1, y);
-    k += getF32_3(dest2, x + 1, y);
-    k += getF32_3(dest2, x, y - 1);
-    k += getF32_3(dest2, x, y + 1);
-       k += getF32_3(laplace, x, y);
+    float3 k = rsGetElementAt_float3(dest2, x - 1, y);
+    k += rsGetElementAt_float3(dest2, x + 1, y);
+    k += rsGetElementAt_float3(dest2, x, y - 1);
+    k += rsGetElementAt_float3(dest2, x, y + 1);
+       k += rsGetElementAt_float3(laplace, x, y);
        k /= 4;
        return k;
   }
-  return getF32_3(dest2, x, y);;
+  return rsGetElementAt_float3(dest2, x, y);;
 }
 
 rs_allocation image;
