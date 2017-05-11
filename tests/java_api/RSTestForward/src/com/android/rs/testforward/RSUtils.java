@@ -16,8 +16,6 @@
 
 package com.android.rs.testforward;
 
-import com.android.rs.unittest.UnitTest;
-
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 

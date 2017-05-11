@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.rs.testbackward;
+package com.android.rs.testbackward19;
 
 import com.android.rs.unittest.*;
 
@@ -34,14 +34,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * RSTestBackward, functional test for platform RenderScript APIs.
+ * RSTestBackward19, functional test for platform RenderScript APIs.
+ *
+ * RSTestBackward19 is necessary in addition to RSTestBackward because setting the target api
+ * to anything above 19 causes all tests to fail on API 19 and below
+ *
+ * However, setting the target api to 19 causes many tests to fail to compile, so backward
+ * compatibility testing needs to be separated to pre-19 and post-19 API versions
+ *
  * To run the test, please use command
  *
- * adb shell am instrument -w com.android.rs.testbackward/android.support.test.runner.AndroidJUnitRunner
+ * adb shell am instrument -w com.android.rs.testbackward19/android.support.test.runner.AndroidJUnitRunner
  */
 @RunWith(Parameterized.class)
-public class RSBackwardCompatibilityTests {
-    private static final String TAG = RSBackwardCompatibilityTests.class.getSimpleName();
+public class RSBackward19CompatibilityTests {
+    private static final String TAG = RSBackward19CompatibilityTests.class.getSimpleName();
 
     /**
      * Returns the list of subclasses of UnitTest to run.
@@ -50,10 +57,17 @@ public class RSBackwardCompatibilityTests {
     public static Iterable<?> getParams() throws Exception {
         int thisApiVersion = android.os.Build.VERSION.SDK_INT;
 
-        int minApiVersion = 21;
+        int minApiVersion = 17;
         if (thisApiVersion < minApiVersion) {
             Log.w(TAG,
                 String.format("API version is less than %d, no tests running", minApiVersion));
+        }
+
+        int maxApiVersion = 19;
+        if (thisApiVersion > maxApiVersion) {
+            Log.w(TAG,
+                String.format("API version is greater than %d, please use RSTestBackward",
+                    maxApiVersion));
         }
 
         Context ctx = InstrumentationRegistry.getTargetContext();
@@ -81,7 +95,7 @@ public class RSBackwardCompatibilityTests {
     public void testRSUnitTest() throws Exception {
         String thisDeviceName = android.os.Build.DEVICE;
         int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-        Log.i(TAG, String.format("RenderScript backward compatibility testing (%s) "
+        Log.i(TAG, String.format("RenderScript backward compatibility 19 testing (%s) "
                 + "on device %s, API version %d",
                 mTest.toString(), thisDeviceName, thisApiVersion));
         mTest.runTest();
