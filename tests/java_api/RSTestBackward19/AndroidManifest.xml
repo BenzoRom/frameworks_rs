@@ -14,18 +14,18 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.rs.testbackward">
+    package="com.android.rs.testbackward19">
     <uses-sdk
-        android:minSdkVersion="21"
-        android:targetSdkVersion="26" />
+        android:minSdkVersion="17"
+        android:targetSdkVersion="19" />
 
     <application
-        android:label="RSTestBackward">
+        android:label="RSTestBackward19">
         <uses-library android:name="android.test.runner" />
     </application>
 
     <instrumentation
         android:name="android.support.test.runner.AndroidJUnitRunner"
-        android:targetPackage="com.android.rs.testbackward"
-        android:label="RenderScript Backward Compatibility Tests" />
+        android:targetPackage="com.android.rs.testbackward19"
+        android:label="RenderScript Backward Compatibility Tests (19)" />
 </manifest>
