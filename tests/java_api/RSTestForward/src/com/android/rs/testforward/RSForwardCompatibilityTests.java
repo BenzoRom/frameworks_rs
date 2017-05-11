@@ -41,7 +41,7 @@ import java.util.List;
  */
 @RunWith(Parameterized.class)
 public class RSForwardCompatibilityTests {
-    private static final String TAG = "RSForwardCompatibilityTests";
+    private static final String TAG = RSForwardCompatibilityTests.class.getSimpleName();
 
     /**
      * Returns the list of subclasses of UnitTest to run.
