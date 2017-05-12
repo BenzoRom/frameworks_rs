@@ -63,6 +63,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/foreach_bounds.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\

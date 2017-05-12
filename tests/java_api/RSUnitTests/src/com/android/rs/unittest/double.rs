@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#pragma version(1)
-#pragma rs java_package_name(com.android.rs.unittest)
+#include "shared.rsh"
 
 int4 RS_KERNEL doubleKernel(int4 in)
 {

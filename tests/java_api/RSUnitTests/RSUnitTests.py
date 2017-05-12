@@ -55,6 +55,7 @@ UNIT_TESTS = {
         'foreach',
         'foreach_bounds',
         'fp_mad',
+        'instance',
         'int4',
         'kernel',
         'kernel_struct',
@@ -81,6 +82,8 @@ UNIT_TESTS = {
     ],
 
     23: [
+        'alloc_copy',
+        'alloc_copyPadded',
         'ctxt_default',
         'kernel2d',
         'kernel2d_oldstyle',
@@ -117,6 +120,8 @@ UNIT_TESTS = {
 # Dictionary mapping unit tests to the corresponding needed .rs files.
 # Only needed if UT_{}.java does not map to {}.rs.
 UNIT_TEST_RS_FILES_OVERRIDE = {
+    'alloc_copy': [],
+    'alloc_copyPadded': [],
     'blur_validation': [],
     'script_group2_float': ['float_test.rs'],
     'script_group2_gatherscatter': ['addup.rs'],

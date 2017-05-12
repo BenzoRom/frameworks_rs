@@ -62,7 +62,9 @@ static bool failed = false;
         return in;                                                             \
     }                                                                          \
 
+#ifndef RSTEST_COMPAT
 VERIFY_KERNEL(half)
+#endif
 VERIFY_KERNEL(float)
 VERIFY_KERNEL(double)
 VERIFY_KERNEL(char)
@@ -176,7 +178,12 @@ void CreateAndTestAlloc(int dataType, int vecSize) {
                 // Store to a cell based on the type, vector size and
                 // dimensionality
                 switch (dt) {
+#ifndef RSTEST_COMPAT
                     STORE_TO_ALLOC(RS_TYPE_FLOAT_16, half);
+#else
+                    // support lib doesn't support f16, skip
+                    case RS_TYPE_FLOAT_16: break;
+#endif
                     STORE_TO_ALLOC(RS_TYPE_FLOAT_32, float);
                     STORE_TO_ALLOC(RS_TYPE_FLOAT_64, double);
                     STORE_TO_ALLOC(RS_TYPE_SIGNED_8, char);
@@ -198,7 +205,12 @@ void CreateAndTestAlloc(int dataType, int vecSize) {
 
     // Launch the appropriate verify_ kernel
     switch (dt) {
+#ifndef RSTEST_COMPAT
         LAUNCH_VERIFY_KERNEL(RS_TYPE_FLOAT_16, half);
+#else
+        // support lib doesn't support f16, skip
+        case RS_TYPE_FLOAT_16: break;
+#endif
         LAUNCH_VERIFY_KERNEL(RS_TYPE_FLOAT_32, float);
         LAUNCH_VERIFY_KERNEL(RS_TYPE_FLOAT_64, double);
         LAUNCH_VERIFY_KERNEL(RS_TYPE_SIGNED_8, char);
@@ -392,7 +404,9 @@ void TestAllCases() {
     _RS_ASSERT(!rsIsObject(rsCreateAllocation(I32_3_2D,
                     (uint32_t) RS_ALLOCATION_USAGE_SHARED)));
 
+#ifndef RSTEST_COMPAT
     TEST_HELPER(half);
+#endif
     TEST_HELPERS(float);
     TEST_HELPERS(double);
     TEST_HELPERS(char);

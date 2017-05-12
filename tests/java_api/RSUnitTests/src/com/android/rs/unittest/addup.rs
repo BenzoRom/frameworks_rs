@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-#pragma version(1)
-#pragma rs java_package_name(com.android.rs.unittest)
+#import "shared.rsh"
 
 rs_allocation a_in;
 int reduction_stride;
