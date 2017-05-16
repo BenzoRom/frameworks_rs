@@ -120,6 +120,9 @@ void Type::compute() {
     // YUV only supports basic 2d
     // so we can stash the plane pointers in the mipmap levels.
     if (mHal.state.dimYuv) {
+        mHal.state.lodDimX[0] = tx;
+        mHal.state.lodDimY[0] = ty;
+        mHal.state.lodDimZ[0] = tz;
         mHal.state.lodDimX[1] = mHal.state.lodDimX[0] / 2;
         mHal.state.lodDimY[1] = mHal.state.lodDimY[0] / 2;
         mHal.state.lodDimX[2] = mHal.state.lodDimX[0] / 2;
