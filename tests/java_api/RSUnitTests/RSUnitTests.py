@@ -127,10 +127,6 @@ UNIT_TEST_RS_FILES_OVERRIDE = {
 
 # List of API versions and the corresponding build tools release version
 BUILD_TOOL_VERSIONS = {
-    # TODO(aeubanks): either remove or uncomment
-    # after figuring out what to do with 19 and 20.
-    #19: '19.1.0',
-    #20: '20.0.0',
     21: '21.1.2',
     22: '22.0.1',
     23: '23.0.3',
