@@ -48,6 +48,7 @@ public class RSTests {
             validClasses.add(UT_foreach.class);
             validClasses.add(UT_foreach_bounds.class);
             validClasses.add(UT_fp_mad.class);
+            validClasses.add(UT_instance.class);
             validClasses.add(UT_int4.class);
             validClasses.add(UT_kernel.class);
             validClasses.add(UT_kernel_struct.class);
