@@ -25,9 +25,25 @@ public class UT_single_source_alloc extends UnitTest {
     private int dimZ = 5;
     private int start = 23;
 
-    // rs_data_type for float, double, char, short, int, long, uchar, ushort, uint, ulong in that
-    // order
-    private int rsDataTypes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
+    // Mimicking enum rs_data_type in frameworks/rs/script_api/include/rs_object_types.rsh
+    private enum rsDataType {
+        RS_TYPE_FLOAT_16    (1),
+        RS_TYPE_FLOAT_32    (2),
+        RS_TYPE_FLOAT_64    (3),
+        RS_TYPE_SIGNED_8    (4),
+        RS_TYPE_SIGNED_16   (5),
+        RS_TYPE_SIGNED_32   (6),
+        RS_TYPE_SIGNED_64   (7),
+        RS_TYPE_UNSIGNED_8  (8),
+        RS_TYPE_UNSIGNED_16 (9),
+        RS_TYPE_UNSIGNED_32 (10),
+        RS_TYPE_UNSIGNED_64 (11);
+
+        private int value;
+
+        rsDataType(int value) { this.value = value; }
+        public int Value() { return value; }
+    }
 
     public UT_single_source_alloc(Context ctx) {
         super("SingleSourceAllocation", ctx);
@@ -48,11 +64,11 @@ public class UT_single_source_alloc extends UnitTest {
 
         // Test 1-D, 2-D and 3-D Allocations of basic RenderScript types by creating Allocations and
         // invoking a kernel on them.
-        for (int dataType : rsDataTypes) {
+        for (rsDataType dataType : rsDataType.values()) {
             for (int vecSize = 1; vecSize <= 4; vecSize++) {
                 for (int nDims = 1; nDims <= 3; nDims++) {
                     initializeGlobals(pRS, s, nDims);
-                    s.invoke_CreateAndTestAlloc(dataType, vecSize);
+                    s.invoke_CreateAndTestAlloc(dataType.Value(), vecSize);
                 }
             }
         }
