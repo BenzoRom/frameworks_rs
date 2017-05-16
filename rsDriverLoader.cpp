@@ -240,21 +240,14 @@ bool Context::loadDriver(bool forceDefault, bool forceRSoV) {
         ALOGE("Failed to load the RSoV driver!");
     }
 
-#ifdef OVERRIDE_RS_DRIVER
-#define XSTR(S) #S
-#define STR(S) XSTR(S)
-#define OVERRIDE_RS_DRIVER_STRING STR(OVERRIDE_RS_DRIVER)
-    if (!forceDefault) {
-        if (loadRuntime(OVERRIDE_RS_DRIVER_STRING)) {
-            ALOGV("Successfully loaded runtime: %s", OVERRIDE_RS_DRIVER_STRING);
+    if (!forceDefault && mVendorDriverName != nullptr) {
+        if (loadRuntime(mVendorDriverName)) {
+            ALOGV("Successfully loaded runtime: %s", mVendorDriverName);
             loadDefault = false;
         } else {
-            ALOGE("Failed to load runtime %s, loading default", OVERRIDE_RS_DRIVER_STRING);
+            ALOGE("Failed to load runtime %s, loading default", mVendorDriverName);
         }
     }
-#undef XSTR
-#undef STR
-#endif  // OVERRIDE_RS_DRIVER
 
     if (loadDefault) {
         if (!loadRuntime("libRSDriver.so")) {
