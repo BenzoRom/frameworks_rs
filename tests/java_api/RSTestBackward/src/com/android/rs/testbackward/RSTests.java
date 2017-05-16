@@ -48,6 +48,7 @@ public class RSTests {
             validClasses.add(UT_foreach.class);
             validClasses.add(UT_foreach_bounds.class);
             validClasses.add(UT_fp_mad.class);
+            validClasses.add(UT_instance.class);
             validClasses.add(UT_int4.class);
             validClasses.add(UT_kernel.class);
             validClasses.add(UT_kernel_struct.class);
@@ -74,6 +75,8 @@ public class RSTests {
         }
 
         if (thisApiVersion >= 23) {
+            validClasses.add(UT_alloc_copy.class);
+            validClasses.add(UT_alloc_copyPadded.class);
             validClasses.add(UT_ctxt_default.class);
             validClasses.add(UT_kernel2d.class);
             validClasses.add(UT_kernel2d_oldstyle.class);

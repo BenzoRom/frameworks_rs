@@ -74,6 +74,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/foreach_multi.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\
@@ -168,6 +170,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/foreach_multi.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\
@@ -228,6 +232,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/UnitTest.java\
     $(my_rs_unit_tests_path)/UT_alloc.java\
     $(my_rs_unit_tests_path)/alloc.rs\
+    $(my_rs_unit_tests_path)/UT_alloc_copy.java\
+    $(my_rs_unit_tests_path)/UT_alloc_copyPadded.java\
     $(my_rs_unit_tests_path)/UT_array_alloc.java\
     $(my_rs_unit_tests_path)/array_alloc.rs\
     $(my_rs_unit_tests_path)/UT_array_init.java\
@@ -264,6 +270,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/foreach_multi.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\
@@ -341,6 +349,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/UnitTest.java\
     $(my_rs_unit_tests_path)/UT_alloc.java\
     $(my_rs_unit_tests_path)/alloc.rs\
+    $(my_rs_unit_tests_path)/UT_alloc_copy.java\
+    $(my_rs_unit_tests_path)/UT_alloc_copyPadded.java\
     $(my_rs_unit_tests_path)/UT_array_alloc.java\
     $(my_rs_unit_tests_path)/array_alloc.rs\
     $(my_rs_unit_tests_path)/UT_array_init.java\
@@ -381,6 +391,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/fp16_globals.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\
@@ -480,6 +492,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/UnitTest.java\
     $(my_rs_unit_tests_path)/UT_alloc.java\
     $(my_rs_unit_tests_path)/alloc.rs\
+    $(my_rs_unit_tests_path)/UT_alloc_copy.java\
+    $(my_rs_unit_tests_path)/UT_alloc_copyPadded.java\
     $(my_rs_unit_tests_path)/UT_array_alloc.java\
     $(my_rs_unit_tests_path)/array_alloc.rs\
     $(my_rs_unit_tests_path)/UT_array_init.java\
@@ -520,6 +534,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/fp16_globals.rs\
     $(my_rs_unit_tests_path)/UT_fp_mad.java\
     $(my_rs_unit_tests_path)/fp_mad.rs\
+    $(my_rs_unit_tests_path)/UT_instance.java\
+    $(my_rs_unit_tests_path)/instance.rs\
     $(my_rs_unit_tests_path)/UT_int4.java\
     $(my_rs_unit_tests_path)/int4.rs\
     $(my_rs_unit_tests_path)/UT_kernel.java\

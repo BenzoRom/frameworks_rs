@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-#pragma version(1)
+#include "shared.rsh"
 
-#pragma rs java_package_name(com.android.rs.unittest)
+int i;
+rs_allocation ai;
 
-typedef struct ListAllocs_s {
-    rs_allocation text;
-    int result;
-} ListAllocs;
-
-ListAllocs *gList;
-
+void instance_test() {
+    // Set our allocation based on the global input value.
+    rsSetElementAt_int(ai, i, 0);
+}

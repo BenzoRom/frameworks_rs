@@ -19,9 +19,16 @@ package com.android.rs.unittest;
 import android.content.Context;
 import android.renderscript.RenderScript;
 import android.renderscript.RenderScript.RSMessageHandler;
+import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
+import dalvik.system.DexFile;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -151,13 +158,46 @@ public abstract class UnitTest {
      */
     public static void checkDuplicateNames(Iterable<UnitTest> tests) {
         Set<String> names = new HashSet<>();
+        List<String> duplicates = new ArrayList<>();
         for (UnitTest test : tests) {
             String name = test.toString();
             if (names.contains(name)) {
-                throw new RuntimeException("duplicate name: " + name);
+                duplicates.add(name);
             }
             names.add(name);
         }
+        if (!duplicates.isEmpty()) {
+            throw new RuntimeException("duplicate name(s): " + duplicates);
+        }
+    }
+
+    public static Iterable<Class<? extends UnitTest>> getProperSubclasses()
+            throws ClassNotFoundException, IOException {
+        return getProperSubclasses(UnitTest.class);
+    }
+
+    /** Returns a list of all proper subclasses of the input class */
+    private static <T> Iterable<Class<? extends T>> getProperSubclasses(Class<T> klass)
+            throws ClassNotFoundException, IOException {
+        Context context = InstrumentationRegistry.getTargetContext();
+
+        ArrayList<Class<? extends T>> ret = new ArrayList<>();
+        DexFile df = new DexFile(context.getPackageCodePath());
+        Enumeration<String> iter = df.entries();
+        while (iter.hasMoreElements()) {
+            String s = iter.nextElement();
+            Class<?> cur = Class.forName(s);
+            while (cur != null) {
+                if (cur.getSuperclass() == klass) {
+                    break;
+                }
+                cur = cur.getSuperclass();
+            }
+            if (cur != null) {
+                ret.add((Class<? extends T>) cur);
+            }
+        }
+        return ret;
     }
 }
 
