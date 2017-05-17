@@ -52,8 +52,6 @@ extern rs_element __attribute__((overloadable))
     return rs_retval;
 }
 
-#if defined(RS_G_RUNTIME) || !defined(RS_DEBUG_RUNTIME)
-
 // TODO: this needs to be optimized, obviously
 static void local_memcpy(void* dst, const void* src, size_t size) {
     char* dst_c = (char*) dst;
@@ -62,7 +60,32 @@ static void local_memcpy(void* dst, const void* src, size_t size) {
         *dst_c++ = *src_c++;
     }
 }
+
+#ifndef RS_DEBUG_RUNTIME
+uint8_t*
+rsOffset(rs_allocation a, uint32_t sizeOf, uint32_t x, uint32_t y,
+         uint32_t z) {
+    Allocation_t *alloc = (Allocation_t *)a.p;
+    uint8_t *p = (uint8_t *)alloc->mHal.drvState.lod[0].mallocPtr;
+    const uint32_t stride = (uint32_t)alloc->mHal.drvState.lod[0].stride;
+    const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
+    uint8_t *dp = &p[(sizeOf * x) + (y * stride) +
+                     (z * stride * dimY)];
+    return dp;
+}
 #endif
+
+uint8_t*
+rsOffsetNs(rs_allocation a, uint32_t x, uint32_t y, uint32_t z) {
+    Allocation_t *alloc = (Allocation_t *)a.p;
+    uint8_t *p = (uint8_t *)alloc->mHal.drvState.lod[0].mallocPtr;
+    const uint32_t stride = alloc->mHal.drvState.lod[0].stride;
+    const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
+    const uint32_t sizeOf = alloc->mHal.state.elementSizeBytes;;
+    uint8_t *dp = &p[(sizeOf * x) + (y * stride) +
+                     (z * stride * dimY)];
+    return dp;
+}
 
 #ifdef RS_DEBUG_RUNTIME
 #define ELEMENT_AT(T)                                                   \
@@ -110,30 +133,6 @@ static void local_memcpy(void* dst, const void* src, size_t size) {
         return tmp;                                                     \
     }
 #else  // NOT RS_DEBUG_RUNTIME
-
-uint8_t*
-rsOffset(rs_allocation a, uint32_t sizeOf, uint32_t x, uint32_t y,
-         uint32_t z) {
-    Allocation_t *alloc = (Allocation_t *)a.p;
-    uint8_t *p = (uint8_t *)alloc->mHal.drvState.lod[0].mallocPtr;
-    const uint32_t stride = (uint32_t)alloc->mHal.drvState.lod[0].stride;
-    const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
-    uint8_t *dp = &p[(sizeOf * x) + (y * stride) +
-                     (z * stride * dimY)];
-    return dp;
-}
-
-uint8_t*
-rsOffsetNs(rs_allocation a, uint32_t x, uint32_t y, uint32_t z) {
-    Allocation_t *alloc = (Allocation_t *)a.p;
-    uint8_t *p = (uint8_t *)alloc->mHal.drvState.lod[0].mallocPtr;
-    const uint32_t stride = alloc->mHal.drvState.lod[0].stride;
-    const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
-    const uint32_t sizeOf = alloc->mHal.state.elementSizeBytes;;
-    uint8_t *dp = &p[(sizeOf * x) + (y * stride) +
-                     (z * stride * dimY)];
-    return dp;
-}
 
 // The functions rsSetElementAtImpl_T and rsGetElementAtImpl_T are implemented in bitcode
 // in ll32/allocation.ll and ll64/allocation.ll. To be able to provide debug info for
@@ -249,6 +248,7 @@ ELEMENT_AT_IMPL_TYPE(double)
     SET_ELEMENT_AT(T)                           \
     GET_ELEMENT_AT(T)
 
+#endif // RS_DEBUG_RUNTIME
 
 extern const void * __attribute__((overloadable))
         rsGetElementAt(rs_allocation a, uint32_t x) {
@@ -302,7 +302,6 @@ extern void __attribute__((overloadable))
     const uint32_t dimY = alloc->mHal.drvState.lod[0].dimY;
     local_memcpy((void*)&p[(eSize * x) + (y * stride) + (z * stride * dimY)], ptr, eSize);
 }
-#endif // RS_DEBUG_RUNTIME
 
 ELEMENT_AT(char)
 ELEMENT_AT(char2)

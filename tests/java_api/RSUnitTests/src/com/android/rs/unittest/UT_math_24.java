@@ -22,7 +22,7 @@ import android.renderscript.RenderScript;
 public class UT_math_24 extends UnitTest {
 
     public UT_math_24(Context ctx) {
-        super("Math", ctx);
+        super("Math_24", ctx);
     }
 
     public void run() {
