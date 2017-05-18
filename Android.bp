@@ -197,6 +197,12 @@ cc_library_shared {
             },
         },
     },
+
+    product_variables: {
+        override_rs_driver: {
+            cflags: ["-DOVERRIDE_RS_DRIVER=%s"],
+        },
+    },
 }
 
 cc_library_shared {
@@ -231,12 +237,6 @@ cc_library_shared {
     static_libs: ["libRSDispatch"],
 
     version_script: "libRS.map",
-
-    product_variables: {
-        override_rs_driver: {
-            cflags: ["-DOVERRIDE_RS_DRIVER=%s"],
-        },
-    },
 }
 
 build = [

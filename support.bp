@@ -1,3 +1,13 @@
+cc_defaults {
+    name: "rs_support_defaults",
+    product_variables: {
+        unbundled_build: {
+            // Unbundled builds use prebuilts in prebuilts/sdk/renderscript instead
+            enabled: false,
+        },
+    },
+}
+
 // Generate custom headers
 gensrcs {
     name: "rs_generated_headers_support",
@@ -32,6 +42,7 @@ gensrcs {
 
 cc_library_shared {
     name: "libRSSupport",
+    defaults: ["rs_support_defaults"],
     sdk_version: "9",
 
     srcs: [

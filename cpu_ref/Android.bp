@@ -117,8 +117,5 @@ cc_library_shared {
             // is not available in PDK.
             enabled: false,
         },
-        override_rs_driver: {
-            cflags: ["-DOVERRIDE_RS_DRIVER=%s"],
-        },
     },
 }

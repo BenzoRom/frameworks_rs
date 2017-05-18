@@ -1,5 +1,6 @@
 cc_library_shared {
     name: "libRSSupportIO",
+    defaults: ["rs_support_defaults"],
 
     sdk_version: "14",
 
@@ -36,6 +37,7 @@ cc_library_shared {
 
 cc_library_shared {
     name: "librsjni",
+    defaults: ["rs_support_defaults"],
 
     sdk_version: "9",
 
