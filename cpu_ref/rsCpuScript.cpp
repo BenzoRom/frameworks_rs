@@ -641,7 +641,13 @@ bool RsdCpuScriptImpl::forEachMtlsSetup(const Allocation ** ains,
         return false;
     }
 
-    if (inLen > 0) {
+    // The only situation where ains[j] is null is when inLen==1 and j==0;
+    // and that can only happen for an old-style kernel in API level 11~13,
+    // where the input allocation cannot be skipped if the output allocation is specified.
+    if (inLen != 0)
+        rsAssert((inLen == 1) || (ains[0] != nullptr));
+
+    if (inLen > 0 && ains[0]) {
         const Allocation *ain0   = ains[0];
         const Type       *inType = ain0->getType();
 
@@ -652,7 +658,7 @@ bool RsdCpuScriptImpl::forEachMtlsSetup(const Allocation ** ains,
         for (int Index = inLen; --Index >= 1;) {
             if (!ain0->hasSameDims(ains[Index])) {
                 mCtx->getContext()->setError(RS_ERROR_BAD_SCRIPT,
-                  "Failed to launch kernel; dimensions of input"
+                  "Failed to launch kernel; dimensions of input "
                   "allocations do not match.");
                 return false;
             }
@@ -675,7 +681,7 @@ bool RsdCpuScriptImpl::forEachMtlsSetup(const Allocation ** ains,
     }
 
     if (inLen > 0 && aout != nullptr) {
-        if (!ains[0]->hasSameDims(aout)) {
+        if (ains[0] && !ains[0]->hasSameDims(aout)) {
             mCtx->getContext()->setError(RS_ERROR_BAD_SCRIPT,
               "Failed to launch kernel; dimensions of input and output allocations do not match.");
 
@@ -705,6 +711,12 @@ bool RsdCpuScriptImpl::forEachMtlsSetup(const Allocation ** ains,
     if (inLen > 0) {
         mtls->fep.inLen = inLen;
         for (int index = inLen; --index >= 0;) {
+            if (ains[index] == nullptr) {
+                // In old style kernels, the first and only input allocation could be null.
+                // Not allowed in newer styles.
+                rsAssert(inLen == 1 && index == 0);
+                continue;
+            }
             mtls->fep.inPtr[index] = (const uint8_t*)ains[index]->mHal.drvState.lod[0].mallocPtr;
             mtls->fep.inStride[index] = ains[index]->getType()->getElementSizeBytes();
         }
