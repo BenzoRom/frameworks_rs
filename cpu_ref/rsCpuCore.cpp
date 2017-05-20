@@ -332,7 +332,14 @@ static inline void FepPtrSetup(const MTLaunchStructForEach *mtls, RsExpandKernel
                                uint32_t z = 0, uint32_t lod = 0,
                                RsAllocationCubemapFace face = RS_ALLOCATION_CUBEMAP_FACE_POSITIVE_X,
                                uint32_t a1 = 0, uint32_t a2 = 0, uint32_t a3 = 0, uint32_t a4 = 0) {
+    // When rsForEach passes a null input allocation (as opposed to no input),
+    // fep->inLen can be 1 with mtls->ains[0] being null.
+    // This should only happen on old style kernels.
     for (uint32_t i = 0; i < fep->inLen; i++) {
+        if (mtls->ains[i] == nullptr) {
+            rsAssert(fep->inLen == 1);
+            continue;
+        }
         fep->inPtr[i] = (const uint8_t *)mtls->ains[i]->getPointerUnchecked(x, y, z, lod, face, a1, a2, a3, a4);
     }
     if (mtls->aout[0] != nullptr) {
