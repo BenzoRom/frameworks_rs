@@ -491,6 +491,7 @@ bool Context::initContext(Device *dev, const RsSurfaceConfig *sc) {
 
     if (!mIO.init()) {
         ALOGE("Failed initializing IO Fifo");
+        pthread_mutex_unlock(&gInitMutex);
         return false;
     }
     mIO.setTimeoutCallback(printWatchdogInfo, this, 2e9);
