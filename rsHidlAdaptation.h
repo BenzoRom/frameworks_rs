@@ -32,6 +32,10 @@ using ::android::hardware::renderscript::V1_0::IContext;
  * 1. Load the dispatch table with HIDL implementation or CPU fallback.
  * 2. Convert input paramters to HIDL types, when using HIDL path.
  * 3. Convert output parameters from HIDL types to RS types, when using HIDL path.
+ *
+ * Access of static member objects is protected by global teardown flag.
+ * https://goto.google.com/rs-static-destructor
+ *
  */
 class RsHidlAdaptation
 {
