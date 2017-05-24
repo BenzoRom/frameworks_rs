@@ -71,7 +71,6 @@ def build(out_dir):
 
 def build_product(out_dir, product):
     env = dict(ORIG_ENV)
-    env['ANDROID_USE_BUILDCACHE'] = 'false'
     env['FORCE_BUILD_LLVM_COMPONENTS'] = 'true'
     env['FORCE_BUILD_RS_COMPAT'] = 'true'
     env['OUT_DIR'] = out_dir
