@@ -109,12 +109,43 @@ extern "C" void rsDeviceSetConfig(RsDevice dev, RsDeviceParam p, int32_t value)
  */
 extern "C" int gDebuggerPresent = 0;
 
-// Context
+namespace{
+// Use reflection to query the default cache dir.
+std::string queryCacheDir() {
+    std::string cacheDir;
+    // First check if we have JavaVM running in this process.
+    if (android::AndroidRuntime::getJavaVM()) {
+        JNIEnv* env = android::AndroidRuntime::getJNIEnv();
+        if (env) {
+            jclass cacheDirClass = env->FindClass("android/renderscript/RenderScriptCacheDir");
+            jfieldID cacheDirID = env->GetStaticFieldID(cacheDirClass, "mCacheDir", "Ljava/io/File;");
+            jobject cache_dir = env->GetStaticObjectField(cacheDirClass, cacheDirID);
 
-// Mutex for locking reflection operation.
-static std::mutex reflectionMutex;
-// The defaultCacheDir will be reused if set, instead of query JNI.
-static std::string defaultCacheDir;
+            if (cache_dir) {
+                jclass fileClass = env->FindClass("java/io/File");
+                jmethodID getPath = env->GetMethodID(fileClass, "getPath", "()Ljava/lang/String;");
+                jstring path_string = (jstring)env->CallObjectMethod(cache_dir, getPath);
+                const char *path_chars = env->GetStringUTFChars(path_string, NULL);
+
+                ALOGD("Successfully queried cache dir: %s", path_chars);
+                cacheDir = std::string(path_chars);
+                env->ReleaseStringUTFChars(path_string, path_chars);
+            } else {
+                ALOGD("Cache dir not initialized");
+            }
+        } else {
+            ALOGD("Failed to query the default cache dir.");
+        }
+    } else {
+        ALOGD("Non JavaVM found in the process.");
+    }
+
+    return cacheDir;
+}
+}
+
+
+// Context
 extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
                                      RsContextType ct, uint32_t flags)
 {
@@ -123,8 +154,29 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
         return nullptr;
     }
 
-    RsHidlAdaptation& instance = RsHidlAdaptation::GetInstance();
-    RsContext context = instance.GetEntryFuncs()->ContextCreate(vdev, version, sdkVersion, ct, flags);
+    RsContext context;
+    RsContextWrapper *ctxWrapper;
+
+    if (flags & RS_CONTEXT_LOW_LATENCY) {
+        // Use CPU path for LOW_LATENCY context.
+        RsFallbackAdaptation& instance = RsFallbackAdaptation::GetInstance();
+        context = instance.GetEntryFuncs()->ContextCreate(vdev, version, sdkVersion, ct, flags);
+        ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
+    } else {
+        RsHidlAdaptation& instance = RsHidlAdaptation::GetInstance();
+        context = instance.GetEntryFuncs()->ContextCreate(vdev, version, sdkVersion, ct, flags);
+        ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
+
+        static std::string defaultCacheDir = queryCacheDir();
+        if (defaultCacheDir.size() > 0) {
+            ALOGD("Setting cache dir: %s", defaultCacheDir.c_str());
+            rsContextSetCacheDir(ctxWrapper,
+                                 defaultCacheDir.c_str(),
+                                 defaultCacheDir.size());
+        }
+    }
+
+
     // Wait for debugger to attach if RS_CONTEXT_WAIT_FOR_ATTACH flag set.
     if (flags & RS_CONTEXT_WAIT_FOR_ATTACH) {
         while (!gDebuggerPresent) {
@@ -132,50 +184,9 @@ extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t s
         }
     }
 
-    RsContextWrapper *ctxWrapper = new RsContextWrapper{context, instance.GetEntryFuncs()};
     // Lock contextMap when adding new entries.
-    {
-        std::unique_lock<std::mutex> lock(contextMapMutex);
-        contextMap.insert(std::make_pair(context, ctxWrapper));
-    }
-
-    std::unique_lock<std::mutex> lock(reflectionMutex);
-    if (defaultCacheDir.size() == 0) {
-        // Use reflection to query the default cache dir.
-        // First check if we have JavaVM running in this process.
-        if (android::AndroidRuntime::getJavaVM()) {
-            JNIEnv* env = android::AndroidRuntime::getJNIEnv();
-            if (env) {
-                jclass cacheDirClass = env->FindClass("android/renderscript/RenderScriptCacheDir");
-                jfieldID cacheDirID = env->GetStaticFieldID(cacheDirClass, "mCacheDir", "Ljava/io/File;");
-                jobject cache_dir = env->GetStaticObjectField(cacheDirClass, cacheDirID);
-
-                if (cache_dir) {
-                    jclass fileClass = env->FindClass("java/io/File");
-                    jmethodID getPath = env->GetMethodID(fileClass, "getPath", "()Ljava/lang/String;");
-                    jstring path_string = (jstring)env->CallObjectMethod(cache_dir, getPath);
-                    const char *path_chars = env->GetStringUTFChars(path_string, NULL);
-
-                    ALOGD("Successfully queried cache dir: %s", path_chars);
-                    defaultCacheDir = std::string(path_chars);
-                    env->ReleaseStringUTFChars(path_string, path_chars);
-                } else {
-                    ALOGD("Cache dir not initialized");
-                }
-            } else {
-                ALOGD("Failed to query the default cache dir.");
-            }
-        } else {
-            ALOGD("Non JavaVM found in the process.");
-        }
-    }
-
-    if (defaultCacheDir.size() > 0) {
-        ALOGD("Setting cache dir: %s", defaultCacheDir.c_str());
-        rsContextSetCacheDir(ctxWrapper,
-                             defaultCacheDir.c_str(),
-                             defaultCacheDir.size());
-    }
+    std::unique_lock<std::mutex> lock(contextMapMutex);
+    contextMap.insert(std::make_pair(context, ctxWrapper));
 
     return (RsContext) ctxWrapper;
 }
