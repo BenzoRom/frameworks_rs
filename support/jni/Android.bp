@@ -31,6 +31,7 @@ cc_library_shared {
 
     ldflags: [
         "-Wl,--exclude-libs,libc++_static.a",
+        "-Wl,--hash-style=sysv",
     ],
     stl: "c++_static",
 }
@@ -66,7 +67,10 @@ cc_library_shared {
 
     required: ["libRSSupport"],
 
-    ldflags: ["-Wl,--exclude-libs,libc++_static.a"],
+    ldflags: [
+        "-Wl,--exclude-libs,libc++_static.a",
+        "-Wl,--hash-style=sysv",
+    ],
 
     stl: "c++_static",
 }
