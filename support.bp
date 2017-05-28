@@ -163,7 +163,10 @@ cc_library_shared {
         "liblog",
         "libdl",
     ],
-    ldflags: ["-Wl,--exclude-libs,libc++_static.a"],
+    ldflags: [
+        "-Wl,--exclude-libs,libc++_static.a",
+        "-Wl,--hash-style=sysv",
+    ],
     stl: "c++_static",
 
     cflags: [
