@@ -54,6 +54,12 @@ cc_library_shared {
 
         "libbcinfo",
     ],
+
+    product_variables: {
+        pdk: {
+            enabled: false,
+        },
+    },
 }
 
 // Build rsg-generator ====================
@@ -202,6 +208,9 @@ cc_library_shared {
         override_rs_driver: {
             cflags: ["-DOVERRIDE_RS_DRIVER=%s"],
         },
+        pdk: {
+            enabled: false,
+        },
     },
 }
 
@@ -233,6 +242,12 @@ cc_library_shared {
         "libcutils",
         "libandroid_runtime",
     ],
+
+    product_variables: {
+        pdk: {
+            enabled: false,
+        },
+    },
 
     static_libs: ["libRSDispatch"],
 
