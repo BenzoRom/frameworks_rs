@@ -29,6 +29,7 @@ typedef RsDevice (*DeviceCreateFnPtr) ();
 typedef void (*DeviceDestroyFnPtr) (RsDevice dev);
 typedef void (*DeviceSetConfigFnPtr) (RsDevice dev, RsDeviceParam p, int32_t value);
 typedef RsContext (*ContextCreateFnPtr)(RsDevice vdev, uint32_t version, uint32_t sdkVersion, RsContextType ct, uint32_t flags);
+typedef RsContext (*ContextCreateVendorFnPtr)(RsDevice vdev, uint32_t version, uint32_t sdkVersion, RsContextType ct, uint32_t flags, const char* vendorDriverName);
 typedef void (*GetNameFnPtr)(RsContext, void * obj, const char **name);
 typedef RsClosure (*ClosureCreateFnPtr)(RsContext, RsScriptKernelID, RsAllocation, RsScriptFieldID*, size_t, int64_t*, size_t, int*, size_t, RsClosure*, size_t, RsScriptFieldID*, size_t);
 typedef RsClosure (*InvokeClosureCreateFnPtr)(RsContext, RsScriptInvokeID, const void*, const size_t, const RsScriptFieldID*, const size_t, const int64_t*, const size_t, const int*, const size_t);
@@ -177,6 +178,7 @@ struct dispatchTable {
     ClosureSetArgFnPtr ClosureSetArg;
     ClosureSetGlobalFnPtr ClosureSetGlobal;
     ContextCreateFnPtr ContextCreate;
+    ContextCreateVendorFnPtr ContextCreateVendor;
     ContextDeinitToClientFnPtr ContextDeinitToClient;
     ContextDestroyFnPtr ContextDestroy;
     ContextDumpFnPtr ContextDump;
