@@ -25,14 +25,20 @@ using android::renderscript::Context;
 using android::renderscript::Device;
 using android::renderscript::ObjectBase;
 
-extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
-                                      RsContextType ct, uint32_t flags) {
+extern "C" RsContext rsContextCreateVendor(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
+                                           RsContextType ct, uint32_t flags,
+                                           const char* vendorDriverName) {
     Device * dev = static_cast<Device *>(vdev);
-    Context *rsc = Context::createContext(dev, nullptr, ct, flags);
+    Context *rsc = Context::createContext(dev, nullptr, ct, flags, vendorDriverName);
     if (rsc) {
         rsc->setTargetSdkVersion(sdkVersion);
     }
     return rsc;
+}
+
+extern "C" RsContext rsContextCreate(RsDevice vdev, uint32_t version, uint32_t sdkVersion,
+                                      RsContextType ct, uint32_t flags) {
+    return rsContextCreateVendor(vdev, version, sdkVersion, ct, flags, nullptr);
 }
 
 extern "C" void rsaContextSetNativeLibDir(RsContext con, char *libDir, size_t length) {
