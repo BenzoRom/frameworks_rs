@@ -171,18 +171,16 @@ public abstract class UnitTest {
         }
     }
 
-    public static Iterable<Class<? extends UnitTest>> getProperSubclasses()
+    public static Iterable<Class<? extends UnitTest>> getProperSubclasses(Context ctx)
             throws ClassNotFoundException, IOException {
-        return getProperSubclasses(UnitTest.class);
+        return getProperSubclasses(UnitTest.class, ctx);
     }
 
     /** Returns a list of all proper subclasses of the input class */
-    private static <T> Iterable<Class<? extends T>> getProperSubclasses(Class<T> klass)
+    private static <T> Iterable<Class<? extends T>> getProperSubclasses(Class<T> klass, Context ctx)
             throws ClassNotFoundException, IOException {
-        Context context = InstrumentationRegistry.getTargetContext();
-
         ArrayList<Class<? extends T>> ret = new ArrayList<>();
-        DexFile df = new DexFile(context.getPackageCodePath());
+        DexFile df = new DexFile(ctx.getPackageCodePath());
         Enumeration<String> iter = df.entries();
         while (iter.hasMoreElements()) {
             String s = iter.nextElement();
