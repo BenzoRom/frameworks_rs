@@ -81,7 +81,8 @@ public:
 
     static Context * createContext(Device *, const RsSurfaceConfig *sc,
             RsContextType ct = RS_CONTEXT_TYPE_NORMAL,
-            uint32_t flags = 0);
+            uint32_t flags = 0,
+            const char* vendorDriverName = nullptr);
     static Context * createContextLite();
     ~Context();
 
@@ -353,6 +354,7 @@ private:
     // Since this is always just a static string, we don't have to
     // allocate, copy, or free any memory here.
     const char* mDriverName;
+    const char* mVendorDriverName;
 
     std::vector<ObjectBase *> mNames;
 
