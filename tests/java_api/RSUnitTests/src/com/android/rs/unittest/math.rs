@@ -301,7 +301,6 @@ static bool test_fp_math(uint32_t index) {
     TEST_FN_FUNC_FN_F(fmin);
     TEST_FN_FUNC_FN_FN(fmod);
     TEST_FN_FUNC_FN_PFN(fract);
-    TEST_FN_FUNC_FN(fract);
     TEST_FN_FUNC_FN_PIN(frexp);
     TEST_FN_FUNC_FN_FN(hypot);
     TEST_IN_FUNC_FN(ilogb);
