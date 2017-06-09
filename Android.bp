@@ -185,6 +185,7 @@ cc_library_shared {
     required: [
         "libclcore.bc",
         "libclcore_debug.bc",
+        "libclcore_debug_g.bc",
         "libclcore_g.bc",
         "libcompiler_rt",
     ],
