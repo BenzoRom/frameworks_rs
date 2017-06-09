@@ -447,6 +447,9 @@ const char* RsdCpuScriptImpl::findCoreLib(const bcinfo::MetadataExtractor& ME, c
 
     // If we're debugging, use the debug library.
     if (mCtx->getContext()->getContextType() == RS_CONTEXT_TYPE_DEBUG) {
+        if (ME.hasDebugInfo()) {
+            return SYSLIBPATH_BC"/libclcore_debug_g.bc";
+        }
         return SYSLIBPATH_BC"/libclcore_debug.bc";
     }
 
