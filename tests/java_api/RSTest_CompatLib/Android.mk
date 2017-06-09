@@ -38,6 +38,3 @@ LOCAL_RENDERSCRIPT_FLAGS := -rs-package-name=android.support.v8.renderscript
 
 include $(BUILD_PACKAGE)
 
-# Allows RSTest_Compat.apk to be added to DIST_DIR when "m dist RSTest_Compat"
-$(call dist-for-goals,$(LOCAL_PACKAGE_NAME),\
-    $(LOCAL_BUILT_MODULE):$(LOCAL_PACKAGE_NAME).apk)
