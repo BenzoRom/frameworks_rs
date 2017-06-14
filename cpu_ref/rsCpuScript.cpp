@@ -108,7 +108,13 @@ static void setCompileArguments(std::vector<const char*>* args,
         // Only load additional libraries for compiles that don't use
         // the debug context.
         if (bccPluginName && strlen(bccPluginName) > 0) {
+#ifdef __ANDROID__
+            // For Android, -plugin option must be used in order to load the
+            // vendor plugin from the sphal namespace.
+            args->push_back("-plugin");
+#else
             args->push_back("-load");
+#endif
             args->push_back(bccPluginName);
         }
     }
