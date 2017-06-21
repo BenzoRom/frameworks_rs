@@ -162,6 +162,7 @@ static bool compileBitcode(const std::string &bcFileName,
 // reinstalled, which would already clear the code_cache/ directory.
 bool isChecksumNeeded(const char *cacheDir) {
     if ((::strcmp(SYSLIBPATH, cacheDir) == 0) ||
+        (::strcmp(SYSLIBPATH_VNDK, cacheDir) == 0) ||
         (::strcmp(SYSLIBPATH_VENDOR, cacheDir) == 0))
         return false;
     char buf[PROP_VALUE_MAX];
