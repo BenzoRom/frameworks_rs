@@ -104,4 +104,3 @@ include $(BUILD_PACKAGE)
 
 my_rs_unit_tests_path :=
 
-$(call dist-for-goals,$(LOCAL_PACKAGE_NAME),$(LOCAL_BUILT_MODULE):$(LOCAL_PACKAGE_NAME).apk)
