@@ -33,6 +33,3 @@ LOCAL_COMPATIBILITY_SUITE := device-tests
 
 include $(BUILD_PACKAGE)
 
-# Allows RSTest.apk to be added to DIST_DIR when "m dist RSTest"
-$(call dist-for-goals,$(LOCAL_PACKAGE_NAME),\
-    $(LOCAL_BUILT_MODULE):$(LOCAL_PACKAGE_NAME).apk)
