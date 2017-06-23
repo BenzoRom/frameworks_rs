@@ -17,8 +17,8 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
 LOCAL_PACKAGE_NAME := RSTestBackward
+LOCAL_MODULE_TAGS := tests
 
 LOCAL_SRC_FILES := \
     $(call all-java-files-under, src)\
@@ -33,6 +33,3 @@ LOCAL_MIN_SDK_VERSION := 21
 
 include $(BUILD_PACKAGE)
 
-# Allows RSTestBackward.apk to be added to DIST_DIR when "m dist RSTestBackward"
-$(call dist-for-goals,$(LOCAL_PACKAGE_NAME),\
-    $(LOCAL_BUILT_MODULE):$(LOCAL_PACKAGE_NAME).apk)
