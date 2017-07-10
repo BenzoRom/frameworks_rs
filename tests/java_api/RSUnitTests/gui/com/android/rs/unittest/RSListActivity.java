@@ -20,6 +20,7 @@ public abstract class RSListActivity extends ListActivity {
     protected abstract Iterable<Class<? extends UnitTest>> getUnitTests() throws Exception;
 
     protected abstract void logStartUnitTest(UnitTest test);
+    protected abstract void logEndUnitTest(UnitTest test);
 
     @Override
     public void onCreate(Bundle bundle) {
@@ -71,6 +72,7 @@ public abstract class RSListActivity extends ListActivity {
                 for (UnitTest unitTest : validUnitTests) {
                     RSListActivity.this.logStartUnitTest(unitTest);
                     unitTest.runTest();
+                    RSListActivity.this.logEndUnitTest(unitTest);
                     RSListActivity.this.runOnUiThread(adapter::notifyDataSetChanged);
                 }
             };
