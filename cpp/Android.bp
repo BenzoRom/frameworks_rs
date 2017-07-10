@@ -10,6 +10,7 @@ cc_library_static {
         "-Werror",
         "-Wno-unused-parameter",
         "-std=c++11",
+        "-DRS_COMPATIBILITY_LIB",
     ],
 
     sdk_version: "9",
