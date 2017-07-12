@@ -8,6 +8,7 @@ cc_library_static {
     cflags: [
         "-Wno-unused-parameter",
         "-std=c++11",
+        "-DRS_COMPATIBILITY_LIB",
     ],
 
     sdk_version: "9",
