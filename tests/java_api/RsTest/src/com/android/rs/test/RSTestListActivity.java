@@ -31,11 +31,13 @@ public class RSTestListActivity extends RSListActivity {
         return UnitTest.getProperSubclasses(this);
     }
 
+    @Override
     protected void logStartUnitTest(UnitTest test) {
-        String thisDeviceName = android.os.Build.DEVICE;
-        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-        Log.i(TAG, String.format("RenderScript testing (%s) "
-                + "on device %s, API version %d",
-                test.toString(), thisDeviceName, thisApiVersion));
+        test.logStart(TAG, "RenderScript Testing");
+    }
+
+    @Override
+    protected void logEndUnitTest(UnitTest test) {
+        test.logEnd(TAG);
     }
 }
