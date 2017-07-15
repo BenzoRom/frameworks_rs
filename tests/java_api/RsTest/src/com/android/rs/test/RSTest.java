@@ -70,12 +70,9 @@ public class RSTest {
     @Test
     @MediumTest
     public void testRSUnitTest() throws Exception {
-        String thisDeviceName = android.os.Build.DEVICE;
-        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-        Log.i(TAG, String.format("RenderScript testing (%s) "
-                + "on device %s, API version %d",
-                mTest.toString(), thisDeviceName, thisApiVersion));
+        mTest.logStart(TAG, "RenderScript Testing");
         mTest.runTest();
+        mTest.logEnd(TAG);
         Assert.assertTrue(mTest.getSuccess());
     }
 }
