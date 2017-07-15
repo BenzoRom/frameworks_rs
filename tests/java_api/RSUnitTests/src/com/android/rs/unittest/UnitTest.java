@@ -38,7 +38,24 @@ public abstract class UnitTest {
         UT_NOT_STARTED,
         UT_RUNNING,
         UT_SUCCESS,
-        UT_FAIL,
+        UT_FAIL;
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case UT_NOT_STARTED:
+                    return "NOT STARTED";
+                case UT_RUNNING:
+                    return "RUNNING";
+                case UT_SUCCESS:
+                    return "PASS";
+                case UT_FAIL:
+                    return "FAIL";
+                default:
+                    throw new RuntimeException(
+                        "missing enum case in UnitTestResult#toString()");
+            }
+        }
     }
 
     private final static String TAG = "RSUnitTest";
@@ -111,8 +128,25 @@ public abstract class UnitTest {
         }
     }
 
+    public void logStart(String tag, String testSuite) {
+        String thisDeviceName = android.os.Build.DEVICE;
+        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
+        Log.i(tag, String.format("%s: starting '%s' "
+                + "on device %s, API version %d",
+                testSuite, toString(), thisDeviceName, thisApiVersion));
+    }
+
+    public void logEnd(String tag) {
+        Log.i(tag, String.format("RenderScript test '%s': %s",
+                toString(), getResultString()));
+    }
+
     public UnitTestResult getResult() {
         return mResult;
+    }
+
+    public String getResultString() {
+        return mResult.toString();
     }
 
     public boolean getSuccess() {
