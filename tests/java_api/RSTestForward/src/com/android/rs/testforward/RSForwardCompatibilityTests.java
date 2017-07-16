@@ -53,7 +53,7 @@ public class RSForwardCompatibilityTests {
         List<UnitTest> validUnitTests = new ArrayList<>();
 
         Iterable<Class<? extends UnitTest>> testClasses =
-            RSUtils.getProperSubclasses(UnitTest.class);
+                UnitTest.getProperSubclasses(ctx);
         for (Class<? extends UnitTest> testClass : testClasses) {
             UnitTest test = testClass.getDeclaredConstructor(Context.class).newInstance(ctx);
             validUnitTests.add(test);
@@ -70,12 +70,9 @@ public class RSForwardCompatibilityTests {
     @Test
     @MediumTest
     public void testRSUnitTest() throws Exception {
-        String thisDeviceName = android.os.Build.DEVICE;
-        int thisApiVersion = android.os.Build.VERSION.SDK_INT;
-        Log.i(TAG, String.format("RenderScript forward compatibility testing (%s) "
-                + "on device %s, API version %d",
-                mTest.toString(), thisDeviceName, thisApiVersion));
+        mTest.logStart(TAG, "RenderScript Forward Compatibility Testing");
         mTest.runTest();
+        mTest.logEnd(TAG);
         Assert.assertTrue(mTest.getSuccess());
     }
 }
