@@ -63,7 +63,6 @@ public class RSTests {
             validClasses.add(UT_sampler.class);
             validClasses.add(UT_static_globals.class);
             validClasses.add(UT_struct.class);
-            validClasses.add(UT_struct_field_simple.class);
             validClasses.add(UT_unsigned.class);
             validClasses.add(UT_vector.class);
         }
@@ -106,6 +105,7 @@ public class RSTests {
         if (thisApiVersion >= 26) {
             validClasses.add(UT_blur_validation.class);
             validClasses.add(UT_struct_field.class);
+            validClasses.add(UT_struct_field_simple.class);
         }
 
         return validClasses;

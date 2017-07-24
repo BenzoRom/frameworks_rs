@@ -128,8 +128,6 @@ LOCAL_SRC_FILES := $(call all-java-files-under,../src)\
     $(my_rs_unit_tests_path)/static_globals.rs\
     $(my_rs_unit_tests_path)/UT_struct.java\
     $(my_rs_unit_tests_path)/struct.rs\
-    $(my_rs_unit_tests_path)/UT_struct_field_simple.java\
-    $(my_rs_unit_tests_path)/struct_field_simple.rs\
     $(my_rs_unit_tests_path)/UT_unsigned.java\
     $(my_rs_unit_tests_path)/unsigned.rs\
     $(my_rs_unit_tests_path)/UT_vector.java\
