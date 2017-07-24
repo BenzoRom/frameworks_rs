@@ -70,7 +70,6 @@ UNIT_TESTS = {
         'rstypes',
         'sampler',
         'static_globals',
-        'struct_field_simple',
         'struct',
         'unsigned',
         'vector',
@@ -114,6 +113,7 @@ UNIT_TESTS = {
     26: [
         'blur_validation',
         'struct_field',
+        'struct_field_simple',
     ],
 }
 
