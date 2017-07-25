@@ -57,6 +57,7 @@ public class RSTests {
             validClasses.add(UT_noroot.class);
             validClasses.add(UT_primitives.class);
             validClasses.add(UT_refcount.class);
+            validClasses.add(UT_reflection3264.class);
             validClasses.add(UT_rsdebug.class);
             validClasses.add(UT_rstime.class);
             validClasses.add(UT_rstypes.class);

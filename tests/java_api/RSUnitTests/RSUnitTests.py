@@ -65,6 +65,7 @@ UNIT_TESTS = {
         'noroot',
         'primitives',
         'refcount',
+        'reflection3264',
         'rsdebug',
         'rstime',
         'rstypes',
