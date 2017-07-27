@@ -111,6 +111,7 @@ public class RSTestCore {
         unitTests.add(new UT_struct_field(this, mCtx));
         unitTests.add(new UT_struct_field_simple(this, mCtx));
         unitTests.add(new UT_bitfield(this, mCtx));
+        unitTests.add(new UT_reflection3264(this, mCtx));
 
         /*
         unitTests.add(new UnitTest(null, "<Pass>", 1));

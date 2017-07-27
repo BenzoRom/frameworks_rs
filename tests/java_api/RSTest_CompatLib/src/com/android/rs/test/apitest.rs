@@ -20,7 +20,7 @@ volatile rs_data_kind dk;
 
 volatile rs_sampler_value rsv;
 
-volatile rs_time_t rst;
+volatile static rs_time_t rst;
 volatile static rs_tm rstm;
 
 char *allocPtr;
