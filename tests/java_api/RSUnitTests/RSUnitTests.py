@@ -34,10 +34,14 @@ import sys
 import os
 
 
-# List of API versions and the tests that correspond to the API version
-# The test name must correspond to a UT_{}.java file
+# List of platform API versions and the tests that pass on that version as
+# well as all newer versions (e.g. tests under 23 also pass on 24, 25, etc.).
+# The Slang version that correctly compiles the test is assumed to be the
+# same build tools version unless otherwise specified in
+# UNIT_TEST_TOOLS_VERSIONS below.
+# The test name must correspond to a UT_{}.java file.
 # e.g. alloc -> UT_alloc.java
-UNIT_TESTS = {
+UNIT_TEST_PLATFORM_VERSIONS = {
     19: [
         'alloc',
         'array_alloc',
@@ -119,6 +123,18 @@ UNIT_TESTS = {
 }
 
 
+# List of tests and the build tools version they compile correctly on.
+# The build tools version is the earliest build tools version that can
+# compile it correctly, all versions newer than that version are also
+# expected to compile correctly.
+# Only to override the platform version in UNIT_TEST_PLATFORM_VERSIONS.
+# Only affects forward compatibility tests.
+# Useful for Slang regression fixes.
+UNIT_TEST_TOOLS_VERSIONS = {
+    'reflection3264': 26,
+}
+
+
 # Tests that only belong to RSTest_Compat (support lib tests)
 SUPPORT_LIB_ONLY_UNIT_TESTS = {
     'alloc_supportlib',
@@ -182,7 +198,8 @@ def WriteMakeCopyright(gen_file):
   )
 
 
-def WriteMakeSrcFiles(gen_file, api_version, src_dir='src'):
+def WriteMakeSrcFiles(gen_file, api_version, src_dir='src',
+                      use_build_tools_version=False):
   """Writes applicable LOCAL_SRC_FILES to gen_file.
 
   Includes everything under ./src, base UnitTest class, and test files.
@@ -191,9 +208,13 @@ def WriteMakeSrcFiles(gen_file, api_version, src_dir='src'):
   # Get all tests compatible with the build tool version
   # Compatible means build tool version >= test version
   tests = []
-  for test_version, tests_for_version in UNIT_TESTS.iteritems():
+  for test_version, tests_for_version in (
+      UNIT_TEST_PLATFORM_VERSIONS.iteritems()):
     if api_version >= test_version:
       tests.extend(tests_for_version)
+  if use_build_tools_version:
+    tests = [x for x in tests if (x not in UNIT_TEST_TOOLS_VERSIONS or
+                                  test_version >= UNIT_TEST_TOOLS_VERSIONS[x])]
   tests = sorted(tests)
   gen_file.write(
       'LOCAL_SRC_FILES := $(call all-java-files-under,{})\\\n'
@@ -288,7 +309,7 @@ def SupportLibGenTestDir():
 def AllUnitTestsExceptSupportLibOnly():
   """Returns a set of all unit tests except SUPPORT_LIB_ONLY_UNIT_TESTS."""
   ret = set()
-  for _, tests in UNIT_TESTS.iteritems():
+  for _, tests in UNIT_TEST_PLATFORM_VERSIONS.iteritems():
     ret.update(tests)
   return ret
 
@@ -501,7 +522,7 @@ def WriteForwardMakefile(gen_file, build_tool_version, build_tool_version_name):
           build_tool_version_name, make_target_name, build_tool_version_name
       )
   )
-  WriteMakeSrcFiles(gen_file, build_tool_version, '../src')
+  WriteMakeSrcFiles(gen_file, build_tool_version, '../src', True)
   gen_file.write(
       '\n'
       'include $(BUILD_PACKAGE)\n\n'
@@ -589,9 +610,9 @@ def WriteBackwardJavaFile(gen_file, package, max_api_version=None):
           package
       )
   )
-  for version in sorted(UNIT_TESTS.keys()):
+  for version in sorted(UNIT_TEST_PLATFORM_VERSIONS.keys()):
     if max_api_version is None or version <= max_api_version:
-      tests = sorted(UNIT_TESTS[version])
+      tests = sorted(UNIT_TEST_PLATFORM_VERSIONS[version])
       gen_file.write(
           '\n\n        if (thisApiVersion >= {}) {{\n'.format(version)
       )
