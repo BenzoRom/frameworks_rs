@@ -228,9 +228,9 @@ llvm-rs-cc
 TOOLS_LIB="
 libbcc.$SONAME
 libbcinfo.$SONAME
-libclang.$SONAME
+libclang_android.$SONAME
 libc++.$SONAME
-libLLVM.$SONAME
+libLLVM_android.$SONAME
 "
 
 TOOLS_LIB32="libc++.$SONAME"
