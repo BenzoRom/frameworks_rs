@@ -96,6 +96,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/primitives.rs\
     $(my_rs_unit_tests_path)/UT_refcount.java\
     $(my_rs_unit_tests_path)/refcount.rs\
+    $(my_rs_unit_tests_path)/UT_reflection3264.java\
+    $(my_rs_unit_tests_path)/reflection3264.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug.java\
     $(my_rs_unit_tests_path)/rsdebug.rs\
     $(my_rs_unit_tests_path)/UT_rstime.java\
@@ -192,6 +194,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/primitives.rs\
     $(my_rs_unit_tests_path)/UT_refcount.java\
     $(my_rs_unit_tests_path)/refcount.rs\
+    $(my_rs_unit_tests_path)/UT_reflection3264.java\
+    $(my_rs_unit_tests_path)/reflection3264.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug.java\
     $(my_rs_unit_tests_path)/rsdebug.rs\
     $(my_rs_unit_tests_path)/UT_rstime.java\
@@ -298,6 +302,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/primitives.rs\
     $(my_rs_unit_tests_path)/UT_refcount.java\
     $(my_rs_unit_tests_path)/refcount.rs\
+    $(my_rs_unit_tests_path)/UT_reflection3264.java\
+    $(my_rs_unit_tests_path)/reflection3264.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug.java\
     $(my_rs_unit_tests_path)/rsdebug.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug_23.java\
@@ -427,6 +433,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/reduce_backward.rs\
     $(my_rs_unit_tests_path)/UT_refcount.java\
     $(my_rs_unit_tests_path)/refcount.rs\
+    $(my_rs_unit_tests_path)/UT_reflection3264.java\
+    $(my_rs_unit_tests_path)/reflection3264.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug.java\
     $(my_rs_unit_tests_path)/rsdebug.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug_23.java\
@@ -570,6 +578,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/reduce_backward.rs\
     $(my_rs_unit_tests_path)/UT_refcount.java\
     $(my_rs_unit_tests_path)/refcount.rs\
+    $(my_rs_unit_tests_path)/UT_reflection3264.java\
+    $(my_rs_unit_tests_path)/reflection3264.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug.java\
     $(my_rs_unit_tests_path)/rsdebug.rs\
     $(my_rs_unit_tests_path)/UT_rsdebug_23.java\
