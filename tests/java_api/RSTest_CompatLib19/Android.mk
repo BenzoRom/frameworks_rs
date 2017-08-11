@@ -33,7 +33,8 @@ LOCAL_RENDERSCRIPT_FLAGS := -rs-package-name=android.support.v8.renderscript
 LOCAL_MIN_SDK_VERSION := 8
 
 my_rs_unit_tests_path := ../RSUnitTests/supportlibsrc_gen/com/android/rs/unittest
-LOCAL_SRC_FILES := $(call all-java-files-under,src)\
+LOCAL_SRC_FILES :=\
+    $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/UnitTest.java\
     $(my_rs_unit_tests_path)/UT_alloc.java\
     $(my_rs_unit_tests_path)/alloc.rs\
