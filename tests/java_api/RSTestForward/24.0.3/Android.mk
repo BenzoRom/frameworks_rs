@@ -35,7 +35,9 @@ my_rs_path := $(TOP)/prebuilts/renderscript/host/linux-x86/24.0.3
 LOCAL_RENDERSCRIPT_CC := $(my_rs_path)/bin/llvm-rs-cc
 LOCAL_RENDERSCRIPT_INCLUDES_OVERRIDE := $(my_rs_path)/include $(my_rs_path)/clang-include
 my_rs_path :=
-LOCAL_SRC_FILES := $(call all-java-files-under,../src)\
+LOCAL_SRC_FILES :=\
+    $(call all-java-files-under,../src)\
+    $(call all-java-files-under,src)\
     $(my_rs_unit_tests_path)/UnitTest.java\
     $(my_rs_unit_tests_path)/UT_alloc.java\
     $(my_rs_unit_tests_path)/alloc.rs\
