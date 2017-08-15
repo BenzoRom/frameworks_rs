@@ -17,6 +17,11 @@ cc_defaults {
 
 cc_library_shared {
     name: "libRSDriver",
+    vendor_available: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
     defaults: ["rs_defaults"],
 
     srcs: [
@@ -53,6 +58,14 @@ cc_library_shared {
         "libnativewindow",
 
         "libbcinfo",
+    ],
+
+    static_libs: ["libarect"],
+
+    header_libs: [
+        "libcutils_headers",
+        "libutils_headers",
+        "libnativebase_headers",
     ],
 
     product_variables: {
@@ -112,6 +125,11 @@ gensrcs {
 
 cc_library_shared {
     name: "libRS_internal",
+    vendor_available: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
     defaults: ["rs_defaults"],
 
     srcs: [
@@ -180,6 +198,8 @@ cc_library_shared {
         "libmediandk",
     ],
 
+    static_libs: ["libarect"],
+
     // These runtime modules, including libcompiler_rt.so, are required for
     // RenderScript.
     required: [
@@ -218,6 +238,11 @@ cc_library_shared {
 cc_library_shared {
     name: "libRS",
     defaults: ["rs_defaults"],
+    vendor_available: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
 
     srcs: [
         "rsApiStubs.cpp",
