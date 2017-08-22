@@ -908,13 +908,13 @@ VariableInst *GlobalSection::getNumWorkgroups() {
 }
 
 bool FunctionDeclaration::DeserializeInternal(InputWordStream &IS) {
-  if (!Deserialize<FunctionInst>(IS)) {
+  if (!(mFunc = Deserialize<FunctionInst>(IS))) {
     return false;
   }
 
   DeserializeZeroOrMore<FunctionParameterInst>(IS, mParams);
 
-  if (!Deserialize<FunctionEndInst>(IS)) {
+  if (!(mFuncEnd = Deserialize<FunctionEndInst>(IS))) {
     return false;
   }
 
