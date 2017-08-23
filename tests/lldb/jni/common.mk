@@ -4,7 +4,7 @@ LOCAL_C_INCLUDES += $(JNI_H_INCLUDE)
 
 LOCAL_CPP_FEATURES += exceptions
 
-LOCAL_CFLAGS := -Werror -Wall -Wextra -std=c++11
+LOCAL_CFLAGS := -Werror -Wall -Wextra
 LOCAL_RENDERSCRIPT_FLAGS += -O0 -target-api 0
 
 LOCAL_SHARED_LIBRARIES += libdl liblog
