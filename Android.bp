@@ -238,12 +238,6 @@ cc_library_shared {
 cc_library_shared {
     name: "libRS",
     defaults: ["rs_defaults"],
-    vendor_available: true,
-    vndk: {
-        enabled: true,
-        support_system_process: true,
-    },
-
     srcs: [
         "rsApiStubs.cpp",
         "rsHidlAdaptation.cpp",
@@ -278,6 +272,11 @@ cc_library_shared {
     static_libs: ["libRSDispatch"],
 
     version_script: "libRS.map",
+}
+
+llndk_library {
+    name: "libRS",
+    symbol_file: "libRS.map",
 }
 
 cc_library_shared {
