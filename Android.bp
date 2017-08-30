@@ -203,27 +203,8 @@ cc_library_shared {
     // These runtime modules, including libcompiler_rt.so, are required for
     // RenderScript.
     required: [
-        "libclcore.bc",
-        "libclcore_debug.bc",
-        "libclcore_debug_g.bc",
-        "libclcore_g.bc",
         "libcompiler_rt",
     ],
-
-    arch: {
-        x86: {
-            required: ["libclcore_x86.bc"],
-        },
-        x86_64: {
-            required: ["libclcore_x86.bc"],
-        },
-
-        arm: {
-            neon: {
-                required: ["libclcore_neon.bc"],
-            },
-        },
-    },
 
     product_variables: {
         override_rs_driver: {
