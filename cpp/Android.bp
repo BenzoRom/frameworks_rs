@@ -6,6 +6,8 @@ cc_library_static {
     include_dirs: ["frameworks/rs"],
 
     cflags: [
+        "-Wall",
+        "-Werror",
         "-Wno-unused-parameter",
         "-std=c++11",
     ],
