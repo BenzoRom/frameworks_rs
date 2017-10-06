@@ -85,6 +85,14 @@ cc_binary_host {
         "rsg_generator.c",
     ],
 
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wno-error=unneeded-internal-declaration",
+        "-Wno-error=unused-function",
+        "-Wno-error=unused-variable",
+    ],
+
     stl: "none",
     sanitize: {
         never: true,
