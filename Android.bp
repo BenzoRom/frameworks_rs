@@ -237,6 +237,7 @@ cc_library_shared {
     required: [
         "libRS_internal",
         "libRSDriver",
+        "libRSCacheDir",
     ],
 
     // Treble configuration
@@ -249,7 +250,6 @@ cc_library_shared {
 
         "liblog",
         "libcutils",
-        "libandroid_runtime",
     ],
 
     product_variables: {
@@ -261,6 +261,23 @@ cc_library_shared {
     static_libs: ["libRSDispatch"],
 
     version_script: "libRS.map",
+}
+
+cc_library_shared {
+    name: "libRSCacheDir",
+    defaults: ["rs_defaults"],
+
+    srcs: ["rsCacheDir.cpp"],
+    shared_libs: [
+        "libandroid_runtime",
+        "liblog",
+    ],
+
+    product_variables: {
+        pdk: {
+            enabled: false,
+        },
+    },
 }
 
 build = [
