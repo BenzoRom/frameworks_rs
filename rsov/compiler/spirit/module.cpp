@@ -446,6 +446,7 @@ EntryPointDefinition::EntryPointDefinition(Builder *builder,
       mExecutionModel(execModel) {
   mName = strndup(name, strlen(name));
   mEntryPointInst = mBuilder->MakeEntryPoint(execModel, mFunction, mName);
+  (void)mExecutionModel; // suppress unused private field warning
 }
 
 bool EntryPointDefinition::DeserializeInternal(InputWordStream &IS) {
