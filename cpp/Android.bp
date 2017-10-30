@@ -1,19 +1,25 @@
 cc_library_static {
     name: "libRSDispatch",
+    vendor_available: true,
 
     srcs: ["rsDispatch.cpp"],
 
-    include_dirs: ["frameworks/rs"],
+    include_dirs: [
+        "frameworks/rs",
+        "libnativehelper/include_jni",
+    ],
 
     cflags: [
         "-Wall",
         "-Werror",
         "-Wno-unused-parameter",
         "-std=c++11",
+        "-DRS_COMPATIBILITY_LIB",
     ],
 
+
     sdk_version: "9",
-    shared_libs: ["libdl"],
+    shared_libs: ["libdl", "liblog"],
     // Used in librsjni, which is built as NDK code => no ASan.
     sanitize: {
         never: true,

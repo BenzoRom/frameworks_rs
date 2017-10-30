@@ -9,11 +9,11 @@
 
 #ifdef RS_COMPATIBILITY_LIB
 #include <stdio.h>
-#include <unistd.h>
 #else
 #include "bcc/Config.h"
 #endif
 
+#include <unistd.h>
 #include <dlfcn.h>
 #include <sys/stat.h>
 

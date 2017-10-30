@@ -1,6 +1,11 @@
 cc_library_shared {
     name: "libRSCpuRef",
     defaults: ["libbcc-targets"],
+    vendor_available: true,
+    vndk: {
+        enabled: true,
+        support_system_process: true,
+    },
 
     srcs: [
         "rsCpuCore.cpp",
@@ -97,6 +102,10 @@ cc_library_shared {
         "libblas",
     ],
     static_libs: ["libbnnmlowp"],
+    header_libs: [
+        "libutils_headers",
+        "libhardware_headers",
+    ],
 
     include_dirs: [
         "frameworks/compile/libbcc/include",
