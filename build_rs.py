@@ -60,7 +60,7 @@ def build(out_dir):
     products = (
         'aosp_arm',
         'aosp_arm64',
-        'aosp_mips',
+        # 'aosp_mips',
         # 'aosp_mips64',
         'aosp_x86',
         'aosp_x86_64',
