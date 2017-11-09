@@ -159,18 +159,16 @@ def install_built_host_files(build_dir, install_dir, host):
         built_files.extend([
             'lib/libbcc' + lib_ext,
             'lib/libbcinfo' + lib_ext,
-            'lib/libclang' + lib_ext,
-            'lib/libLLVM' + lib_ext,
+            'lib/libclang_android' + lib_ext,
+            'lib/libLLVM_android' + lib_ext,
         ])
     else:
         built_files.extend([
             'lib64/libbcc' + lib_ext,
             'lib64/libbcinfo' + lib_ext,
-            'lib64/libclang' + lib_ext,
-            'lib64/libLLVM' + lib_ext,
-            'lib64/libc++' + lib_ext,
             'lib64/libclang_android' + lib_ext,
             'lib64/libLLVM_android' + lib_ext,
+            'lib64/libc++' + lib_ext,
         ])
 
     for built_file in built_files:
