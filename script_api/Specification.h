@@ -597,7 +597,7 @@ public:
      */
     bool readSpecFile(const std::string& fileName, unsigned int maxApiLevel);
     // Generate all the files.
-    bool generateFiles(bool forVerification, unsigned int maxApiLevel) const;
+    bool generateFiles(unsigned int maxApiLevel) const;
 
     const std::vector<SpecFile*>& getSpecFiles() const { return mSpecFiles; }
     const std::map<std::string, Constant*>& getConstants() const { return mConstants; }
