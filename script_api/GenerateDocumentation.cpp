@@ -50,7 +50,7 @@ static void writeHeader(GeneratedFile* file, const string& title,
         // Output only the first two lines. Assuming there's no other HTML
         // markups there
         // TODO: escape/remove markups
-        for (int i = 0; i < std::min(desc.size(), 2UL); ++i) {
+        for (unsigned int i = 0; i < std::min(desc.size(), 2UL); ++i) {
             if (i) *file << " ";
             *file << desc[i];
         }
