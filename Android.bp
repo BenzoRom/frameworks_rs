@@ -311,5 +311,6 @@ build = [
 subdirs = [
     "cpp",
     "cpu_ref",
+    "script_api",
     "support",
 ]
