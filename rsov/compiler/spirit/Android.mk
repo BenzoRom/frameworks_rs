@@ -30,7 +30,7 @@ SPIRIT_SRCS := \
 
 LIBNAME = libspirit
 
-NDK_PREBUILTS := $(TOP)/prebuilts/ndk/r13
+NDK_PREBUILTS := $(TOP)/prebuilts/ndk/current
 SPIRV_TOOLS_PATH := $(NDK_PREBUILTS)/sources/third_party/shaderc/third_party/spirv-tools
 SPIRV_HEADERS_PATH := $(SPIRV_TOOLS_PATH)/external/spirv-headers
 SPIRV_CORE_GRAMMAR := $(SPIRV_HEADERS_PATH)/include/spirv/1.1/spirv.core.grammar.json
