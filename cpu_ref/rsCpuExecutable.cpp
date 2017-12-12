@@ -743,7 +743,8 @@ ScriptExecutable* ScriptExecutable::createFromSharedObject(
           goto error;
         } else {
           // skip the versionInfo packet as libRs doesn't use it
-          while (nLines--) {
+          while (nLines) {
+            --nLines;
             if (strgets(line, MAXLINE, &rsInfo) == nullptr)
               goto error;
           }
