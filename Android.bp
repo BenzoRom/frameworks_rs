@@ -192,6 +192,7 @@ cc_library_shared {
 
     shared_libs: [
         "liblog",
+        "libutilscallstack",
         "libutils",
         "libEGL",
         "libGLESv1_CM",
@@ -264,6 +265,7 @@ cc_library_shared {
         "libhidlbase",
         "libhidltransport",
         "libhwbinder",
+        "libutilscallstack",
         "libutils",
         "android.hardware.renderscript@1.0",
 
