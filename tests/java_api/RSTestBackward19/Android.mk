@@ -26,6 +26,7 @@ LOCAL_COMPATIBILITY_SUITE := device-tests
 LOCAL_RENDERSCRIPT_TARGET_API := 19
 LOCAL_MIN_SDK_VERSION := 17
 LOCAL_PACKAGE_NAME := RSTestBackward19
+LOCAL_SDK_VERSION := current
 my_rs_unit_tests_path := ../RSUnitTests/src/com/android/rs/unittest
 LOCAL_SRC_FILES :=\
     $(call all-java-files-under,src)\
