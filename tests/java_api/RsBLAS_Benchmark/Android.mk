@@ -17,8 +17,8 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_STATIC_JAVA_LIBRARIES := android-support-test legacy-android-test
-LOCAL_JAVA_LIBRARIES := android.test.runner
+LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
+LOCAL_JAVA_LIBRARIES := android.test.runner.stubs
 
 LOCAL_MODULE_TAGS := tests
 
@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src) \
 		   $(call all-renderscript-files-under, src)
 
 LOCAL_PACKAGE_NAME := RsBlasBenchmark
+LOCAL_SDK_VERSION := current
 LOCAL_JNI_SHARED_LIBRARIES := libgemmdata
 
 include $(BUILD_PACKAGE)
