@@ -126,6 +126,7 @@ gensrcs {
 cc_library_shared {
     name: "libRS_internal",
     vendor_available: true,
+    polly: false,
     vndk: {
         enabled: true,
         support_system_process: true,

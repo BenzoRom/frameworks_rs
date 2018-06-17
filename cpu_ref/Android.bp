@@ -2,6 +2,7 @@ cc_library_shared {
     name: "libRSCpuRef",
     defaults: ["libbcc-targets"],
     vendor_available: true,
+    polly: false,
     vndk: {
         enabled: true,
         support_system_process: true,
