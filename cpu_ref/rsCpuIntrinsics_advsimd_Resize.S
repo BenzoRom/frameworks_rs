@@ -147,16 +147,17 @@ END(rsdIntrinsicResize_oscctl_K)
  *             uint8_t const * restrict src0,   // x5
  *             uint8_t const * restrict src1,   // x6
  *             uint8_t const * restrict src2,   // x7
- *             size_t xclip,                    // [sp,#0]  -> [sp,#64] -> x12
- *             size_t avail,                    // [sp,#8]  -> [sp,#72] -> x11
- *             uint64_t osc_ctl,                // [sp,#16] -> [sp,#80] -> x10
- *             int32 const *yr,                 // [sp,#24] -> [sp,#88] -> v4   (copied to v3   for scalar access)
+ *             size_t xclip,                    // [sp,#0]  -> [sp,#80] -> x12
+ *             size_t avail,                    // [sp,#8]  -> [sp,#88] -> x11
+ *             uint64_t osc_ctl,                // [sp,#16] -> [sp,#96] -> x10
+ *             int32 const *yr,                 // [sp,#24] -> [sp,#104] -> v4   (copied to v3   for scalar access)
  */
 ENTRY(rsdIntrinsicResizeB\comp\()_K)
-            sub         x8, sp, #32
-            sub         sp, sp, #64
+            sub         x8, sp, #48
+            sub         sp, sp, #80
             st1         {v8.1d - v11.1d}, [sp]
             st1         {v12.1d - v15.1d}, [x8]
+            str         x19, [x8, #32]
 
             /* align the working buffer on the stack to make it easy to use bit
              * twiddling for address calculations.
@@ -164,7 +165,7 @@ ENTRY(rsdIntrinsicResizeB\comp\()_K)
             sub         x12, sp, #BUFFER_SIZE
             bic         x12, x12, #(1 << (CHUNKSHIFT + 1 + COMPONENT_SHIFT + 1)) - 1
 
-            ldr         x8, [sp,#88]            // yr
+            ldr         x8, [sp,#104]           // yr
             adr         x9, 8f
             ld1         {v4.4s}, [x8]
             ld1         {v5.8h}, [x9]
@@ -184,10 +185,10 @@ ENTRY(rsdIntrinsicResizeB\comp\()_K)
             lsl         x9, x3, #VECSHIFT
             add         x8, x8, x9
 
-            ldr         x10, [sp,#80]           // osc_ctl
-            ldp         x13,x11, [sp,#64]       // xclip, avail
+            ldr         x10, [sp,#96]           // osc_ctl
+            ldp         x13,x11, [sp,#80]       // xclip, avail
 
-            mov         x18, sp
+            mov         x19, sp
             mov         sp, x12
 
             /* x4-x7 contain pointers to the four lines of input to be
@@ -742,9 +743,10 @@ ENTRY(rsdIntrinsicResizeB\comp\()_K)
             st1         {v8.b}[0], [x0], #1
 .endif
 1:
-9:          mov         sp, x18
+9:          mov         sp, x19
             ld1         {v8.1d - v11.1d}, [sp], #32
             ld1         {v12.1d - v15.1d}, [sp], #32
+            ldr         x19, [sp], #16
             ret
 END(rsdIntrinsicResizeB\comp\()_K)
 .endr
